@@ -307,7 +307,7 @@ void Rcn600::process(void) {
 						CV_Value = notifySusiCVRead(CV_Number);
 					}
 					else {
-						CV_Value = 255;		//Se non è implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
+						CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
 					}
 				}
 				 
@@ -351,7 +351,7 @@ void Rcn600::process(void) {
 						CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
 					}
 					else {
-						CV_Value = 254;		//Se non è implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 254
+						CV_Value = 254;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 254
 					}
 				}
 
@@ -386,7 +386,7 @@ void Rcn600::process(void) {
 							if (notifySusiCVWrite((897 + (SusiData.MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
 								Data_ACK();
 							}
-							//nel caso in cui non è implementato un sistema di memorizzazione CVs, non faccio nulla
+							//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
 						}
 					}
 					break;
