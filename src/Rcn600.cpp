@@ -403,7 +403,23 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 119: {														// Controllo Valore CV
+		case 119: {	
+			/* "CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
+			*
+			* DCC-Befehl Byte Prüfen im Service- und Betriebsmodus
+			* V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
+			* D = Vergleichswert zum Prüfen. Wenn D dem gespeicherten CV-Wert
+			* entspricht, antwortet der Slave mit einem Acknowledge. 
+			* Dieser und die beiden folgenden Befehle sind die in Abschnitt 4 genannten
+			* 3 Byte Pakete entsprechend [RCN-214] 
+			* 
+			* Controllo byte di comando DCC in modalita' di servizio e di funzionamento
+			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
+			* D = valore di confronto per il controllo. Se D corrisponde al valore CV memorizzato
+			* lo Slave risponde con un riconoscimento.
+			* Questo ei due comandi seguenti sono quelli menzionati nella sezione 4
+			* Pacchetti da 3 byte secondo [RCN-214]
+			*/
 			static uint16_t CV_Number;
 			static uint8_t CV_Value;
 
