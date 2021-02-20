@@ -149,6 +149,5 @@ void setup() {
 }
 
 void loop() {
-  // You MUST call the NmraDcc.process() method frequently from the Arduino loop() function for correct library operation
   SUSI.process();
 }

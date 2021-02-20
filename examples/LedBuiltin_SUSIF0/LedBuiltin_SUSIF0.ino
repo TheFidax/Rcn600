@@ -20,5 +20,5 @@ void setup() {
 }
 
 void loop() {
-  SUSI.process();     // Elaboro pi� volte possibile i dati acquisiti
+  SUSI.process();     // Elaboro piu' volte possibile i dati acquisiti
 }
