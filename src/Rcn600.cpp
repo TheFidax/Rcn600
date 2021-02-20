@@ -456,6 +456,35 @@ void Rcn600::process(void) {
 			*/
 			break;
 		}
+		case 81: {
+			/* " "Soll" Geschwindigkeit " : 0101-0001 (0x51 = 81) R G6 G5 G4 - G3 G2 G1 G0
+			*
+			* Interne Fahrstufe des "Masters" entsprechend der über die Kennlinie (CVs
+			* 67 bis 94, CVs 2, 6 und 5) und sonstiger CVs, die die Geschwindigkeit des
+			* Fahrzeugs bestimmen, umgerechnete empfangene Fahrstufe auf 127
+			* Fahrstufen normalisiert. D.h. der höchste aufgrund der CVs 94 und/oder
+			* CV5 bzw. sonstiger entsprechender CVs erreichbare Wert wird auf 127
+			* normiert. CVs für Beschleunigung und Bremsen wie die CVs 3, 4, 23 und
+			* 24 gehen in die Berechnung nicht ein. G = 0 bedeutet Lok hält, G = 1 ...
+			* 127 ist die Geschwindigkeit R = Fahrtrichtung mit R = 0 für rückwärts und
+			* R = 1 für vorwärts.
+			* Da die Decoder unterschiedliche Verfahren zur Bestimmung der
+			* Höchstgeschwindigkeit verwenden, kann es hier leicht unterschiedliche
+			* Implementationen geben. Wichtig ist vor allem, dass sich die Befehle für
+			* Ist und Soll-Geschwindigkeit gleich verhalten.
+			* 
+			* 
+			* Gradino di velocita' interno del "master" secondo la curva caratteristica (CVs Da 67 a 94, CV 2, 6 e 5) e altri CV che aumentano la velocita' del file Determina il veicolo,
+			* convertito il passo di velocita' ricevuto a 127 Gradini di velocita' normalizzati.
+			* Vale a dire il piu' alto basato sui CV 94 e / CV5.
+			* il valore ottenibile di altri CV corrispondenti e' impostato su 127 normalizzato.
+			* CV per accelerazione e frenata come CV 3, 4, 23 e 24 non sono inclusi nel calcolo.
+			* G = 0 significa che la locomotiva si ferma, G = 1 ... 127 e' la velocita', R = senso di marcia con R = 0 per indietro e R = 1 per avanti.
+			* Poiche' i decoder hanno metodi diversi per determinare la velocita' massima, puo' essere leggermente diverso qui Dare implementazioni. 
+			* Soprattutto, e' importante che i comandi per la velocita' effettiva e quella target si comportano allo stesso modo.
+			*/
+			break;
+		}
 
 
 
