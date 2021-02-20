@@ -188,43 +188,50 @@ void Rcn600::process(void) {
 
 		/* Devo controllare il valore del primo Byte */
 		switch (SusiData.MessageByte[0]) {
-		case 96: {														// Gruppo Funzioni Digitali 1: F0 -> F4
+		case 96: {
+			/* "Funktionsgruppe 1" : 0110-0000 (0x60 = 96) 0 0 0 F0 - F4 F3 F2 F1 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_0_4, SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 97: {														// Gruppo Funzioni Digitali 2: F5 -> F12
+		case 97: {
+			/* "Funktionsgruppe 2" : 0110-0001 (0x61 = 97) F12 F11 F10 F9 - F8 F7 F6 F5 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_5_12, SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 98: {														// Gruppo Funzioni Digitali 3: F13 -> F20
+		case 98: {
+			/* "Funktionsgruppe 3" : 0110-0010 (0x62 = 98) F20 F19 F18 F17 - F16 F15 F14 F13 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_13_20, SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 99: {														// Gruppo Funzioni Digitali 4: F21 -> F28
+		case 99: {
+			/* "Funktionsgruppe 4" : 0110-0011 (0x63 = 99) F28 F27 F26 F25 - F24 F23 F22 F21 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_21_28, SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 100: {														// Gruppo Funzioni Digitali 5: F29 -> F36
+		case 100: {
+			/* "Funktionsgruppe 5" : 0110-0100 (0x64 = 100) F36 F35 F34 F33 - F32 F31 F30 F29 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_29_36, SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 101: {														// Gruppo Funzioni Digitali 6: F37 -> F44
+		case 101: {
+			/* "Funktionsgruppe 6" : 0110-0101 (0x65 = 101) F44 F43 F42 F41 - F40 F39 F38 F37 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_37_44, SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 102: {														// Gruppo Funzioni Digitali 7: F45 -> F52
+		case 102: {
+			/* "Funktionsgruppe 7" : 0110-0110 (0x66 = 102) F52 F51 F50 F49 - F48 F47 F46 F45 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_45_52, SusiData.MessageByte[1]);
 			}
@@ -245,7 +252,7 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 109: {													
-			/* "Binärzustände kurze Form" ( Forma abbreviata degli stati binari ):  0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 */
+			/* "Binärzustände kurze Form" :  0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 */
 			static uint8_t functionNumber, funcState;
 			funcState = bitRead(SusiData.MessageByte[1], 7);	//leggo il valore dello stato 'D'
 			bitWrite(SusiData.MessageByte[1], 7, 0);		//elimino il valore dello stato
