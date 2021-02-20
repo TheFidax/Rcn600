@@ -8,6 +8,7 @@ Libreria testa su Arduino UNO.
 Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI (Clock e Dati); la linea Clock va collegata ad un pin di tipo **Interrupt**.
 
 Data  ---> 470Ω ---> Pin generico (anche di tipo analogico)
+
 Clock ---> 470Ω ---> Pin Interrupt
 
 Maggiori informazioni della specifiva "*RCN-600.pdf*".
