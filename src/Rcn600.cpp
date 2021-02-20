@@ -242,6 +242,58 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
+		case 109: {														// " Binärzustände kurze Form " ( Forma abbreviata degli stati binari ): 
+			/* 0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 */
+			static uint8_t functionNumber, funcState;
+			funcState = bitRead(SusiData.MessageByte[1], 7);	//leggo il valore dello stato 'D'
+			bitWrite(SusiData.MessageByte[1], 7, 0);		//elimino il valore dello stato
+			functionNumber = SusiData.MessageByte[1];		//i restanti bit identificano la Funzione 'L'
+
+			/*
+			*	D = 0 bedeutet Funktion L ausgeschaltet, D = 1 eingeschaltet	
+			*	L = Funktionsnummer 1 ... 127
+			*	L = 0 (Broadcast) schaltet alle Funktionen 1 bis 127 aus (D = 0) oder an (D = 1) 
+			* 
+			*	D = 0 significa funzione L disattivata, D = 1 attivata
+			*	L = numero funzione 1 ... 127
+			*	L = 0 (trasmissione) disattiva (D = 0) o attiva tutte le funzioni da 1 a 127 (D = 1)
+			*/
+
+			if (functionNumber == 0) {
+				// Comanda tutte le funzioni
+				if (notifySusiFunc) {
+					if (funcState == 0) {	// disattivo tutte le funzioni
+						notifySusiFunc(SUSI_FN_0_4, 0);
+						notifySusiFunc(SUSI_FN_5_12, 0);
+						notifySusiFunc(SUSI_FN_13_20, 0);
+						notifySusiFunc(SUSI_FN_21_28, 0);
+						notifySusiFunc(SUSI_FN_29_36, 0);
+						notifySusiFunc(SUSI_FN_37_44, 0);
+						notifySusiFunc(SUSI_FN_45_52, 0);
+						notifySusiFunc(SUSI_FN_53_60, 0);
+						notifySusiFunc(SUSI_FN_61_68, 0);
+					}
+					else {				// attivo tutte le funzioni 
+						notifySusiFunc(SUSI_FN_0_4, 255);
+						notifySusiFunc(SUSI_FN_5_12, 255);
+						notifySusiFunc(SUSI_FN_13_20, 255);
+						notifySusiFunc(SUSI_FN_21_28, 255);
+						notifySusiFunc(SUSI_FN_29_36, 255);
+						notifySusiFunc(SUSI_FN_37_44, 255);
+						notifySusiFunc(SUSI_FN_45_52, 255);
+						notifySusiFunc(SUSI_FN_53_60, 255);
+						notifySusiFunc(SUSI_FN_61_68, 255);
+					}
+				}
+			}
+			else {
+				// Comanda una singola funzione
+				if (notifySusiSingleFunc) {
+					notifySusiSingleFunc(functionNumber, funcState);
+				}
+			}
+			break;
+		}
 		case 33: {														// Trigger / Pulsazione
 			if (notifySusiTriggerPulse) {
 				notifySusiTriggerPulse(SusiData.MessageByte[1]);

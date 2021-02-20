@@ -123,6 +123,17 @@ void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) {
 }
 #endif
 
+// Decommentare la #define sotto per stampare quando e' comandata una singola funzione
+#define NOTIFY_SUSI_SINGLE_FUNC
+#ifdef  NOTIFY_SUSI_SINGLE_FUNC
+void notifySusiSingleFunc(uint8_t functionNumber, uint8_t funcState) {
+  Serial.print("notifySusiSingleFunc F: ");
+  Serial.print(functionNumber);
+  Serial.print(" ; State: ");
+  Serial.println(funcState);
+};
+#endif
+
 // Decommentare la #define sotto per stampare quando e' richiesto un Trigger / Pulsazione
 #define NOTIFY_SUSI_TRIGGER_PULSE
 #ifdef  NOTIFY_SUSI_TRIGGER_PULSE

@@ -70,6 +70,15 @@ extern "C" {
 	*/
 	extern	void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) __attribute__((weak));
 	/*
+	*	notifySusiSingleFunc() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione
+	*	Input:
+	*		- il numero della funzione (da 1 a 127)
+	*		- lo stato della Funzione (attiva = 1, disattiva = 0)
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiSingleFunc(uint8_t functionNumber, uint8_t funcState) __attribute__((weak));
+	/*
 	*	notifySusiTriggerPulse() viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione) per eventuali sbuffi di vapore
 	*	Input:
 	*		- stato del comando Trigger/Pulse
