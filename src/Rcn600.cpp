@@ -447,13 +447,12 @@ void Rcn600::process(void) {
 			* = 1 ... 127 ist die normiert Geschwindigkeit R = Fahrtrichtung mit R = 0
 			* für rückwärts und R = 1 für vorwärts
 			* 
-			* La velocita' e la direzione corrispondono alla situazione reale
-			* Motore. Questo e' un valore di controllo in relazione alla velocita' "target",
-			* ovvero che dopo aver tracciato la rampa di velocita', i valori effettivi e target sono gli stessi
-			* dovrebbe essere (stato stabile). Il valore G e' come 0 ... 127 su im
-			* Trasmettere il modello impostato Vmax standardizzato. G = 0 significa che la locomotiva e' ferma, G
-			* = 1 ... 127 e' la velocita' normalizzata R = senso di marcia con R = 0
-			* per indietro e R = 1 per avanti
+			* La velocita' e la direzione corrispondono alla situazione reale del Motore. 
+			* Questo e' un valore di controllo in relazione alla velocita' "target",
+			* ovvero che dopo aver tracciato la rampa di velocita', i valori effettivi e target sono gli stessi, dovrebbe essere (stato stabile). 
+			* Il valore G deve essere trasferito come 0 ... 127 standardizzato alla Vmax impostata nel modello. 
+			* G = 0 significa che la locomotiva e' ferma, G = 1 ... 127 e' la velocita' normalizzata, R = senso di marcia 
+			* con R = 0 per indietro e R = 1 per avanti
 			*/
 			break;
 		}
