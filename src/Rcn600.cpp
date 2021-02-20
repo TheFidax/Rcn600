@@ -362,7 +362,30 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 36: {
+		case 36: {	/* DEPRECATO DALLA REVISIONE 6 / 12 / 2020 */
+			/* " "Ist" Lok-Fahrstufe " : 0010-0100 (0x24 = 36) R G6 G5 G4 - G3 G2 G1 G0
+			*
+			* Die Fahrstufe und Richtung entsprechen dem realen Zustand am Motor.
+			* Der Wert G ist als 0...127 auf die im Modell eingestellte Vmax normiert zu
+			* übertragen. G = 0 bedeutet Lok steht, G = 1 ... 127 ist die normierte
+			* Geschwindigkeit R = Fahrtrichtung mit R = 0 für rückwärts und R = 1
+			* für vorwärts.
+			* Dieser und der folgende Befehl werden nicht für neue Implementierungen
+			* empfohlen. Slaves sollten nach Möglichkeit die Befehle 0x50 bis 0x52
+			* auswerten. Master, die aus Gründen der Kompatibilität zu existierenden
+			* Produkten abweichende und/oder unterschiedliche Umsetzungen bei den
+			* Befehlen 0x24 und 0x25 verwenden, sind normkonform.
+			* 
+			* Il livello di velocita' e la direzione corrispondono allo stato reale del motore.
+			* Il valore G e' normalizzato come 0 ... 127 alla Vmax impostata nel modello
+			* Trasferimento. G = 0 significa che la locomotiva e' ferma, G = 1 ... 127 e' quella standardizzata
+			* Velocita' R = senso di marcia con R = 0 all'indietro e R = 1 per avanti.
+			* Questo e il seguente comando non vengono utilizzati per le nuove implementazioni
+			* consigliato. Se possibile, gli slave dovrebbero utilizzare i comandi da 0x50 a 0x52
+			* valutare. Master, che per motivi di compatibilita' con gli esistenti
+			* Prodotti che deviano e / o implementazioni differenti nel
+			* L'uso dei comandi 0x24 e 0x25 e' conforme allo standard.
+			*/
 			if (notifySusiRealSpeed) {
 				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
 					notifySusiRealSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
@@ -373,7 +396,7 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 37: {
+		case 37: {	/* DEPRECATO DALLA REVISIONE 6 / 12 / 2020 */
 			/* " "Soll" Lok-Fahrstufe " : 0010-0101 (0x25 = 37) R G6 G5 G4 - G3 G2 G1 G0
 			*
 			* Empfangene Fahrstufe des "Masters" auf 127 Fahrstufen normiert.
