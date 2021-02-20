@@ -403,6 +403,10 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
+
+
+		/* METODI MANIPOLAZIONE CVs */
+
 		case 119: {	
 			/* "CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
 			*
@@ -465,7 +469,23 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 123: {														// Manipolazione bit CV
+		case 123: {	
+			/* "CV-Manipulation Bit manipulieren" : 0111-1011 (0x7B = 123) | 1 V6 V5 V4 - V3 V2 V1 V0 | 1 1 1 K - D B2 B1 B0
+			*
+			* DCC-Befehl Bit Manipulieren im Service- und Betriebsmodus
+			* V = CV-Nummer 897 ... 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
+			* K = 0: Bit Prüfen. Wenn D mit dem Bitzustand an der Bitstelle B der CV
+			* übereinstimmt, wird mit einem Acknowledge geantwortet.
+			* K = 1: Bit Schreiben. D wird in Bitstelle B der CV geschrieben.
+			* Der Slave bestätigt das Schreiben mit einem Acknowledge.
+			* 
+			* Manipolazione dei bit di comando DCC in modalita' di servizio e operativa
+			* V = numero CV 897 ... 1024 (valore 0 = CV 897, valore 127 = CV 1024)
+			* k = 0: bit di controllo. Se D con lo stato del bit alla posizione del bit B del CV
+			* partite, viene dato un riconoscimento.
+			* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
+			* Lo slave conferma la scrittura con un riconoscimento.
+			*/
 			static uint16_t CV_Number;
 
 			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
