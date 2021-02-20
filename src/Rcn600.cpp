@@ -415,6 +415,7 @@ void Rcn600::process(void) {
 		}
 
 
+
 		/* METODI MANIPOLAZIONE CVs */
 
 		case 119: {	
