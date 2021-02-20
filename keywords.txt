@@ -1,0 +1,21 @@
+Rcn600	KEYWORD1
+
+SUSI_DIRECTION	LITERAL1
+SUSI_FN_GROUP	LITERAL1
+SUSI_t	LITERAL1
+
+//////////////////////// Rcn600
+init	KEYWORD2
+process	KEYWORD2
+
+notifySusiFunc	KEYWORD2
+notifySusiTriggerPulse	KEYWORD2
+notifySusiSpeedDeviation	KEYWORD2
+notifySusiCurrentAbsorption	KEYWORD2
+notifySusiRequestSpeed	KEYWORD2
+notifySusiRealSpeed	KEYWORD2
+
+//////////////////////// CVs
+notifySusiCVRead	KEYWORD2
+notifySusibitManipulation	KEYWORD2
+notifySusiCVWrite	KEYWORD2
