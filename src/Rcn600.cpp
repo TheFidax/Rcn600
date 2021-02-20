@@ -436,6 +436,27 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
+		case 80: {
+			/* " "Ist" Geschwindigkeit " : 0101-0000 (0x50 = 80) R G6 G5 G4 - G3 G2 G1 G0
+			*
+			* Die Geschwindigkeit und Richtung entsprechen dem realen Zustand am
+			* Motor. Dieses ist ein Regelwert in Bezug auf die "Soll"- Geschwindigkeit,
+			* d.h. dass nach Nachführung der Geschwindigkeitsrampe Ist und Soll gleich
+			* sein sollen (ausgeregelter Zustand). Der Wert G ist als 0...127 auf die im
+			* Modell eingestellte Vmax normiert zu übertragen. G = 0 bedeutet Lok steht, G
+			* = 1 ... 127 ist die normiert Geschwindigkeit R = Fahrtrichtung mit R = 0
+			* für rückwärts und R = 1 für vorwärts
+			* 
+			* La velocita' e la direzione corrispondono alla situazione reale
+			* Motore. Questo e' un valore di controllo in relazione alla velocita' "target",
+			* ovvero che dopo aver tracciato la rampa di velocita', i valori effettivi e target sono gli stessi
+			* dovrebbe essere (stato stabile). Il valore G e' come 0 ... 127 su im
+			* Trasmettere il modello impostato Vmax standardizzato. G = 0 significa che la locomotiva e' ferma, G
+			* = 1 ... 127 e' la velocita' normalizzata R = senso di marcia con R = 0
+			* per indietro e R = 1 per avanti
+			*/
+			break;
+		}
 
 
 
