@@ -472,16 +472,25 @@ void Rcn600::process(void) {
 			* Höchstgeschwindigkeit verwenden, kann es hier leicht unterschiedliche
 			* Implementationen geben. Wichtig ist vor allem, dass sich die Befehle für
 			* Ist und Soll-Geschwindigkeit gleich verhalten.
-			* 
-			* 
-			* Gradino di velocita' interno del "master" secondo la curva caratteristica (CVs Da 67 a 94, CV 2, 6 e 5) e altri CV che aumentano la velocita' del file Determina il veicolo,
-			* convertito il passo di velocita' ricevuto a 127 Gradini di velocita' normalizzati.
-			* Vale a dire il piu' alto basato sui CV 94 e / CV5.
-			* il valore ottenibile di altri CV corrispondenti e' impostato su 127 normalizzato.
-			* CV per accelerazione e frenata come CV 3, 4, 23 e 24 non sono inclusi nel calcolo.
-			* G = 0 significa che la locomotiva si ferma, G = 1 ... 127 e' la velocita', R = senso di marcia con R = 0 per indietro e R = 1 per avanti.
-			* Poiche' i decoder hanno metodi diversi per determinare la velocita' massima, puo' essere leggermente diverso qui Dare implementazioni. 
-			* Soprattutto, e' importante che i comandi per la velocita' effettiva e quella target si comportano allo stesso modo.
+			*
+			* Livello di guida interno del "Master" in base al controllo della caratteristica (CV)
+			* da 67 a 94, CV 2, 6 e 5) e altri CV che determinano la velocita' della normalizzazione del veicolo convertito hanno ricevuto un livello di guida a 127 livelli di guida.
+			* Cio' significa che il valore piu' alto ottenibile grazie ai CV 94 e/o CV5 o ad altri CV corrispondenti e' normalizzato a 127. 
+			* I CV per l'accelerazione e la frenata come i CV 3, 4, 23 e 24 non vengono utilizzati nel calcolo. 
+			* G = 0 significa appigli per locomotive, G = 1 ... 127 e' la velocita' R = direzione di marcia con R = 0 per l'indietro e R = 1 per l'avanti.
+			* Poiche' i decodificatori utilizzano metodi diversi per determinare la velocita' massima, potrebbero esserci implementazioni leggermente diverse. 
+			* Soprattutto, e' importante che i comandi per la velocita' effettiva e di destinazione si comportino allo stesso modo.
+			*/
+			break;
+		}
+		case 82: {
+			/* "DCC-Fahrstufe" : 0101-0010 (0x52 = 82) R G6 G5 G4 - G3 G2 G1 G0
+			*
+			* Dieser Wert ist nur ggf. von 14 oder 28 Fahrstufen auf 127 Fahrstufen normiert. 
+			* Es findet keine Anpassung durch irgendwelches CVs statt.
+			*
+			* Questo valore e' standardizzato solo da 14 o 28 passaggi di guida a 127 passaggi di guida. 
+			* Non vi e' alcuna regolazione da parte di CV.
 			*/
 			break;
 		}
