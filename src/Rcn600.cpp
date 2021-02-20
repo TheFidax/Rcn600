@@ -454,6 +454,14 @@ void Rcn600::process(void) {
 			* G = 0 significa che la locomotiva e' ferma, G = 1 ... 127 e' la velocita' normalizzata, R = senso di marcia 
 			* con R = 0 per indietro e R = 1 per avanti
 			*/
+			if (notifySusiRealSpeed) {
+				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
+					notifySusiRealSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
+				}
+				else {
+					notifySusiRealSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_REV);
+				}
+			}
 			break;
 		}
 		case 81: {
@@ -481,6 +489,14 @@ void Rcn600::process(void) {
 			* Poiche' i decodificatori utilizzano metodi diversi per determinare la velocita' massima, potrebbero esserci implementazioni leggermente diverse. 
 			* Soprattutto, e' importante che i comandi per la velocita' effettiva e di destinazione si comportino allo stesso modo.
 			*/
+			if (notifySusiRequestSpeed) {
+				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
+					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
+				}
+				else {
+					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_REV);
+				}
+			}
 			break;
 		}
 		case 82: {
