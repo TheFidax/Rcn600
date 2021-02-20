@@ -78,7 +78,7 @@ void Rcn600::init(void) {
 		SlaveNumber = notifySusiCVRead(897);
 	}
 	else {	//in caso contrario imposto il valore 1
-		SlaveNumber = 1;
+		SlaveNumber = DEFAULT_SLAVE_NUMBER;
 	}
 
 #ifdef DEBUG_RCN_LIBRARY
@@ -302,8 +302,13 @@ void Rcn600::process(void) {
 						CV_Value = LIB_VER;
 					}
 				}
-				else if (notifySusiCVRead) { //altre CV disponibili per il modulo
-					CV_Value = notifySusiCVRead(CV_Number);
+				else {
+					if (notifySusiCVRead) { //altre CV disponibili per il modulo
+						CV_Value = notifySusiCVRead(CV_Number);
+					}
+					else {
+						CV_Value = 255;		//Se non è implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
+					}
 				}
 				 
 #ifdef DEBUG_RCN_LIBRARY
@@ -345,6 +350,9 @@ void Rcn600::process(void) {
 					if (notifySusiCVRead) {
 						CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
 					}
+					else {
+						CV_Value = 254;		//Se non è implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 254
+					}
 				}
 
 #ifdef DEBUG_RCN_LIBRARY
@@ -373,9 +381,12 @@ void Rcn600::process(void) {
 				}
 				case 1: {	//scrittura del bit
 					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
-						bitWrite(CV_Value, bitPosition, bitRead(SusiData.MessageByte[2], 3));	//scrivo il nuovo valore del bit
-						if (notifySusiCVWrite((897 + (SusiData.MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
-							Data_ACK();
+						if (notifySusiCVWrite) {
+							bitWrite(CV_Value, bitPosition, bitRead(SusiData.MessageByte[2], 3));	//scrivo il nuovo valore del bit
+							if (notifySusiCVWrite((897 + (SusiData.MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
+								Data_ACK();
+							}
+							//nel caso in cui non è implementato un sistema di memorizzazione CVs, non faccio nulla
 						}
 					}
 					break;
@@ -399,6 +410,7 @@ void Rcn600::process(void) {
 							Data_ACK();
 						}
 					}
+					//in caso di sistema di memorizzazione CVs non implementato non eseguo l'ACK
 				}
 
 				if (CV_Number == 897) {
