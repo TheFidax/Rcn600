@@ -357,8 +357,8 @@ void Rcn600::process(void) {
 			* CV specifico del costruttore calibrato nel decoder della locomotiva. Valori negativi
 			* significa un feed back come e' possibile con le moderne locomotive elettriche.
 			*/
-			if (notifySusiCurrent) {
-				notifySusiCurrent(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
+			if (notifySusiMotorCurrent) {
+				notifySusiMotorCurrent(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
 			}
 			break;
 		}
@@ -381,6 +381,25 @@ void Rcn600::process(void) {
 				else {
 					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_REV);
 				}
+			}
+			break;
+		}
+		case 38: {
+			/* "Lastausregelung" : 0010-0110 (0x26 = 38) P7 P6 P5 P4 - P3 P2 P1 P0
+			*
+			* Die Erfassung des Lastzustandes kann über Motorspannung, -strom oder -
+			* leistung erfolgen. 0 = keine Last, 127 = maximale Last. Es sind auch
+			* negative Werte möglich, die im 2er-Komplement übertragen werden.
+			* Diese bedeuten weniger Last als Fahren in der Ebene.
+			* 
+			* Lo stato del carico puo' essere registrato tramite tensione del motore, corrente o prestazione. 
+			* 0 = nessun carico, 127 = carico massimo. 
+			* Ci sono anche possibili valori negativi, che vengono trasferiti nel complemento di 2.
+			* Significa meno carico rispetto alla guida in piano.
+			*/
+
+			if (notifySusiMotorLoad) {
+				notifySusiMotorLoad(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
 			}
 			break;
 		}

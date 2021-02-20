@@ -104,13 +104,13 @@ extern "C" {
 	*/
 	extern	void notifySusiTriggerPulse(uint8_t state) __attribute__((weak));
 	/*
-	*	notifySusiCurrentAbsorption() viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
+	*	notifySusiMotorCurrent() viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
 	*	Input:
 	*		- Assorbimento di Corrente: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiCurrent(int absorption) __attribute__((weak));
+	extern	void notifySusiMotorCurrent(int current) __attribute__((weak));
 	/*
 	*	notifySusiRequestSpeed() viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
 	*	Input:
@@ -129,7 +129,14 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir) __attribute__ ((weak));
-	
+	/*
+	*	notifySusiMotorLoad() viene invocato quando: si riceve dal Master i dati sul carico del Motore
+	*	Input:
+	*		- Carico del Motore: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiMotorLoad(int load) __attribute__((weak));
 	
 	/* Metodi per la manipolazione delle CVs */
 	/*
