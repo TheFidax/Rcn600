@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "Arduino.h"
 #include "SUSI_FN_BIT.h"
+#include "SUSI_AUX_BIT.h"
 
 //#define	DEBUG_RCN_LIBRARY		//attiva la modalita' di debug
 
@@ -30,6 +31,13 @@ typedef enum {
 	SUSI_FN_53_60,
 	SUSI_FN_61_68,
 } SUSI_FN_GROUP;
+
+typedef enum {
+	SUSI_AUX_1_8 = 1,
+	SUSI_AUX_9_16,
+	SUSI_AUX_17_24,
+	SUSI_AUX_25_32,
+} SUSI_AUX_GROUP;
 
 typedef struct {
 	uint8_t		CLK_pin;			//pin a cui è collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
@@ -78,6 +86,15 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiSingleFunc(uint8_t functionNumber, uint8_t funcState) __attribute__((weak));
+	/*
+	*	notifySusiAux() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione
+	*	Input:
+	*		- il numero dell'Uscita
+	*		- lo stato dell'uscita (attiva = 1, disattiva = 0)
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState) __attribute__((weak));
 	/*
 	*	notifySusiTriggerPulse() viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione) per eventuali sbuffi di vapore
 	*	Input:

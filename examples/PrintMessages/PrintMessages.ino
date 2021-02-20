@@ -134,6 +134,64 @@ void notifySusiSingleFunc(uint8_t functionNumber, uint8_t funcState) {
 };
 #endif
 
+// Decommentare la #define sotto per stampare lo stato delle AUX comandate direttamente dal Master
+#define NOTIFY_SUSI_AUX
+#ifdef  NOTIFY_SUSI_AUX
+void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState) {
+  Serial.print("notifySusiAux: ");
+
+  switch( SUSI_auxGrp ) {
+     case SUSI_AUX_1_8:
+       Serial.print(" AUX 1-8: ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_01) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_02) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_03) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_04) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_05) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_06) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_07) ? "1  ": "0  ");
+       Serial.println((SUSI_AuxState & SUSI_AUX_BIT_08) ? "1  ": "0  ");
+       break;
+    
+     case SUSI_AUX_9_16:
+       Serial.print(" AUX 9-16: ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_09) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_10) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_11) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_12) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_13) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_14) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_15) ? "1  ": "0  ");
+       Serial.println((SUSI_AuxState & SUSI_AUX_BIT_16) ? "1  ": "0  ");
+       break;
+
+     case SUSI_AUX_17_24:
+       Serial.print(" AUX 17-24: ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_17) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_18) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_19) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_20) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_21) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_22) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_23) ? "1  ": "0  ");
+       Serial.println((SUSI_AuxState & SUSI_AUX_BIT_24) ? "1  ": "0  ");
+       break;
+  
+     case SUSI_AUX_25_32:
+       Serial.print(" AUX 25-32: ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_25) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_26) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_27) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_28) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_29) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_30) ? "1  ": "0  ");
+       Serial.print((SUSI_AuxState & SUSI_AUX_BIT_31) ? "1  ": "0  ");
+       Serial.println((SUSI_AuxState & SUSI_FN_BIT_32) ? "1  ": "0  ");
+       break;  
+   }
+}
+#endif
+
 // Decommentare la #define sotto per stampare quando e' richiesto un Trigger / Pulsazione
 #define NOTIFY_SUSI_TRIGGER_PULSE
 #ifdef  NOTIFY_SUSI_TRIGGER_PULSE

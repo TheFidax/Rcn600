@@ -242,8 +242,8 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 109: {														// " Binärzustände kurze Form " ( Forma abbreviata degli stati binari ): 
-			/* 0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 */
+		case 109: {													
+			/* "Binärzustände kurze Form" ( Forma abbreviata degli stati binari ):  0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 */
 			static uint8_t functionNumber, funcState;
 			funcState = bitRead(SusiData.MessageByte[1], 7);	//leggo il valore dello stato 'D'
 			bitWrite(SusiData.MessageByte[1], 7, 0);		//elimino il valore dello stato
@@ -259,38 +259,62 @@ void Rcn600::process(void) {
 			*	L = 0 (trasmissione) disattiva (D = 0) o attiva tutte le funzioni da 1 a 127 (D = 1)
 			*/
 
-			if (functionNumber == 0) {
-				// Comanda tutte le funzioni
-				if (notifySusiFunc) {
+			if (notifySusiSingleFunc) {
+				if (functionNumber == 0) {
+					// Comanda tutte le funzioni
+					static uint8_t i;
 					if (funcState == 0) {	// disattivo tutte le funzioni
-						notifySusiFunc(SUSI_FN_0_4, 0);
-						notifySusiFunc(SUSI_FN_5_12, 0);
-						notifySusiFunc(SUSI_FN_13_20, 0);
-						notifySusiFunc(SUSI_FN_21_28, 0);
-						notifySusiFunc(SUSI_FN_29_36, 0);
-						notifySusiFunc(SUSI_FN_37_44, 0);
-						notifySusiFunc(SUSI_FN_45_52, 0);
-						notifySusiFunc(SUSI_FN_53_60, 0);
-						notifySusiFunc(SUSI_FN_61_68, 0);
+						for (i = 1; i < 128; ++i) {
+							notifySusiSingleFunc(i, 0);
+						}
 					}
 					else {				// attivo tutte le funzioni 
-						notifySusiFunc(SUSI_FN_0_4, 255);
-						notifySusiFunc(SUSI_FN_5_12, 255);
-						notifySusiFunc(SUSI_FN_13_20, 255);
-						notifySusiFunc(SUSI_FN_21_28, 255);
-						notifySusiFunc(SUSI_FN_29_36, 255);
-						notifySusiFunc(SUSI_FN_37_44, 255);
-						notifySusiFunc(SUSI_FN_45_52, 255);
-						notifySusiFunc(SUSI_FN_53_60, 255);
-						notifySusiFunc(SUSI_FN_61_68, 255);
+						for (i = 1; i < 128; ++i) {
+							notifySusiSingleFunc(i, 1);
+						}
 					}
 				}
-			}
-			else {
-				// Comanda una singola funzione
-				if (notifySusiSingleFunc) {
+				else {
+					// Comanda una singola funzione
 					notifySusiSingleFunc(functionNumber, funcState);
 				}
+			}
+			break;
+		}
+		case 64: {
+			/* "Direktbefehl 1" (2-Byte): 0100-0000 (0x40 = 64) X8 X7 X6 X5 - X4 X3 X2 X1
+			* 
+			* Die Direktbefehle dienen zur direkten Ansteuerung von Ausgängen und
+			* anderen Funktionen nach der Anwendung der Funktionstabelle im Master.
+			* Ein Bit = 1 bedeutet der entsprechende Ausgang ist eingeschaltet.
+			* 
+			* I comandi diretti vengono utilizzati per il controllo diretto delle uscite e
+			* altre funzioni dopo aver utilizzato la tabella delle funzioni nel master.
+			* Un bit = 1 significa che l'uscita corrispondente è attivata.
+			*/
+			if (notifySusiAux) {
+				notifySusiAux(SUSI_AUX_1_8, SusiData.MessageByte[1]);
+			}
+			break;
+		}
+		case 65: {
+			/* "Direktbefehl 2" */
+			if (notifySusiAux) {
+				notifySusiAux(SUSI_AUX_9_16, SusiData.MessageByte[1]);
+			}
+			break;
+		}
+		case 66: {
+			/* "Direktbefehl 3" */
+			if (notifySusiAux) {
+				notifySusiAux(SUSI_AUX_17_24, SusiData.MessageByte[1]);
+			}
+			break;
+		}
+		case 67: {
+			/* "Direktbefehl 4" */
+			if (notifySusiAux) {
+				notifySusiAux(SUSI_AUX_25_32, SusiData.MessageByte[1]);
 			}
 			break;
 		}
