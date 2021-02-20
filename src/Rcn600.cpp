@@ -336,7 +336,7 @@ void Rcn600::process(void) {
 			*
 			* 
 			* Il comando viene utilizzato per sincronizzare una scarica di vapore.
-			* Lo farà mai scoppio di vapore inviato una volta. 
+			* Lo fara' mai scoppio di vapore inviato una volta. 
 			* I bit da 1 a 7 sono per uso futuro, Applicazioni riservate.
 			*/
 			if (notifySusiTriggerPulse) {
@@ -344,7 +344,19 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 35: {														// Consumo di corrente da parte del motore
+		case 35: {
+			/* "Strom" : 0010-0011 (0x23 = 35) S7 S6 S5 S4 - S3 S2 S1 S0
+			*
+			* Vom Motor verbrauchter Strom. Der Wert hat einen Bereich von -128 bis
+			* 127, wird im 2er-Komplement übertragen und wird über eine
+			* herstellerspezifische CV im Lokdecoder kalibriert. Negative Werte
+			* bedeuten ein Rückspeisen wie es bei modernen E-Loks möglich ist.
+			*
+			* Elettricita' consumata dal motore. Il valore ha un intervallo da -128 a
+			* 127, viene trasmesso in complemento a 2 e viene trasmesso tramite a
+			* CV specifico del costruttore calibrato nel decoder della locomotiva. Valori negativi
+			* significa un feed back come e' possibile con le moderne locomotive elettriche.
+			*/
 			if (notifySusiCurrent) {
 				notifySusiCurrent(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
 			}
