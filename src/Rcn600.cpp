@@ -374,6 +374,16 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 37: {
+			/* " "Soll" Lok-Fahrstufe " : 0010-0101 (0x25 = 37) R G6 G5 G4 - G3 G2 G1 G0
+			*
+			* Empfangene Fahrstufe des "Masters" auf 127 Fahrstufen normiert.
+			* G = 0 bedeutet Lok hält, G = 1 ... 127 ist die normierte Geschwindigkeit
+			* R = Fahrtrichtung mit R = 0 für rückwärts und R = 1 für vorwärts 
+			*
+			* Passo di velocita' ricevuto del "master" normalizzato a 127 passi di velocita'.
+			* G = 0 significa che la locomotiva si ferma, G = 1 ... 127 e' la velocita' normalizzata
+			* R = senso di marcia con R = 0 indietro e R = 1 avanti
+			*/
 			if (notifySusiRequestSpeed) {
 				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
 					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
