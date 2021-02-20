@@ -11,8 +11,7 @@ process	KEYWORD2
 notifySusiFunc	KEYWORD2
 notifySusiSingleFunc	KEYWORD2
 notifySusiTriggerPulse	KEYWORD2
-notifySusiSpeedDeviation	KEYWORD2
-notifySusiCurrentAbsorption	KEYWORD2
+notifySusiCurrent	KEYWORD2
 notifySusiRequestSpeed	KEYWORD2
 notifySusiRealSpeed	KEYWORD2
 

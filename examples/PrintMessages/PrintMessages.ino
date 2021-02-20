@@ -201,19 +201,10 @@ void notifySusiTriggerPulse(uint8_t state) {
 };
 #endif
 
-// Decommentare la #define sotto per stampare lo scostamento della velocita' reale da quella richiesta al decodificatore
-#define NOTIFY_SUSI_SPEED_DEVIATION
-#ifdef  NOTIFY_SUSI_SPEED_DEVIATION
-void notifySusiSpeedDeviation(int deviation) {
-  Serial.print("notifySusiSpeedDeviation: ");
-  Serial.println(deviation,DEC);
-};
-#endif
-
 // Decommentare la #define sotto per stampare il consumo di corrente del motore
-#define NOTIFY_SUSI_CURRENT_ABSORPTION
-#ifdef  NOTIFY_SUSI_CURRENT_ABSORPTION
-void notifySusiCurrentAbsorption(int absorption) {
+#define NOTIFY_SUSI_CURRENT
+#ifdef  NOTIFY_SUSI_CURRENT
+void notifySusiCurrent(int absorption) {
   Serial.print("notifySusiCurrentAbsorption: ");
   Serial.println(absorption,DEC);
 };

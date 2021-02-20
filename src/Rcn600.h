@@ -104,21 +104,13 @@ extern "C" {
 	*/
 	extern	void notifySusiTriggerPulse(uint8_t state) __attribute__((weak));
 	/*
-	*	notifySusiSpeedDeviation() viene invocato quando: si riceve dal Master i dati sulla differenza fra la velocita' reale e la velocita' richiesta dalla centrale
-	*	Input:
-	*		- Deviazione della velocita': da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
-	*	Restituisce:
-	*		- Nulla
-	*/
-	extern	void notifySusiSpeedDeviation(int deviation) __attribute__((weak));
-	/*
 	*	notifySusiCurrentAbsorption() viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
 	*	Input:
 	*		- Assorbimento di Corrente: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiCurrentAbsorption(int absorption) __attribute__((weak));
+	extern	void notifySusiCurrent(int absorption) __attribute__((weak));
 	/*
 	*	notifySusiRequestSpeed() viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
 	*	Input:

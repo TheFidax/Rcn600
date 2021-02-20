@@ -327,21 +327,26 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 33: {														// Trigger / Pulsazione
+		case 33: {
+			/* "Trigger-Puls" : 0010-0001 (0x21 = 33) 0 0 0 0 - 0 0 0 1 
+			*
+			* Der Befehl dient zur Synchronisation eines Dampfstoßes. Er wird je
+			* Dampfstoß einmal gesendet. Die Bits 1 bis 7 sind für zukünftige
+			* Anwendungen reserviert.
+			*
+			* 
+			* Il comando viene utilizzato per sincronizzare una scarica di vapore.
+			* Lo farà mai scoppio di vapore inviato una volta. 
+			* I bit da 1 a 7 sono per uso futuro, Applicazioni riservate.
+			*/
 			if (notifySusiTriggerPulse) {
 				notifySusiTriggerPulse(SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 34: {														// Deviazione fra la velocita' richiesta e la velocita' reale
-			if (notifySusiSpeedDeviation) {
-				notifySusiSpeedDeviation(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
-			}
-			break;
-		}
 		case 35: {														// Consumo di corrente da parte del motore
-			if (notifySusiCurrentAbsorption) {
-				notifySusiCurrentAbsorption(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
+			if (notifySusiCurrent) {
+				notifySusiCurrent(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
 			}
 			break;
 		}
