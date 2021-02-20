@@ -451,16 +451,6 @@ void Rcn600::process(void) {
 						CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
 					}
 				}
-				 
-#ifdef DEBUG_RCN_LIBRARY
-				Serial.print("notifySusiCVcheck: ");
-				Serial.print(" CV: ");
-				Serial.print(CV_Number, DEC);
-				Serial.print(" CV_Value: ");
-				Serial.print(CV_Value, DEC);
-				Serial.print(" CV_Value_toCheck: ");
-				Serial.println(SusiData.MessageByte[2], DEC);
-#endif // DEBUG_RCN_LIBRARY
 
 				/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
 				if (CV_Value == SusiData.MessageByte[2]) {
@@ -511,22 +501,6 @@ void Rcn600::process(void) {
 						CV_Value = 254;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 254
 					}
 				}
-
-#ifdef DEBUG_RCN_LIBRARY
-				Serial.print("notifySusibitManipulation: ");
-				Serial.print(" CV: ");
-				Serial.print(CV_Number, DEC);
-				Serial.print(" operation: ");
-				Serial.print(operation, DEC);
-				Serial.print(" bitValue: ");
-				Serial.print(bitValue, DEC);
-				Serial.print(" CurrentbitValue: ");
-				Serial.print(bitRead(CV_Value, bitPosition), DEC);
-				Serial.print(" CV_Value: ");
-				Serial.print(CV_Value, BIN);
-				Serial.print(" bitPosition: ");
-				Serial.println(bitPosition, DEC);
-#endif // DEBUG_RCN_LIBRARY
 
 				//in base all'operazione richiesta eseguiro' un'azione
 				switch (operation) {
