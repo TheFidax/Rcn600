@@ -230,13 +230,15 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 103: {														// Gruppo Funzioni Digitali 8: F53 -> F60
+		case 103: {
+			/* "Funktionsgruppe 8" : 0110-0111 (0x67 = 103) F60 F59 F58 F57 - F56 F55 F54 F53 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_53_60, SusiData.MessageByte[1]);
 			}
 			break;
 		}
-		case 104: {														// Gruppo Funzioni Digitali 9: F60 -> F61
+		case 104: {
+			/* "Funktionsgruppe 9" : 0110-1000 (0x68 = 104) F68 F67 F66 F65 - F64 F63 F62 F61 */
 			if (notifySusiFunc) {
 				notifySusiFunc(SUSI_FN_61_68, SusiData.MessageByte[1]);
 			}
@@ -298,21 +300,21 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 65: {
-			/* "Direktbefehl 2" */
+			/* "Direktbefehl 2" : 0100-0001 (0x41 = 65) X16 X15 X14 X13 - X12 X11 X10 X9 */
 			if (notifySusiAux) {
 				notifySusiAux(SUSI_AUX_9_16, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 66: {
-			/* "Direktbefehl 3" */
+			/* "Direktbefehl 3" : 0100-0010 (0x42 = 66) X24 X23 X22 X21 - X20 X19 X18 X17 */
 			if (notifySusiAux) {
 				notifySusiAux(SUSI_AUX_17_24, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 67: {
-			/* "Direktbefehl 4" */
+			/* "Direktbefehl 4" : 0100-0011 (0x43 = 67) X32 X31 X30 X29 - X28 X27 X26 X25 */
 			if (notifySusiAux) {
 				notifySusiAux(SUSI_AUX_25_32, SusiData.MessageByte[1]);
 			}
