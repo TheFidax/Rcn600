@@ -6,6 +6,7 @@
 #include "Arduino.h"
 #include "SUSI_FN_BIT.h"
 #include "SUSI_AUX_BIT.h"
+#include "SUSI_AN_BIT.h"
 
 //#define	DEBUG_RCN_LIBRARY		//attiva la modalita' di debug
 
@@ -38,6 +39,17 @@ typedef enum {
 	SUSI_AUX_17_24,
 	SUSI_AUX_25_32,
 } SUSI_AUX_GROUP;
+
+typedef enum {
+	SUSI_AN_0_7 = 1,
+	SUSI_AN_8_15,
+	SUSI_AN_16_23,
+	SUSI_AN_24_31,
+	SUSI_AN_32_39,
+	SUSI_AN_40_47,
+	SUSI_AN_48_55,
+	SUSI_AN_56_63,
+} SUSI_AN_GROUP;
 
 typedef struct {
 	uint8_t		CLK_pin;			//pin a cui è collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
@@ -137,8 +149,18 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiMotorLoad(int load) __attribute__((weak));
+	/*
+	*	notifySusiAnalog() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
+	*	Input:
+	*		- il gruppo Analogico decodificato
+	*		- lo stato del gruppo
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiAnalog(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) __attribute__((weak));
 	
-	/* Metodi per la manipolazione delle CVs */
+
+	/* METODI MANIPOLAZIONE CVs */
 	/*
 	*	notifySusiCVRead() viene invocato quando: e' richiesta la lettura di una CV
 	*	Input:
