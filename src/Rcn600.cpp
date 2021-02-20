@@ -499,7 +499,7 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 82: {
+		case 82: {	/* NON IMPLEMENTATO */
 			/* "DCC-Fahrstufe" : 0101-0010 (0x52 = 82) R G6 G5 G4 - G3 G2 G1 G0
 			*
 			* Dieser Wert ist nur ggf. von 14 oder 28 Fahrstufen auf 127 Fahrstufen normiert. 
