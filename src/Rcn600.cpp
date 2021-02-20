@@ -517,7 +517,18 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 127: {														// Scrittura Valore CV
+		case 127: {	
+			/* "CV-Manipulation Byte schreiben" : 0111-1111 (0x7F = 127) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0 
+			*
+			* DCC-Befehl Byte Schreiben im Service- und Betriebsmodus
+			* V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
+			* D = Wert zum Schreiben in die CV. Der Slave bestätigt das Schreiben mit
+			* einem Acknowledge. 
+			* 
+			* Scrittura byte di comando DCC in modalita' di servizio e operativa
+			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
+			* D = valore per la scrittura nel CV. Lo Slave conferma la scrittura con un riconoscimento.
+			*/
 			static uint16_t CV_Number;
 
 			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
