@@ -319,7 +319,14 @@ void Rcn600::process(void) {
 			*/
 
 			if (SusiData.MessageByte[2] == 111) {	// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
+				static uint16_t Command;
+				stati uint8_t State;
 
+				Command = SusiData.MessageByte[3];	//memorizzo i bit "più significativ"
+				Command = Command << 7;				//sposto i bit 7 posti a 'sinistra'
+				Command |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
+
+				State = bitRead(SusiData.MessageByte[1], 7);
 			}
 			break;
 		}
