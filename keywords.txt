@@ -21,6 +21,7 @@ notifySusiMotorLoad	KEYWORD2
 notifySusiAnalogFunction	KEYWORD2
 notifySusiAnalogDirectCommand	KEYWORD2
 notifySusiMasterAddress	KEYWORD2
+notifySusiControllModule	KEYWORD2
 
 //////////////////////// CVs
 notifySusiCVRead	KEYWORD2
