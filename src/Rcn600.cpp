@@ -268,24 +268,24 @@ void Rcn600::process(void) {
 			*	L = 0 (trasmissione) disattiva (D = 0) o attiva tutte le funzioni da 1 a 127 (D = 1)
 			*/
 
-			if (notifySusiSingleFunc) {
+			if (notifySusiBinaryState) {
 				if (functionNumber == 0) {
 					// Comanda tutte le funzioni
 					static uint8_t i;
 					if (funcState == 0) {	// disattivo tutte le funzioni
 						for (i = 1; i < 128; ++i) {
-							notifySusiSingleFunc(i, 0);
+							notifySusiBinaryState(i, 0);
 						}
 					}
 					else {				// attivo tutte le funzioni 
 						for (i = 1; i < 128; ++i) {
-							notifySusiSingleFunc(i, 1);
+							notifySusiBinaryState(i, 1);
 						}
 					}
 				}
 				else {
 					// Comanda una singola funzione
-					notifySusiSingleFunc(functionNumber, funcState);
+					notifySusiBinaryState(functionNumber, funcState);
 				}
 			}
 			break;
@@ -319,14 +319,18 @@ void Rcn600::process(void) {
 			*/
 
 			if (SusiData.MessageByte[2] == 111) {	// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
-				static uint16_t Command;
-				static uint8_t State;
+				if (notifySusiBinaryState) {		// Controllo se e' presente il metodo per gestire il comando
+					static uint16_t Command;
+					static uint8_t State;
 
-				Command = SusiData.MessageByte[3];	//memorizzo i bit "più significativ"
-				Command = Command << 7;				//sposto i bit 7 posti a 'sinistra'
-				Command |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
+					Command = SusiData.MessageByte[3];	//memorizzo i bit "più significativ"
+					Command = Command << 7;				//sposto i bit 7 posti a 'sinistra'
+					Command |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
 
-				State = bitRead(SusiData.MessageByte[1], 7);
+					State = bitRead(SusiData.MessageByte[1], 7);
+
+					notifySusiBinaryState(Command, State);
+				}
 			}
 			break;
 		}
