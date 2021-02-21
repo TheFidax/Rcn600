@@ -167,7 +167,7 @@ extern "C" {
 	*	Restituisce:
 	*		- Nulla
 	*/
-		extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
+	extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
 	
 
 	/* METODI MANIPOLAZIONE CVs */
