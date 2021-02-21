@@ -722,6 +722,21 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
+		case 108: {
+			/*	"Modul-Steuerbyte" : 0110-1100 (0x6C = 108) B7 B6 B5 B4 - B3 B2 B1 B0
+			*
+			*	- Bit 0 = Buffer Control: 0 = Puffer aus, 1 = Puffer an
+			*	- Bit 1 = Rücksetzfunktion: 0 = alle Funktionen auf "Aus" setzen, 1 = normaler Betrieb
+			*	Alle weiteren Bits von der RailCommunity reserviert.
+			*	Falls implementiert sind nach einem Reset die Bits 0 und 1 im Slave auf 1 zu setzen. 
+			*
+			*	- Bit 0 = Controllo buffer: 0 = Buffer off, 1 = Buffer on
+			*	- Bit 1 = Funzione di ripristino: 0 = impostare tutte le funzioni su "Off", 1 = normale funzionamento
+			*	Tutti gli altri bit riservati dalla RailCommunity.
+			*	Se implementati, i bit 0 e 1 nello slave devono essere impostati su 1 dopo un ripristino.
+			*/
+			break;
+		}
 
 
 		/* METODI MANIPOLAZIONE CVs */
