@@ -890,10 +890,15 @@ void Rcn600::process(void) {
 				if (isCVvalid(CV_Number)) {
 					/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
-					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
-						if (notifySusiCVWrite) {
-							if (notifySusiCVWrite(CV_Number, SusiData.MessageByte[2]) == SusiData.MessageByte[2]) {
-								Data_ACK();
+					if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
+						if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (SusiData.MessageByte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
+							
+						}
+						else {	//scrittura CVs
+							if (notifySusiCVWrite) {
+								if (notifySusiCVWrite(CV_Number, SusiData.MessageByte[2]) == SusiData.MessageByte[2]) {
+									Data_ACK();
+								}
 							}
 						}
 						//in caso di sistema di memorizzazione CVs non implementato non eseguo l'ACK
