@@ -263,98 +263,102 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 109: {													
-			/* "Binärzustände kurze Form" :  0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 */
-			static uint8_t functionNumber, funcState;
-			funcState = bitRead(SusiData.MessageByte[1], 7);	//leggo il valore dello stato 'D'
-			bitWrite(SusiData.MessageByte[1], 7, 0);		//elimino il valore dello stato
-			functionNumber = SusiData.MessageByte[1];		//i restanti bit identificano la Funzione 'L'
-
-			/*
-			*	D = 0 bedeutet Funktion L ausgeschaltet, D = 1 eingeschaltet	
-			*	L = Funktionsnummer 1 ... 127
-			*	L = 0 (Broadcast) schaltet alle Funktionen 1 bis 127 aus (D = 0) oder an (D = 1) 
+			/* "Binärzustände kurze Form" :  0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 
 			* 
+			*	D = 0 bedeutet Funktion L ausgeschaltet, D = 1 eingeschaltet
+			*	L = Funktionsnummer 1 ... 127
+			*	L = 0 (Broadcast) schaltet alle Funktionen 1 bis 127 aus (D = 0) oder an (D = 1)
+			*
 			*	D = 0 significa funzione L disattivata, D = 1 attivata
 			*	L = numero funzione 1 ... 127
 			*	L = 0 (trasmissione) disattiva (D = 0) o attiva tutte le funzioni da 1 a 127 (D = 1)
 			*/
 
-			if (notifySusiBinaryState) {
-				if (functionNumber == 0) {
-					// Comanda tutte le funzioni
-					static uint8_t i;
-					if (funcState == 0) {	// disattivo tutte le funzioni
-						for (i = 1; i < 128; ++i) {
-							notifySusiBinaryState(i, 0);
+			if ((uint16_t)freeMemory() >= (sizeof(uint8_t) * 2)) {				// Controllo di avere abbastanza memoria per le variabili
+				static uint8_t functionNumber, funcState;
+				funcState = bitRead(SusiData.MessageByte[1], 7);	// leggo il valore dello stato 'D'
+				bitWrite(SusiData.MessageByte[1], 7, 0);			// elimino il valore dello stato
+				functionNumber = SusiData.MessageByte[1];			// i restanti bit identificano la Funzione 'L'
+
+				if (notifySusiBinaryState) {
+					if (functionNumber == 0) {
+						// Comanda tutte le funzioni
+						static uint8_t i;
+						if (funcState == 0) {	// disattivo tutte le funzioni
+							for (i = 1; i < 128; ++i) {
+								notifySusiBinaryState(i, 0);
+							}
+						}
+						else {				// attivo tutte le funzioni 
+							for (i = 1; i < 128; ++i) {
+								notifySusiBinaryState(i, 1);
+							}
 						}
 					}
-					else {				// attivo tutte le funzioni 
-						for (i = 1; i < 128; ++i) {
-							notifySusiBinaryState(i, 1);
-						}
+					else {
+						// Comanda una singola funzione
+						notifySusiBinaryState(functionNumber, funcState);
 					}
-				}
-				else {
-					// Comanda una singola funzione
-					notifySusiBinaryState(functionNumber, funcState);
 				}
 			}
 			break;
 		}
 		case 110: {	// && 111
-			/* "Binärzustände lange Form low Byte" : 0110-1110 (0x6E = 110) D L6 L5 L4 - L3 L2 L1 L0
+			/*	"Binärzustände lange Form low Byte" : 0110-1110 (0x6E = 110) D L6 L5 L4 - L3 L2 L1 L0
 			*
-			* Befehl wird immer paarweise vor dem Binärzustand lange Form high Byte gesendet. 
-			* Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
-			* D = 0 bedeutet Binärzustand L ausgeschaltet, D = 1 "eingeschaltet"
-			* L = niederwertige Bits der Binärzustandsnummer 1 ... 32767 
+			*	Befehl wird immer paarweise vor dem Binärzustand lange Form high Byte gesendet. 
+			*	Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
+			*	D = 0 bedeutet Binärzustand L ausgeschaltet, D = 1 "eingeschaltet"
+			*	L = niederwertige Bits der Binärzustandsnummer 1 ... 32767 
 			* 
-			* Il comando viene sempre inviato in coppie prima che lo stato binario formi lunghi byte alti. 
-			* Se i due comandi non seguono direttamente, devono essere ignorati.
-			* D = 0 significa stato binario L spento, D = 1 "acceso"
-			* L = bit di basso valore dello stato binario numero 1 ... 32767
+			*	Il comando viene sempre inviato in coppie prima che lo stato binario formi lunghi byte alti. 
+			*	Se i due comandi non seguono direttamente, devono essere ignorati.
+			*	D = 0 significa stato binario L spento, D = 1 "acceso"
+			*	L = bit di basso valore dello stato binario numero 1 ... 32767
 			* 
 			*
-			* "Binärzustände lange Form high Byte" : 0110-1111 (0x6F = 111) H7 H6 H5 H4 - H3 H2 H1 H0
+			*	"Binärzustände lange Form high Byte" : 0110-1111 (0x6F = 111) H7 H6 H5 H4 - H3 H2 H1 H0
 			* 
-			* Befehl wird immer paarweise nach dem Binärzustand lange Form low
-			* Byte gesendet. Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
-			* Erst dieser Befehl führt zur Ausführung des Gesamtbefehls.
-			* H = höherwertigen Bits der Binärzustandsnummer high 1 ... 32767 
-			* H und L = 0 (Broadcast) schaltet alle 32767 verfügbaren Binärzustände
-			* aus (D = 0) oder an (D = 1) 
+			*	Befehl wird immer paarweise nach dem Binärzustand lange Form low
+			*	Byte gesendet. Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
+			*	Erst dieser Befehl führt zur Ausführung des Gesamtbefehls.
+			*	H = höherwertigen Bits der Binärzustandsnummer high 1 ... 32767 
+			*	H und L = 0 (Broadcast) schaltet alle 32767 verfügbaren Binärzustände
+			*	aus (D = 0) oder an (D = 1) 
 			* 
-			* Il comando viene sempre inviato in coppie dopo che lo stato binario forma lunghi byte bassi. Se i due comandi non si sus seguono direttamente, devono essere ignorati.
-			* Solo dopo questo comando eseguira' l'intero comando.
-			* H = bit di qualita' superiore dello stato binario numero alto 1 ... 32767 
+			*	Il comando viene sempre inviato in coppie dopo che lo stato binario forma lunghi byte bassi. Se i due comandi non si sus seguono direttamente, devono essere ignorati.
+			*	Solo dopo questo comando eseguira' l'intero comando.
+			*	H = bit di qualita' superiore dello stato binario numero alto 1 ... 32767 
 			*/
 
-			if (SusiData.MessageByte[2] == 111) {	// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
-				if (notifySusiBinaryState) {		// Controllo se e' presente il metodo per gestire il comando
-					static uint16_t Command;
-					static uint8_t State;
+			if ((uint16_t)freeMemory() >= (sizeof(uint8_t) + sizeof(uint16_t))) {	// Controllo di avere abbastanza memoria per le variabili
+				if (SusiData.MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
+					if (notifySusiBinaryState) {						// Controllo se e' presente il metodo per gestire il comando
+						static uint16_t Command;
+						static uint8_t State;
 
-					Command = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
-					Command = Command << 7;				//sposto i bit 7 posti a 'sinistra'
-					Command |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
+						Command = SusiData.MessageByte[3];			// memorizzo i bit "piu' significativ"
+						Command = Command << 7;						// sposto i bit 7 posti a 'sinistra'
+						Command |= SusiData.MessageByte[1];			// aggiungo i 7 bit "meno significativi"
 
-					State = bitRead(SusiData.MessageByte[1], 7);
+						State = bitRead(SusiData.MessageByte[1], 7);
 
-					notifySusiBinaryState(Command, State);
+						notifySusiBinaryState(Command, State);
+					}
 				}
 			}
 			break;
 		}
 		case 64: {
-			/* "Direktbefehl 1" (2-Byte): 0100-0000 (0x40 = 64) X8 X7 X6 X5 - X4 X3 X2 X1
+			/*	"Direktbefehl 1" (2-Byte): 0100-0000 (0x40 = 64) X8 X7 X6 X5 - X4 X3 X2 X1
 			* 
-			* Die Direktbefehle dienen zur direkten Ansteuerung von Ausgängen und
-			* anderen Funktionen nach der Anwendung der Funktionstabelle im Master.
-			* Ein Bit = 1 bedeutet der entsprechende Ausgang ist eingeschaltet.
+			*	Die Direktbefehle dienen zur direkten Ansteuerung von Ausgängen und
+			*	anderen Funktionen nach der Anwendung der Funktionstabelle im Master.
+			*	Ein Bit = 1 bedeutet der entsprechende Ausgang ist eingeschaltet.
 			* 
-			* I comandi diretti vengono utilizzati per il controllo diretto delle uscite e
-			* altre funzioni dopo aver utilizzato la tabella delle funzioni nel master.
-			* Un bit = 1 significa che l'uscita corrispondente è attivata.
+			*	I comandi diretti vengono utilizzati per il controllo diretto delle uscite e
+			*	altre funzioni dopo aver utilizzato la tabella delle funzioni nel master.
+			*	Un bit = 1 significa che l'uscita corrispondente è attivata.
 			*/
 			if (notifySusiAux) {
 				notifySusiAux(SUSI_AUX_1_8, SusiData.MessageByte[1]);
@@ -362,37 +366,37 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 65: {
-			/* "Direktbefehl 2" : 0100-0001 (0x41 = 65) X16 X15 X14 X13 - X12 X11 X10 X9 */
+			/*	"Direktbefehl 2" : 0100-0001 (0x41 = 65) X16 X15 X14 X13 - X12 X11 X10 X9 */
 			if (notifySusiAux) {
 				notifySusiAux(SUSI_AUX_9_16, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 66: {
-			/* "Direktbefehl 3" : 0100-0010 (0x42 = 66) X24 X23 X22 X21 - X20 X19 X18 X17 */
+			/*	"Direktbefehl 3" : 0100-0010 (0x42 = 66) X24 X23 X22 X21 - X20 X19 X18 X17 */
 			if (notifySusiAux) {
 				notifySusiAux(SUSI_AUX_17_24, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 67: {
-			/* "Direktbefehl 4" : 0100-0011 (0x43 = 67) X32 X31 X30 X29 - X28 X27 X26 X25 */
+			/*	"Direktbefehl 4" : 0100-0011 (0x43 = 67) X32 X31 X30 X29 - X28 X27 X26 X25 */
 			if (notifySusiAux) {
 				notifySusiAux(SUSI_AUX_25_32, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 33: {
-			/* "Trigger-Puls" : 0010-0001 (0x21 = 33) 0 0 0 0 - 0 0 0 1 
+			/*	"Trigger-Puls" : 0010-0001 (0x21 = 33) 0 0 0 0 - 0 0 0 1 
 			*
-			* Der Befehl dient zur Synchronisation eines Dampfstoßes. Er wird je
-			* Dampfstoß einmal gesendet. Die Bits 1 bis 7 sind für zukünftige
-			* Anwendungen reserviert.
+			*	Der Befehl dient zur Synchronisation eines Dampfstoßes. Er wird je
+			*	Dampfstoß einmal gesendet. Die Bits 1 bis 7 sind für zukünftige
+			*	Anwendungen reserviert.
 			*
 			* 
-			* Il comando viene utilizzato per sincronizzare una scarica di vapore.
-			* Lo fara' mai scoppio di vapore inviato una volta. 
-			* I bit da 1 a 7 sono per uso futuro, Applicazioni riservate.
+			*	Il comando viene utilizzato per sincronizzare una scarica di vapore.
+			*	Lo fara' mai scoppio di vapore inviato una volta. 
+			*	I bit da 1 a 7 sono per uso futuro, Applicazioni riservate.
 			*/
 			if (notifySusiTriggerPulse) {
 				notifySusiTriggerPulse(SusiData.MessageByte[1]);
@@ -400,17 +404,17 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 35: {
-			/* "Strom" : 0010-0011 (0x23 = 35) S7 S6 S5 S4 - S3 S2 S1 S0
+			/*	"Strom" : 0010-0011 (0x23 = 35) S7 S6 S5 S4 - S3 S2 S1 S0
 			*
-			* Vom Motor verbrauchter Strom. Der Wert hat einen Bereich von -128 bis
-			* 127, wird im 2er-Komplement übertragen und wird über eine
-			* herstellerspezifische CV im Lokdecoder kalibriert. Negative Werte
-			* bedeuten ein Rückspeisen wie es bei modernen E-Loks möglich ist.
+			*	Vom Motor verbrauchter Strom. Der Wert hat einen Bereich von -128 bis
+			*	127, wird im 2er-Komplement übertragen und wird über eine
+			*	herstellerspezifische CV im Lokdecoder kalibriert. Negative Werte
+			*	bedeuten ein Rückspeisen wie es bei modernen E-Loks möglich ist.
 			*
-			* Elettricita' consumata dal motore. Il valore ha un intervallo da -128 a
-			* 127, viene trasmesso in complemento a 2 e viene trasmesso tramite a
-			* CV specifico del costruttore calibrato nel decoder della locomotiva. Valori negativi
-			* significa un feed back come e' possibile con le moderne locomotive elettriche.
+			*	Elettricita' consumata dal motore. Il valore ha un intervallo da -128 a
+			*	127, viene trasmesso in complemento a 2 e viene trasmesso tramite a
+			*	CV specifico del costruttore calibrato nel decoder della locomotiva. Valori negativi
+			*	significa un feed back come e' possibile con le moderne locomotive elettriche.
 			*/
 			if (notifySusiMotorCurrent) {
 				notifySusiMotorCurrent(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
@@ -418,28 +422,28 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 36: {	/* DEPRECATO DALLA REVISIONE 6 / 12 / 2020 */
-			/* " "Ist" Lok-Fahrstufe " : 0010-0100 (0x24 = 36) R G6 G5 G4 - G3 G2 G1 G0
+			/*	" "Ist" Lok-Fahrstufe " : 0010-0100 (0x24 = 36) R G6 G5 G4 - G3 G2 G1 G0
 			*
-			* Die Fahrstufe und Richtung entsprechen dem realen Zustand am Motor.
-			* Der Wert G ist als 0...127 auf die im Modell eingestellte Vmax normiert zu
-			* übertragen. G = 0 bedeutet Lok steht, G = 1 ... 127 ist die normierte
-			* Geschwindigkeit R = Fahrtrichtung mit R = 0 für rückwärts und R = 1
-			* für vorwärts.
-			* Dieser und der folgende Befehl werden nicht für neue Implementierungen
-			* empfohlen. Slaves sollten nach Möglichkeit die Befehle 0x50 bis 0x52
-			* auswerten. Master, die aus Gründen der Kompatibilität zu existierenden
-			* Produkten abweichende und/oder unterschiedliche Umsetzungen bei den
-			* Befehlen 0x24 und 0x25 verwenden, sind normkonform.
+			*	Die Fahrstufe und Richtung entsprechen dem realen Zustand am Motor.
+			*	Der Wert G ist als 0...127 auf die im Modell eingestellte Vmax normiert zu
+			*	übertragen. G = 0 bedeutet Lok steht, G = 1 ... 127 ist die normierte
+			*	Geschwindigkeit R = Fahrtrichtung mit R = 0 für rückwärts und R = 1
+			*	für vorwärts.
+			*	Dieser und der folgende Befehl werden nicht für neue Implementierungen
+			*	empfohlen. Slaves sollten nach Möglichkeit die Befehle 0x50 bis 0x52
+			*	auswerten. Master, die aus Gründen der Kompatibilität zu existierenden
+			*	Produkten abweichende und/oder unterschiedliche Umsetzungen bei den
+			*	Befehlen 0x24 und 0x25 verwenden, sind normkonform.
 			* 
-			* Il livello di velocita' e la direzione corrispondono allo stato reale del motore.
-			* Il valore G e' normalizzato come 0 ... 127 alla Vmax impostata nel modello
-			* Trasferimento. G = 0 significa che la locomotiva e' ferma, G = 1 ... 127 e' quella standardizzata
-			* Velocita' R = senso di marcia con R = 0 all'indietro e R = 1 per avanti.
-			* Questo e il seguente comando non vengono utilizzati per le nuove implementazioni
-			* consigliato. Se possibile, gli slave dovrebbero utilizzare i comandi da 0x50 a 0x52
-			* valutare. Master, che per motivi di compatibilita' con gli esistenti
-			* Prodotti che deviano e / o implementazioni differenti nel
-			* L'uso dei comandi 0x24 e 0x25 e' conforme allo standard.
+			*	Il livello di velocita' e la direzione corrispondono allo stato reale del motore.
+			*	Il valore G e' normalizzato come 0 ... 127 alla Vmax impostata nel modello
+			*	Trasferimento. G = 0 significa che la locomotiva e' ferma, G = 1 ... 127 e' quella standardizzata
+			*	Velocita' R = senso di marcia con R = 0 all'indietro e R = 1 per avanti.
+			*	Questo e il seguente comando non vengono utilizzati per le nuove implementazioni
+			*	consigliato. Se possibile, gli slave dovrebbero utilizzare i comandi da 0x50 a 0x52
+			*	valutare. Master, che per motivi di compatibilita' con gli esistenti
+			*	Prodotti che deviano e / o implementazioni differenti nel
+			*	L'uso dei comandi 0x24 e 0x25 e' conforme allo standard.
 			*/
 			if (notifySusiRealSpeed) {
 				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
@@ -452,15 +456,15 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 37: {	/* DEPRECATO DALLA REVISIONE 6 / 12 / 2020 */
-			/* " "Soll" Lok-Fahrstufe " : 0010-0101 (0x25 = 37) R G6 G5 G4 - G3 G2 G1 G0
+			/*	" "Soll" Lok-Fahrstufe " : 0010-0101 (0x25 = 37) R G6 G5 G4 - G3 G2 G1 G0
 			*
-			* Empfangene Fahrstufe des "Masters" auf 127 Fahrstufen normiert.
-			* G = 0 bedeutet Lok hält, G = 1 ... 127 ist die normierte Geschwindigkeit
-			* R = Fahrtrichtung mit R = 0 für rückwärts und R = 1 für vorwärts 
+			*	Empfangene Fahrstufe des "Masters" auf 127 Fahrstufen normiert.
+			*	G = 0 bedeutet Lok hält, G = 1 ... 127 ist die normierte Geschwindigkeit
+			*	R = Fahrtrichtung mit R = 0 für rückwärts und R = 1 für vorwärts 
 			*
-			* Passo di velocita' ricevuto del "master" normalizzato a 127 passi di velocita'.
-			* G = 0 significa che la locomotiva si ferma, G = 1 ... 127 e' la velocita' normalizzata
-			* R = senso di marcia con R = 0 indietro e R = 1 avanti
+			*	Passo di velocita' ricevuto del "master" normalizzato a 127 passi di velocita'.
+			*	G = 0 significa che la locomotiva si ferma, G = 1 ... 127 e' la velocita' normalizzata
+			*	R = senso di marcia con R = 0 indietro e R = 1 avanti
 			*/
 			if (notifySusiRequestSpeed) {
 				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
@@ -473,17 +477,17 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 38: {
-			/* "Lastausregelung" : 0010-0110 (0x26 = 38) P7 P6 P5 P4 - P3 P2 P1 P0
+			/*	"Lastausregelung" : 0010-0110 (0x26 = 38) P7 P6 P5 P4 - P3 P2 P1 P0
 			*
-			* Die Erfassung des Lastzustandes kann über Motorspannung, -strom oder -
-			* leistung erfolgen. 0 = keine Last, 127 = maximale Last. Es sind auch
-			* negative Werte möglich, die im 2er-Komplement übertragen werden.
-			* Diese bedeuten weniger Last als Fahren in der Ebene.
+			*	Die Erfassung des Lastzustandes kann über Motorspannung, -strom oder -
+			*	leistung erfolgen. 0 = keine Last, 127 = maximale Last. Es sind auch
+			*	negative Werte möglich, die im 2er-Komplement übertragen werden.
+			*	Diese bedeuten weniger Last als Fahren in der Ebene.
 			* 
-			* Lo stato del carico puo' essere registrato tramite tensione del motore, corrente o prestazione. 
-			* 0 = nessun carico, 127 = carico massimo. 
-			* Ci sono anche possibili valori negativi, che vengono trasferiti nel complemento di 2.
-			* Significa meno carico rispetto alla guida in piano.
+			*	Lo stato del carico puo' essere registrato tramite tensione del motore, corrente o prestazione. 
+			*	0 = nessun carico, 127 = carico massimo. 
+			*	Ci sono anche possibili valori negativi, che vengono trasferiti nel complemento di 2.
+			*	Significa meno carico rispetto alla guida in piano.
 			*/
 
 			if (notifySusiMotorLoad) {
@@ -492,22 +496,22 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 80: {
-			/* " "Ist" Geschwindigkeit " : 0101-0000 (0x50 = 80) R G6 G5 G4 - G3 G2 G1 G0
+			/*	" "Ist" Geschwindigkeit " : 0101-0000 (0x50 = 80) R G6 G5 G4 - G3 G2 G1 G0
 			*
-			* Die Geschwindigkeit und Richtung entsprechen dem realen Zustand am
-			* Motor. Dieses ist ein Regelwert in Bezug auf die "Soll"- Geschwindigkeit,
-			* d.h. dass nach Nachführung der Geschwindigkeitsrampe Ist und Soll gleich
-			* sein sollen (ausgeregelter Zustand). Der Wert G ist als 0...127 auf die im
-			* Modell eingestellte Vmax normiert zu übertragen. G = 0 bedeutet Lok steht, G
-			* = 1 ... 127 ist die normiert Geschwindigkeit R = Fahrtrichtung mit R = 0
-			* für rückwärts und R = 1 für vorwärts
+			*	Die Geschwindigkeit und Richtung entsprechen dem realen Zustand am
+			*	Motor. Dieses ist ein Regelwert in Bezug auf die "Soll"- Geschwindigkeit,
+			*	d.h. dass nach Nachführung der Geschwindigkeitsrampe Ist und Soll gleich
+			*	sein sollen (ausgeregelter Zustand). Der Wert G ist als 0...127 auf die im
+			*	Modell eingestellte Vmax normiert zu übertragen. G = 0 bedeutet Lok steht, G
+			*	= 1 ... 127 ist die normiert Geschwindigkeit R = Fahrtrichtung mit R = 0
+			*	für rückwärts und R = 1 für vorwärts
 			* 
-			* La velocita' e la direzione corrispondono alla situazione reale del Motore. 
-			* Questo e' un valore di controllo in relazione alla velocita' "target",
-			* ovvero che dopo aver tracciato la rampa di velocita', i valori effettivi e target sono gli stessi, dovrebbe essere (stato stabile). 
-			* Il valore G deve essere trasferito come 0 ... 127 standardizzato alla Vmax impostata nel modello. 
-			* G = 0 significa che la locomotiva e' ferma, G = 1 ... 127 e' la velocita' normalizzata, R = senso di marcia 
-			* con R = 0 per indietro e R = 1 per avanti
+			*	La velocita' e la direzione corrispondono alla situazione reale del Motore. 
+			*	Questo e' un valore di controllo in relazione alla velocita' "target",
+			*	ovvero che dopo aver tracciato la rampa di velocita', i valori effettivi e target sono gli stessi, dovrebbe essere (stato stabile). 
+			*	Il valore G deve essere trasferito come 0 ... 127 standardizzato alla Vmax impostata nel modello. 
+			*	G = 0 significa che la locomotiva e' ferma, G = 1 ... 127 e' la velocita' normalizzata, R = senso di marcia 
+			*	con R = 0 per indietro e R = 1 per avanti
 			*/
 			if (notifySusiRealSpeed) {
 				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
@@ -520,29 +524,29 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 81: {
-			/* " "Soll" Geschwindigkeit " : 0101-0001 (0x51 = 81) R G6 G5 G4 - G3 G2 G1 G0
+			/*	" "Soll" Geschwindigkeit " : 0101-0001 (0x51 = 81) R G6 G5 G4 - G3 G2 G1 G0
 			*
-			* Interne Fahrstufe des "Masters" entsprechend der über die Kennlinie (CVs
-			* 67 bis 94, CVs 2, 6 und 5) und sonstiger CVs, die die Geschwindigkeit des
-			* Fahrzeugs bestimmen, umgerechnete empfangene Fahrstufe auf 127
-			* Fahrstufen normalisiert. D.h. der höchste aufgrund der CVs 94 und/oder
-			* CV5 bzw. sonstiger entsprechender CVs erreichbare Wert wird auf 127
-			* normiert. CVs für Beschleunigung und Bremsen wie die CVs 3, 4, 23 und
-			* 24 gehen in die Berechnung nicht ein. G = 0 bedeutet Lok hält, G = 1 ...
-			* 127 ist die Geschwindigkeit R = Fahrtrichtung mit R = 0 für rückwärts und
-			* R = 1 für vorwärts.
-			* Da die Decoder unterschiedliche Verfahren zur Bestimmung der
-			* Höchstgeschwindigkeit verwenden, kann es hier leicht unterschiedliche
-			* Implementationen geben. Wichtig ist vor allem, dass sich die Befehle für
-			* Ist und Soll-Geschwindigkeit gleich verhalten.
+			*	Interne Fahrstufe des "Masters" entsprechend der über die Kennlinie (CVs
+			*	67 bis 94, CVs 2, 6 und 5) und sonstiger CVs, die die Geschwindigkeit des
+			*	Fahrzeugs bestimmen, umgerechnete empfangene Fahrstufe auf 127
+			*	Fahrstufen normalisiert. D.h. der höchste aufgrund der CVs 94 und/oder
+			*	CV5 bzw. sonstiger entsprechender CVs erreichbare Wert wird auf 127
+			*	normiert. CVs für Beschleunigung und Bremsen wie die CVs 3, 4, 23 und
+			*	24 gehen in die Berechnung nicht ein. G = 0 bedeutet Lok hält, G = 1 ...
+			*	127 ist die Geschwindigkeit R = Fahrtrichtung mit R = 0 für rückwärts und
+			*	R = 1 für vorwärts.
+			*	Da die Decoder unterschiedliche Verfahren zur Bestimmung der
+			*	Höchstgeschwindigkeit verwenden, kann es hier leicht unterschiedliche
+			*	Implementationen geben. Wichtig ist vor allem, dass sich die Befehle für
+			*	Ist und Soll-Geschwindigkeit gleich verhalten.
 			*
-			* Livello di guida interno del "Master" in base al controllo della caratteristica (CV)
-			* da 67 a 94, CV 2, 6 e 5) e altri CV che determinano la velocita' della normalizzazione del veicolo convertito hanno ricevuto un livello di guida a 127 livelli di guida.
-			* Cio' significa che il valore piu' alto ottenibile grazie ai CV 94 e/o CV5 o ad altri CV corrispondenti e' normalizzato a 127. 
-			* I CV per l'accelerazione e la frenata come i CV 3, 4, 23 e 24 non vengono utilizzati nel calcolo. 
-			* G = 0 significa appigli per locomotive, G = 1 ... 127 e' la velocita' R = direzione di marcia con R = 0 per l'indietro e R = 1 per l'avanti.
-			* Poiche' i decodificatori utilizzano metodi diversi per determinare la velocita' massima, potrebbero esserci implementazioni leggermente diverse. 
-			* Soprattutto, e' importante che i comandi per la velocita' effettiva e di destinazione si comportino allo stesso modo.
+			*	Livello di guida interno del "Master" in base al controllo della caratteristica (CV)
+			*	da 67 a 94, CV 2, 6 e 5) e altri CV che determinano la velocita' della normalizzazione del veicolo convertito hanno ricevuto un livello di guida a 127 livelli di guida.
+			*	Cio' significa che il valore piu' alto ottenibile grazie ai CV 94 e/o CV5 o ad altri CV corrispondenti e' normalizzato a 127. 
+			*	I CV per l'accelerazione e la frenata come i CV 3, 4, 23 e 24 non vengono utilizzati nel calcolo. 
+			*	G = 0 significa appigli per locomotive, G = 1 ... 127 e' la velocita' R = direzione di marcia con R = 0 per l'indietro e R = 1 per l'avanti.
+			*	Poiche' i decodificatori utilizzano metodi diversi per determinare la velocita' massima, potrebbero esserci implementazioni leggermente diverse. 
+			*	Soprattutto, e' importante che i comandi per la velocita' effettiva e di destinazione si comportino allo stesso modo.
 			*/
 			if (notifySusiRequestSpeed) {
 				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
@@ -555,23 +559,23 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 82: {	/* NON IMPLEMENTATO */
-			/* "DCC-Fahrstufe" : 0101-0010 (0x52 = 82) R G6 G5 G4 - G3 G2 G1 G0
+			/*	"DCC-Fahrstufe" : 0101-0010 (0x52 = 82) R G6 G5 G4 - G3 G2 G1 G0
 			*
-			* Dieser Wert ist nur ggf. von 14 oder 28 Fahrstufen auf 127 Fahrstufen normiert. 
-			* Es findet keine Anpassung durch irgendwelches CVs statt.
+			*	Dieser Wert ist nur ggf. von 14 oder 28 Fahrstufen auf 127 Fahrstufen normiert. 
+			*	Es findet keine Anpassung durch irgendwelches CVs statt.
 			*
-			* Questo valore e' standardizzato solo da 14 o 28 passaggi di guida a 127 passaggi di guida. 
-			* Non vi e' alcuna regolazione da parte di CV.
+			*	Questo valore e' standardizzato solo da 14 o 28 passaggi di guida a 127 passaggi di guida. 
+			*	Non vi e' alcuna regolazione da parte di CV.
 			*/
 			break;
 		}
 		case 40: {
-			/* "Analogfunktionsgruppe 1" : 0010-1000 (0x28 = 40) A7 A6 A5 A4 - A3 A2 A1 A0 
+			/*	"Analogfunktionsgruppe 1" : 0010-1000 (0x28 = 40) A7 A6 A5 A4 - A3 A2 A1 A0 
 			*
-			* Die acht Befehle dieser Gruppe erlauben die Übertragung von acht
-			* verschiedenen Analogwerten im Digitalbetrieb.
+			*	Die acht Befehle dieser Gruppe erlauben die Übertragung von acht
+			*	verschiedenen Analogwerten im Digitalbetrieb.
 			*
-			* Gli otto comandi di questo gruppo consentono la trasmissione di otto diversi valori analogici in modalita' digitale.
+			*	Gli otto comandi di questo gruppo consentono la trasmissione di otto diversi valori analogici in modalita' digitale.
 			*/
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_0_7, SusiData.MessageByte[1]);
@@ -579,68 +583,68 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 41: {
-			/* "Analogfunktionsgruppe 2" : 0010-1001 (0x29 = 41) A15 A14 A13 A12 - A11 A10 A9 A8 */
+			/*	"Analogfunktionsgruppe 2" : 0010-1001 (0x29 = 41) A15 A14 A13 A12 - A11 A10 A9 A8 */
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_8_15, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 42: {
-			/* "Analogfunktionsgruppe 3" : 0010-1010 (0x2A = 42) A23 A22 A21 A20 - A19 A18 A17 A16 */
+			/*	"Analogfunktionsgruppe 3" : 0010-1010 (0x2A = 42) A23 A22 A21 A20 - A19 A18 A17 A16 */
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_16_23, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 43: {
-			/* "Analogfunktionsgruppe 4" : 0010-1011 (0x2B = 43) A31 A30 A29 A28 - A27 A26 A25 A24 */
+			/*	"Analogfunktionsgruppe 4" : 0010-1011 (0x2B = 43) A31 A30 A29 A28 - A27 A26 A25 A24 */
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_24_31, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 44: {
-			/* "Analogfunktionsgruppe 5" : 0010-1100 (0x2C = 44) A39 A38 A37 A36 - A35 A34 A33 A32 */
+			/*	"Analogfunktionsgruppe 5" : 0010-1100 (0x2C = 44) A39 A38 A37 A36 - A35 A34 A33 A32 */
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_32_39, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 45: {
-			/* "Analogfunktionsgruppe 6" : 0010-1101 (0x2D = 45) A47 A46 A45 A44 - A43 A42 A42 A40 */
+			/*	"Analogfunktionsgruppe 6" : 0010-1101 (0x2D = 45) A47 A46 A45 A44 - A43 A42 A42 A40 */
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_40_47, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 46: {
-			/* "Analogfunktionsgruppe 7" : 0010-1110 (0x2E = 46) A55 A54 A53 A52 - A51 A50 A49 A48 */
+			/*	"Analogfunktionsgruppe 7" : 0010-1110 (0x2E = 46) A55 A54 A53 A52 - A51 A50 A49 A48 */
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_48_55, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 47: {
-			/* "Analogfunktionsgruppe 8" : 0010-1111 (0x2F = 47) A63 A62 A61 A60 - A59 A58 A57 A56 */
+			/*	"Analogfunktionsgruppe 8" : 0010-1111 (0x2F = 47) A63 A62 A61 A60 - A59 A58 A57 A56 */
 			if (notifySusiAnalogFunction) {
 				notifySusiAnalogFunction(SUSI_AN_56_63, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 48: {
-			/* "Direktbefehl 1 für Analogbetrieb" : 0011-0000 (0x30 = 48) D7 D6 D5 D4 - D3 D2 D1 D0
+			/*	"Direktbefehl 1 für Analogbetrieb" : 0011-0000 (0x30 = 48) D7 D6 D5 D4 - D3 D2 D1 D0
 			*
-			* Einstellung von Grundfunktionen im Analogbetrieb unter Umgehung einer Funktionszuordnung.
-			* - Bit 0: Sound an/aus
-			* - Bit 1: Auf-/Abrüsten
-			* - Bit 2-6: reserviert
-			* - Bit 7: Reduzierte Lautstärke
+			*	Einstellung von Grundfunktionen im Analogbetrieb unter Umgehung einer Funktionszuordnung.
+			*	- Bit 0: Sound an/aus
+			*	- Bit 1: Auf-/Abrüsten
+			*	- Bit 2-6: reserviert
+			*	- Bit 7: Reduzierte Lautstärke
 			* 
-			* Impostazione delle funzioni di base in modalità analogica ignorando un'assegnazione di funzione.
-			* - Bit 0: Suono on/off
-			* - Bit 1: Aggiornamento/Disarmo
-			* - Bit 2-6: riservato
-			* - Bit 7: Volume ridotto
+			*	Impostazione delle funzioni di base in modalità analogica ignorando un'assegnazione di funzione.
+			*	- Bit 0: Suono on/off
+			*	- Bit 1: Aggiornamento/Disarmo
+			*	- Bit 2-6: riservato
+			*	- Bit 7: Volume ridotto
 			*/
 			if (notifySusiAnalogDirectCommand) {
 				notifySusiAnalogDirectCommand(1, SusiData.MessageByte[1]);
@@ -648,19 +652,19 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 49: {
-			/* "Direktbefehl 2 für Analogbetrieb" : 0011-0000 (0x31 = 49) D7 D6 D5 D4 - D3 D2 D1 D0
+			/*	"Direktbefehl 2 für Analogbetrieb" : 0011-0000 (0x31 = 49) D7 D6 D5 D4 - D3 D2 D1 D0
 			*
-			* Einstellung von Grundfunktionen im Analogbetrieb unter Umgehung einer Funktionszuordnung.
-			* - Bit 0: Spitzenlicht
-			* - Bit 1: Schlusslicht
-			* - Bit 2: Standlicht
-			* - Bit 3-7: reserviert
+			*	Einstellung von Grundfunktionen im Analogbetrieb unter Umgehung einer Funktionszuordnung.
+			*	- Bit 0: Spitzenlicht
+			*	- Bit 1: Schlusslicht
+			*	- Bit 2: Standlicht
+			*	- Bit 3-7: reserviert
 			* 
-			* Impostazione delle funzioni di base in modalità analogica ignorando un'assegnazione di funzione.
-			* - Bit 0: Luce di picco
-			* - Bit 1: Fanale posteriore
-			* - Bit 2: Stand light
-			* - Bit 3-7: riservato
+			*	Impostazione delle funzioni di base in modalità analogica ignorando un'assegnazione di funzione.
+			*	- Bit 0: Luce di picco
+			*	- Bit 1: Fanale posteriore
+			*	- Bit 2: Stand light
+			*	- Bit 3-7: riservato
 			*/
 			if (notifySusiAnalogDirectCommand) {
 				notifySusiAnalogDirectCommand(2, SusiData.MessageByte[1]);
@@ -668,49 +672,52 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 0: {
-			/* "No Operation" : 0000-0000 (0x00 = 0) X X X X - X X X X
+			/*	"No Operation" : 0000-0000 (0x00 = 0) X X X X - X X X X
 			*
-			* Der Befehl bewirkt keine Aktion im Slave. Die Daten können einen
-			* beliebigen Wert haben. Der Befehl kann als Lückenfüller oder zu
-			* Testzwecken verwendet werden. 
+			*	Der Befehl bewirkt keine Aktion im Slave. Die Daten können einen
+			*	beliebigen Wert haben. Der Befehl kann als Lückenfüller oder zu
+			*	Testzwecken verwendet werden. 
 			* 
-			* Il comando non esegue alcuna azione nello slave. 
-			* I dati possono avere qualsiasi valore. Il comando puo' essere utilizzato come gap filler o a scopo di test. 
+			*	Il comando non esegue alcuna azione nello slave. 
+			*	I dati possono avere qualsiasi valore. Il comando puo' essere utilizzato come gap filler o a scopo di test. 
 			*/
 			break;
 		}
 		case 94: {	//&& 95
-			/* "Moduladresse low" : 0101-1110 (0x5E = 94) A7 A6 A5 A4 - A3 A2 A1 A0
+			/*	"Moduladresse low" : 0101-1110 (0x5E = 94) A7 A6 A5 A4 - A3 A2 A1 A0
 			* 
-			* Übermittelt die niederwertigen Bits der aktiven Digitaladresse des "Masters", wenn er sich in einer digitalen Betriebsart befindet.
-			* Der Befehl wird immer paarweise vor der Adresse high Byte gesendet.
-			* Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren. 
+			*	Übermittelt die niederwertigen Bits der aktiven Digitaladresse des "Masters", wenn er sich in einer digitalen Betriebsart befindet.
+			*	Der Befehl wird immer paarweise vor der Adresse high Byte gesendet.
+			*	Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren. 
 			*
-			* Invia i bit di basso valore dell'indirizzo digitale attivo del "master" quando e' in modalita' digitale.
-			* Il comando viene sempre inviato in coppie in coppia prima dell'indirizzo high bytes.
-			* Se i due comandi non si susseguono direttamente, devono essere ignorati.  
+			*	Invia i bit di basso valore dell'indirizzo digitale attivo del "master" quando e' in modalita' digitale.
+			*	Il comando viene sempre inviato in coppie in coppia prima dell'indirizzo high bytes.
+			*	Se i due comandi non si susseguono direttamente, devono essere ignorati.  
 			* 
 			* 
-			* "Moduladresse high" : 0101-1111 (0x5F = 95) A15 A14 A13 A12 - A11 A10 A9 A8
+			*	"Moduladresse high" : 0101-1111 (0x5F = 95) A15 A14 A13 A12 - A11 A10 A9 A8
 			*
-			* Übermittelt die höherwertigen Bits der aktiven Digitaladresse des "Masters", wenn er sich in einer digitalen Betriebsart befindet.
-			* Der Befehl wird immer paarweise nach der Adresse low Byte gesendet.
-			* Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren. 
+			*	Übermittelt die höherwertigen Bits der aktiven Digitaladresse des "Masters", wenn er sich in einer digitalen Betriebsart befindet.
+			*	Der Befehl wird immer paarweise nach der Adresse low Byte gesendet.
+			*	Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren. 
 			* 
-			* Invia i bit di qualita' superiore dell'indirizzo digitale attivo del "master" quando e' in modalita' digitale.
-			* Il comando viene sempre inviato a coppie in base all'indirizzo a byte basso.
-			* Se i due comandi non si susseguono direttamente, devono essere ignorati. 
+			*	Invia i bit di qualita' superiore dell'indirizzo digitale attivo del "master" quando e' in modalita' digitale.
+			*	Il comando viene sempre inviato a coppie in base all'indirizzo a byte basso.
+			*	Se i due comandi non si susseguono direttamente, devono essere ignorati. 
 			*/
 
+
 			if (SusiData.MessageByte[2] == 95) {	//i byte di comando devono susseguirsi
-				if (notifySusiMasterAddress) {		// Controllo se e' presente il metodo per gestire il comando
-					static uint16_t MasterAddress;
+				if ((uint16_t)freeMemory() >= (sizeof(uint16_t))) {				// Controllo di avere abbastanza memoria per le variabili
+					if (notifySusiMasterAddress) {		// Controllo se e' presente il metodo per gestire il comando
+						static uint16_t MasterAddress;
 
-					MasterAddress = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
-					MasterAddress = MasterAddress << 8;				//sposto i bit 7 posti a 'sinistra'
-					MasterAddress |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
+						MasterAddress = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
+						MasterAddress = MasterAddress << 8;				//sposto i bit 7 posti a 'sinistra'
+						MasterAddress |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
 
-					notifySusiMasterAddress(MasterAddress);
+						notifySusiMasterAddress(MasterAddress);
+					}
 				}
 			}
 			break;
@@ -720,21 +727,21 @@ void Rcn600::process(void) {
 		/* METODI MANIPOLAZIONE CVs */
 
 		case 119: {	
-			/* "CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
+			/*	"CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
 			*
-			* DCC-Befehl Byte Prüfen im Service- und Betriebsmodus
-			* V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
-			* D = Vergleichswert zum Prüfen. Wenn D dem gespeicherten CV-Wert
-			* entspricht, antwortet der Slave mit einem Acknowledge. 
-			* Dieser und die beiden folgenden Befehle sind die in Abschnitt 4 genannten
-			* 3 Byte Pakete entsprechend [RCN-214] 
+			*	DCC-Befehl Byte Prüfen im Service- und Betriebsmodus
+			*	V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
+			*	D = Vergleichswert zum Prüfen. Wenn D dem gespeicherten CV-Wert
+			*	entspricht, antwortet der Slave mit einem Acknowledge. 
+			*	Dieser und die beiden folgenden Befehle sind die in Abschnitt 4 genannten
+			*	3 Byte Pakete entsprechend [RCN-214] 
 			* 
-			* Controllo byte di comando DCC in modalita' di servizio e di funzionamento
-			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
-			* D = valore di confronto per il controllo. Se D corrisponde al valore CV memorizzato
-			* lo Slave risponde con un riconoscimento.
-			* Questo ei due comandi seguenti sono quelli menzionati nella sezione 4
-			* Pacchetti da 3 byte secondo [RCN-214]
+			*	Controllo byte di comando DCC in modalita' di servizio e di funzionamento
+			*	V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
+			*	D = valore di confronto per il controllo. Se D corrisponde al valore CV memorizzato
+			*	lo Slave risponde con un riconoscimento.
+			*	Questo ei due comandi seguenti sono quelli menzionati nella sezione 4
+			*	Pacchetti da 3 byte secondo [RCN-214]
 			*/
 			static uint16_t CV_Number;
 			static uint8_t CV_Value;
