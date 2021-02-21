@@ -53,7 +53,7 @@ void ISR_SUSI() {
 						SusiData.MessageComplete = true;
 					}
 				}
-				else {	/* Ho letto 3 byte, non ci sono messaggi di lunghezza maggiore */
+				else {	/* Ho letto 4 byte, non ci sono messaggi di lunghezza maggiore */
 					SusiData.MessageComplete = true;
 				}
 			}
