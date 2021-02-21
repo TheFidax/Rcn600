@@ -9,6 +9,7 @@
 #include "SUSI_AN_BIT.h"
 
 //#define	DEBUG_RCN_LIBRARY		//attiva la modalita' di debug
+//#define	DEBUG_CV_RCN_LIBRARY	//Attiva la modalita' di Debug per la gestione CVs
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
 #define	LIB_VER						1		//identifica la versione della libreria
@@ -150,14 +151,23 @@ extern "C" {
 	*/
 	extern	void notifySusiMotorLoad(int load) __attribute__((weak));
 	/*
-	*	notifySusiAnalog() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
+	*	notifySusiAnalogFunction() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni analogiche
 	*	Input:
 	*		- il gruppo Analogico decodificato
 	*		- lo stato del gruppo
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiAnalog(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) __attribute__((weak));
+	extern	void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) __attribute__((weak));
+	/*
+	*	notifySusiAnalogDirectCommand() viene invocato quando: si ricevono i dati dal Master i comandi diretti per il funzionamento analogico
+	*	Input:
+	*		- il numero del comando: 1 o 2
+	*		- i bit del comando
+	*	Restituisce:
+	*		- Nulla
+	*/
+		extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
 	
 
 	/* METODI MANIPOLAZIONE CVs */

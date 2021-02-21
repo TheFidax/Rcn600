@@ -18,7 +18,8 @@ notifySusiMotorCurrent	KEYWORD2
 notifySusiRequestSpeed	KEYWORD2
 notifySusiRealSpeed	KEYWORD2
 notifySusiMotorLoad	KEYWORD2
-notifySusiAnalog	KEYWORD2
+notifySusiAnalogFunction	KEYWORD2
+notifySusiAnalogDirectCommand	KEYWORD2
 
 //////////////////////// CVs
 notifySusiCVRead	KEYWORD2

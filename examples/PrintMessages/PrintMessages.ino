@@ -244,9 +244,9 @@ void notifySusiMotorLoad(int load) {
 #endif
 
 // Decommentare la #define sotto per stampare lo stato dei comandi analogici
-#define NOTIFY_SUSI_ANALOG
-#ifdef  NOTIFY_SUSI_ANALOG
-void notifySusiAnalog(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) {
+#define NOTIFY_SUSI_ANALOG_FUNCTION
+#ifdef  NOTIFY_SUSI_ANALOG_FUNCTION
+void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) {
   Serial.print("notifySusiAnalog: ");
   switch( SUSI_AnalogGrp ) {
      case SUSI_AN_0_7:
@@ -346,6 +346,18 @@ void notifySusiAnalog(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) {
        break; 
    }
 }
+#endif
+
+// Decommentare la #define sotto per stampare i comandi 'Diretti Analogici'
+#define NOTIFY_SUSI_ANALOG_DIRECT_COMMAND
+#ifdef  NOTIFY_SUSI_ANALOG_DIRECT_COMMAND
+void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) {
+  Serial.print("notifySusiAnalogDirectCommand: ");
+  Serial.print(" Command Number: ");
+  Serial.print(commandNumber);
+  Serial.print(" Command: ");
+  Serial.println(Command);
+};
 #endif
 
 void setup() {   

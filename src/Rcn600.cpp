@@ -105,7 +105,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	digitalWrite(SusiData.DATA_pin, HIGH);
 	pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit
 
-#ifdef DEBUG_RCN_LIBRARY
+#ifdef DEBUG_CV_RCN_LIBRARY
 	Serial.println("SUSI ACK");
 #endif
 }
@@ -120,7 +120,7 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 	* Slave 3: 980 - 1019
 	* Per tutti: 1020 - 1024 */
 
-#ifdef DEBUG_RCN_LIBRARY
+#ifdef DEBUG_CV_RCN_LIBRARY
 	Serial.print("isCVvalid: ");
 	Serial.print("CV da controllare: ");
 	Serial.print(CV);
@@ -128,31 +128,31 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 #endif
 
 	if ((SlaveNumber == 1) && ((CV >= 900) && (CV <= 939))) {
-#ifdef DEBUG_RCN_LIBRARY
+#ifdef DEBUG_CV_RCN_LIBRARY
 		Serial.println("Slave 1");
 #endif
 		return true;
 	}
 	else if ((SlaveNumber == 2) && ((CV >= 940) && (CV <= 979))) {
-#ifdef DEBUG_RCN_LIBRARY
+#ifdef DEBUG_CV_RCN_LIBRARY
 		Serial.println("Slave 2");
 #endif
 		return true;
 	}
 	else if ((SlaveNumber == 3) && ((CV >= 980) && (CV <= 1019))) {
-#ifdef DEBUG_RCN_LIBRARY
+#ifdef DEBUG_CV_RCN_LIBRARY
 		Serial.println("Slave 3");
 #endif
 		return true;
 	}
 	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {	//CV valide per tutti i moduli
-#ifdef DEBUG_RCN_LIBRARY
+#ifdef DEBUG_CV_RCN_LIBRARY
 		Serial.println("Tutti gli Slave");
 #endif
 		return true;
 	}
 	else {
-#ifdef DEBUG_RCN_LIBRARY
+#ifdef DEBUG_CV_RCN_LIBRARY
 		Serial.println("CV NON VALIDA");
 #endif
 		return false;
@@ -562,57 +562,97 @@ void Rcn600::process(void) {
 			*
 			* Gli otto comandi di questo gruppo consentono la trasmissione di otto diversi valori analogici in modalita' digitale.
 			*/
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_0_7, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_0_7, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 41: {
 			/* "Analogfunktionsgruppe 2" : 0010-1001 (0x29 = 41) A15 A14 A13 A12 - A11 A10 A9 A8 */
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_8_15, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_8_15, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 42: {
 			/* "Analogfunktionsgruppe 3" : 0010-1010 (0x2A = 42) A23 A22 A21 A20 - A19 A18 A17 A16 */
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_16_23, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_16_23, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 43: {
 			/* "Analogfunktionsgruppe 4" : 0010-1011 (0x2B = 43) A31 A30 A29 A28 - A27 A26 A25 A24 */
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_24_31, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_24_31, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 44: {
 			/* "Analogfunktionsgruppe 5" : 0010-1100 (0x2C = 44) A39 A38 A37 A36 - A35 A34 A33 A32 */
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_32_39, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_32_39, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 45: {
 			/* "Analogfunktionsgruppe 6" : 0010-1101 (0x2D = 45) A47 A46 A45 A44 - A43 A42 A42 A40 */
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_40_47, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_40_47, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 46: {
 			/* "Analogfunktionsgruppe 7" : 0010-1110 (0x2E = 46) A55 A54 A53 A52 - A51 A50 A49 A48 */
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_48_55, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_48_55, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 47: {
 			/* "Analogfunktionsgruppe 8" : 0010-1111 (0x2F = 47) A63 A62 A61 A60 - A59 A58 A57 A56 */
-			if (notifySusiAnalog) {
-				notifySusiAnalog(SUSI_AN_56_63, SusiData.MessageByte[1]);
+			if (notifySusiAnalogFunction) {
+				notifySusiAnalogFunction(SUSI_AN_56_63, SusiData.MessageByte[1]);
+			}
+			break;
+		}
+		case 48: {
+			/* "Direktbefehl 1 für Analogbetrieb" : 0011-0000 (0x30 = 48) D7 D6 D5 D4 - D3 D2 D1 D0
+			*
+			* Einstellung von Grundfunktionen im Analogbetrieb unter Umgehung einer Funktionszuordnung.
+			* - Bit 0: Sound an/aus
+			* - Bit 1: Auf-/Abrüsten
+			* - Bit 2-6: reserviert
+			* - Bit 7: Reduzierte Lautstärke
+			* 
+			* Impostazione delle funzioni di base in modalità analogica ignorando un'assegnazione di funzione.
+			* - Bit 0: Suono on/off
+			* - Bit 1: Aggiornamento/Disarmo
+			* - Bit 2-6: riservato
+			* - Bit 7: Volume ridotto
+			*/
+			if (notifySusiAnalogDirectCommand) {
+				notifySusiAnalogDirectCommand(1, SusiData.MessageByte[1]);
+			}
+			break;
+		}
+		case 49: {
+			/* "Direktbefehl 2 für Analogbetrieb" : 0011-0000 (0x31 = 49) D7 D6 D5 D4 - D3 D2 D1 D0
+			*
+			* Einstellung von Grundfunktionen im Analogbetrieb unter Umgehung einer Funktionszuordnung.
+			* - Bit 0: Spitzenlicht
+			* - Bit 1: Schlusslicht
+			* - Bit 2: Standlicht
+			* - Bit 3-7: reserviert
+			* 
+			* Impostazione delle funzioni di base in modalità analogica ignorando un'assegnazione di funzione.
+			* - Bit 0: Luce di picco
+			* - Bit 1: Fanale posteriore
+			* - Bit 2: Stand light
+			* - Bit 3-7: riservato
+			*/
+			if (notifySusiAnalogDirectCommand) {
+				notifySusiAnalogDirectCommand(2, SusiData.MessageByte[1]);
 			}
 			break;
 		}
