@@ -4,9 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "Arduino.h"
-#include "SUSI_FN_BIT.h"
-#include "SUSI_AUX_BIT.h"
-#include "SUSI_AN_BIT.h"
+#include "DataHeaders/SUSI_FN_BIT.h"
+#include "DataHeaders/SUSI_AUX_BIT.h"
+#include "DataHeaders/SUSI_AN_BIT.h"
+#include "MemoryFree/MemoryFree.h"
 
 //#define	DEBUG_RCN_LIBRARY		//attiva la modalita' di debug
 //#define	DEBUG_CV_RCN_LIBRARY	//Attiva la modalita' di Debug per la gestione CVs
