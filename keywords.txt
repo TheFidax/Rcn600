@@ -22,6 +22,7 @@ notifySusiAnalogFunction	KEYWORD2
 notifySusiAnalogDirectCommand	KEYWORD2
 notifySusiMasterAddress	KEYWORD2
 notifySusiControllModule	KEYWORD2
+notifyCVResetFactoryDefault KEYWORD2
 
 //////////////////////// CVs
 notifySusiCVRead	KEYWORD2
