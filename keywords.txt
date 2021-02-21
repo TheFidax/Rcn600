@@ -10,6 +10,7 @@ SUSI_t	LITERAL1
 init	KEYWORD2
 process	KEYWORD2
 
+notifySusiRawMessage	KEYWORD2
 notifySusiFunc	KEYWORD2
 notifySusiBinaryState	KEYWORD2
 notifySusiAux	KEYWORD2

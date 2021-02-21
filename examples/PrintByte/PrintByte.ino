@@ -1,6 +1,6 @@
 /*
 Questo esempio permette di vedere, tramite seriale, il gruppo di Byte (con i rispettivi valori) ricveuti dal Master.
-Per eseguire tale operazione E' INDISPENSABILE ABILITARE LA MODALITA' DI DEBUG NEL FILE Rcn600.h 
+Per eseguire tale operazione E' INDISPENSABILE ABILITARE LA MODALITA' DI NOTIFY_RAW_MESSAGE NEL FILE Rcn600.h 
 */
 #include <Rcn600.h>			// Includo la libreria per la gestione della SUSI
 #include <EEPROM.h>
@@ -17,10 +17,37 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value){
   return EEPROM.read(CV);
 }
 
-void setup() {   
+void notifySusiRawMessage(uint8_t *rawMessage, uint8_t messageLength) {
+  static uint8_t i;
+  
+  Serial.print("notifySusiRawMessage : ");
+  
+  for(i = 0; i < messageLength; ++i) {
+    Serial.print(rawMessage[i], BIN);
+    if(i != messageLength) {
+      Serial.print(" - ");
+    }
+  }
+
+  Serial.print(" ( ");
+
+  for(i = 0; i < messageLength; ++i) {
+    Serial.print(rawMessage[i]);
+    if(i != messageLength) {
+      Serial.print(" - ");
+    }
+  }
+
+  Serial.println(" )");
+}
+
+void setup() {  
+  Serial.begin(115200);
+  while(!Serial) {}
+   
 	SUSI.init();			// Avvio la libreria
 }
 
 void loop() {
-	SUSI.process();			// Elaboro più volte possibile i dati acquisiti
+	SUSI.process();			// Elaboro piï¿½ volte possibile i dati acquisiti
 }

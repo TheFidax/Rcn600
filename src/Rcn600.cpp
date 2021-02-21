@@ -91,16 +91,6 @@ void Rcn600::init(void) {
 	else {	//in caso contrario imposto il valore 1
 		SlaveNumber = DEFAULT_SLAVE_NUMBER;
 	}
-
-#ifdef DEBUG_RCN_LIBRARY
-	Serial.begin(115200);	// Avvio la comunicazione Seriale
-
-	while (!Serial) {}		// Attendo che la comunicazione seriale sia disponibile
-
-	Serial.print("SUSI Debug Modulo ");	//Informo l'utente che e' pronto a leggere i Byte
-	Serial.print(SlaveNumber);
-	Serial.println(": ");
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,10 +105,6 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 
 	digitalWrite(SusiData.DATA_pin, HIGH);
 	pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit
-
-#ifdef DEBUG_CV_RCN_LIBRARY
-	Serial.println("SUSI ACK");
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,41 +117,19 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 	* Slave 3: 980 - 1019
 	* Per tutti: 1020 - 1024 */
 
-#ifdef DEBUG_CV_RCN_LIBRARY
-	Serial.print("isCVvalid: ");
-	Serial.print("CV da controllare: ");
-	Serial.print(CV);
-	Serial.print(" ; CV valida per: ");
-#endif
-
 	if ((SlaveNumber == 1) && ((CV >= 900) && (CV <= 939))) {
-#ifdef DEBUG_CV_RCN_LIBRARY
-		Serial.println("Slave 1");
-#endif
 		return true;
 	}
 	else if ((SlaveNumber == 2) && ((CV >= 940) && (CV <= 979))) {
-#ifdef DEBUG_CV_RCN_LIBRARY
-		Serial.println("Slave 2");
-#endif
 		return true;
 	}
 	else if ((SlaveNumber == 3) && ((CV >= 980) && (CV <= 1019))) {
-#ifdef DEBUG_CV_RCN_LIBRARY
-		Serial.println("Slave 3");
-#endif
 		return true;
 	}
 	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {	//CV valide per tutti i moduli
-#ifdef DEBUG_CV_RCN_LIBRARY
-		Serial.println("Tutti gli Slave");
-#endif
 		return true;
 	}
 	else {
-#ifdef DEBUG_CV_RCN_LIBRARY
-		Serial.println("CV NON VALIDA");
-#endif
 		return false;
 	}
 	return false;
@@ -186,18 +150,14 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 
 void Rcn600::process(void) {
 	if (SusiData.MessageComplete) {		//controllo che sia stato ricevuto un messaggio completo
-#ifdef DEBUG_RCN_LIBRARY
-		Serial.print(SusiData.MessageByte[0]);
-		Serial.print(" - ");
-		Serial.print(SusiData.MessageByte[1]);
-		if (SusiData.ByteCounter == 2) {
-			Serial.print(" - ");
-			Serial.print(SusiData.MessageByte[2]);
-		}
-		Serial.println();
-#endif // DEBUG_RCN_LIBRARY
-
 		/* Devo controllare il valore del primo Byte */
+
+#ifdef NOTIFY_RAW_MESSAGE
+		if (notifySusiRawMessage) {
+			notifySusiRawMessage(SusiData.MessageByte, (SusiData.ByteCounter + 1));
+		}
+#endif // NOTIFY_RAW_MESSAGE
+
 		switch (SusiData.MessageByte[0]) {
 		case 96: {
 			/* "Funktionsgruppe 1" : 0110-0000 (0x60 = 96) 0 0 0 F0 - F4 F3 F2 F1 */

@@ -9,8 +9,7 @@
 #include "DataHeaders/SUSI_AN_BIT.h"
 #include "MemoryFree/MemoryFree.h"
 
-//#define	DEBUG_RCN_LIBRARY		//attiva la modalita' di debug
-//#define	DEBUG_CV_RCN_LIBRARY	//Attiva la modalita' di Debug per la gestione CVs
+#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
 #define	LIB_VER						10		//identifica la versione della libreria: 1.0
@@ -82,6 +81,17 @@ class Rcn600 {
 #if defined (__cplusplus)
 extern "C" {
 #endif
+#ifdef NOTIFY_RAW_MESSAGE
+	/*
+	*	notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio da decodificare
+	*	Input:
+	*		- i byte che compongono il messaggio acquisito dalla libreria
+	*		- la lunghezza del messaggio
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiRawMessage(uint8_t *rawMessage, uint8_t messageLength) __attribute__((weak));
+#endif // NOTIFY_RAW_MESSAGE
 	/*
 	*	notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
 	*	Input:
