@@ -13,7 +13,7 @@
 //#define	DEBUG_CV_RCN_LIBRARY	//Attiva la modalita' di Debug per la gestione CVs
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
-#define	LIB_VER						1		//identifica la versione della libreria
+#define	LIB_VER						10		//identifica la versione della libreria: 1.0
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 
 #define	SYNC_TIME			9		//tempo necessario a sincronizzare Master e Slave: 9ms
