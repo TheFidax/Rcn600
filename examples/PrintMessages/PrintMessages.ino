@@ -369,6 +369,15 @@ void notifySusiMasterAddress(uint16_t MasterAddress) {
 };
 #endif
 
+// Decommentare la #define sotto per stampare i comandi 'Controllo Modulo'
+#define NOTIFY_SUSI_MODULE_CONTROLL
+#ifdef  NOTIFY_SUSI_MODULE_CONTROLL
+void notifySusiControllModule(uint8_t ModuleControll) {
+  Serial.print("notifySusiControllModule: ");
+  Serial.println(ModuleControll);
+};
+#endif
+
 void setup() {   
   Serial.begin(115200); // Avvio la comunicazione Seriale
 
