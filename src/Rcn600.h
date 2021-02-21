@@ -177,6 +177,14 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiMasterAddress(uint16_t MasterAddress) __attribute__((weak));
+	/*
+	*	notifySusiControlModule() viene invocato quando: si riceve il comando sul controllo del modulo
+	*	Input:
+	*		- byte contenete il controllo del modulo
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiControllModule(uint8_t ModuleControll) __attribute__((weak));
 
 	
 
