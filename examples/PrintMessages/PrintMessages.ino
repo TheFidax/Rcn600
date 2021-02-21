@@ -360,6 +360,15 @@ void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) {
 };
 #endif
 
+// Decommentare la #define sotto per stampare l'indirizzo del Decoder Master
+#define NOTIFY_SUSI_MASTER_ADDRESS
+#ifdef  NOTIFY_SUSI_MASTER_ADDRESS
+void notifySusiMasterAddress(uint16_t MasterAddress) {
+  Serial.print("notifySusiMasterAddress: ");
+  Serial.println(MasterAddress);
+};
+#endif
+
 void setup() {   
   Serial.begin(115200); // Avvio la comunicazione Seriale
 

@@ -323,7 +323,7 @@ void Rcn600::process(void) {
 					static uint16_t Command;
 					static uint8_t State;
 
-					Command = SusiData.MessageByte[3];	//memorizzo i bit "più significativ"
+					Command = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
 					Command = Command << 7;				//sposto i bit 7 posti a 'sinistra'
 					Command |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
 
@@ -666,6 +666,42 @@ void Rcn600::process(void) {
 			* Il comando non esegue alcuna azione nello slave. 
 			* I dati possono avere qualsiasi valore. Il comando puo' essere utilizzato come gap filler o a scopo di test. 
 			*/
+			break;
+		}
+		case 94: {	//&& 95
+			/* "Moduladresse low" : 0101-1110 (0x5E = 94) A7 A6 A5 A4 - A3 A2 A1 A0
+			* 
+			* Übermittelt die niederwertigen Bits der aktiven Digitaladresse des "Masters", wenn er sich in einer digitalen Betriebsart befindet.
+			* Der Befehl wird immer paarweise vor der Adresse high Byte gesendet.
+			* Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren. 
+			*
+			* Invia i bit di basso valore dell'indirizzo digitale attivo del "master" quando e' in modalita' digitale.
+			* Il comando viene sempre inviato in coppie in coppia prima dell'indirizzo high bytes.
+			* Se i due comandi non si susseguono direttamente, devono essere ignorati.  
+			* 
+			* 
+			* "Moduladresse high" : 0101-1111 (0x5F = 95) A15 A14 A13 A12 - A11 A10 A9 A8
+			*
+			* Übermittelt die höherwertigen Bits der aktiven Digitaladresse des "Masters", wenn er sich in einer digitalen Betriebsart befindet.
+			* Der Befehl wird immer paarweise nach der Adresse low Byte gesendet.
+			* Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren. 
+			* 
+			* Invia i bit di qualita' superiore dell'indirizzo digitale attivo del "master" quando e' in modalita' digitale.
+			* Il comando viene sempre inviato a coppie in base all'indirizzo a byte basso.
+			* Se i due comandi non si susseguono direttamente, devono essere ignorati. 
+			*/
+
+			if (SusiData.MessageByte[2] == 95) {	//i byte di comando devono susseguirsi
+				if (notifySusiMasterAddress) {		// Controllo se e' presente il metodo per gestire il comando
+					static uint16_t MasterAddress;
+
+					MasterAddress = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
+					MasterAddress = MasterAddress << 8;				//sposto i bit 7 posti a 'sinistra'
+					MasterAddress |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
+
+					notifySusiMasterAddress(MasterAddress);
+				}
+			}
 			break;
 		}
 

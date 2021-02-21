@@ -168,6 +168,15 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
+	/*
+	*	notifySusiMasterAddress() viene invocato quando: si riceve l'indirizzo digitale del Master
+	*	Input:
+	*		- l'indirizzo Digitale del Master
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiMasterAddress(uint16_t MasterAddress) __attribute__((weak));
+
 	
 
 	/* METODI MANIPOLAZIONE CVs */
