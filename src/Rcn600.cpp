@@ -25,7 +25,7 @@ void ISR_SUSI() {
 		else if (((micros() - SusiData.lastbit_time) > 10) && ((micros() - SusiData.lastbit_time) < 500)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 			read_bit();
 
-			/* Controllo se ho letto un Byte */
+			/* Controllo se ho letto un Byte (8 bit) */
 			if (SusiData.bitCounter == 8) {
 				/* Se ho letto un Byte, memorizzo il momento in cui la lettura è avvenuta e resetto il contatore dei bit */
 				SusiData.lastByte_time = millis();
@@ -34,11 +34,22 @@ void ISR_SUSI() {
 				if (SusiData.ByteCounter == 0) {	/* Se e' il primo Byte letto devo leggerne un altro */
 					SusiData.ByteCounter = 1;
 				}
-				else if (SusiData.ByteCounter == 1) {	/* Se e' il secodno Byte letto, devo controllare se e' un emssaggio che richiede 3 byte */
-					if (SusiData.MessageByte[0] == 119 || SusiData.MessageByte[0] == 123 || SusiData.MessageByte[0] == 127) {
+				else if (SusiData.ByteCounter == 1) {	/* Se e' il secodno Byte letto, devo controllare se e' un messaggio che richiede 3 byte o 4 byte */
+					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 byte */
+						SusiData.ByteCounter = 2;
+					}
+					else if (SusiData.MessageByte[0] == 119 || SusiData.MessageByte[0] == 123 || SusiData.MessageByte[0] == 127) {	/* Comandi manipolazione CVs: 3 byte*/
 						SusiData.ByteCounter = 2;
 					}
 					else { /* o se sonop sufficienti due Byte */
+						SusiData.MessageComplete = true;
+					}
+				}
+				else if (SusiData.ByteCounter == 2) {	//comandi in sequenza (94 e 110) che richiedono 4 byte
+					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 byte */
+						SusiData.ByteCounter = 3;
+					}
+					else {	// comandi a cui bastano 3 byte
 						SusiData.MessageComplete = true;
 					}
 				}
