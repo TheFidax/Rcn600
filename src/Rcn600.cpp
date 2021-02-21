@@ -735,6 +735,10 @@ void Rcn600::process(void) {
 			*	Tutti gli altri bit riservati dalla RailCommunity.
 			*	Se implementati, i bit 0 e 1 nello slave devono essere impostati su 1 dopo un ripristino.
 			*/
+
+			if (notifySusiControlModule) {
+				notifySusiControlModule(SusiData.MessageByte[1]);
+			}
 			break;
 		}
 
