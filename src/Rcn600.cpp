@@ -892,7 +892,11 @@ void Rcn600::process(void) {
 
 					if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
 						if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (SusiData.MessageByte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
-							
+							if (notifyCVResetFactoryDefault) {
+								notifyCVResetFactoryDefault();
+
+								Data_ACK();
+							}
 						}
 						else {	//scrittura CVs
 							if (notifySusiCVWrite) {
