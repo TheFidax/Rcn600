@@ -206,6 +206,28 @@ extern "C" {
 	*		- il valore letto (post scrittura) nella posizione richiesta
 	*/
 	extern uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) __attribute__((weak));
+	/*
+	*	notifySusiCVWrite() viene invocato quando: e' richiesta la Scrittura di una CV.
+	*	Input:
+	*		- il numero della CV richiesta
+	*		- il Nuovo valore della CV
+	*	Restituisce:
+	*		- il valore letto (post scrittura) nella posizione richiesta
+	*/
+	extern uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) __attribute__((weak));
+	/* RESET CVs, Utilizzato stesso metodo della Libreria NmraDcc
+	* 
+	*  notifyCVResetFactoryDefault() Called when CVs must be reset.
+	*                                This is called when CVs must be reset
+	*                                to their factory defaults.
+	*
+	*  Inputs:
+	*    None
+	*                                                                                                        
+	*  Returns:
+	*    None
+	*/
+	extern void    notifyCVResetFactoryDefault(void) __attribute__((weak));
 
 #if defined (__cplusplus)
 }
