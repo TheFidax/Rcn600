@@ -290,6 +290,39 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
+		case 110: {	// && 111
+			/* "Binärzustände lange Form low Byte" : 0110-1110 (0x6E = 110) D L6 L5 L4 - L3 L2 L1 L0
+			*
+			* Befehl wird immer paarweise vor dem Binärzustand lange Form high Byte gesendet. 
+			* Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
+			* D = 0 bedeutet Binärzustand L ausgeschaltet, D = 1 "eingeschaltet"
+			* L = niederwertige Bits der Binärzustandsnummer 1 ... 32767 
+			* 
+			* Il comando viene sempre inviato in coppie prima che lo stato binario formi lunghi byte alti. 
+			* Se i due comandi non seguono direttamente, devono essere ignorati.
+			* D = 0 significa stato binario L spento, D = 1 "acceso"
+			* L = bit di basso valore dello stato binario numero 1 ... 32767
+			* 
+			*
+			* "Binärzustände lange Form high Byte" : 0110-1111 (0x6F = 111) H7 H6 H5 H4 - H3 H2 H1 H0
+			* 
+			* Befehl wird immer paarweise nach dem Binärzustand lange Form low
+			* Byte gesendet. Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
+			* Erst dieser Befehl führt zur Ausführung des Gesamtbefehls.
+			* H = höherwertigen Bits der Binärzustandsnummer high 1 ... 32767 
+			* H und L = 0 (Broadcast) schaltet alle 32767 verfügbaren Binärzustände
+			* aus (D = 0) oder an (D = 1) 
+			* 
+			* Il comando viene sempre inviato in coppie dopo che lo stato binario forma lunghi byte bassi. Se i due comandi non si sus seguono direttamente, devono essere ignorati.
+			* Solo dopo questo comando eseguira' l'intero comando.
+			* H = bit di qualita' superiore dello stato binario numero alto 1 ... 32767 
+			*/
+
+			if (SusiData.MessageByte[2] == 111) {	// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
+
+			}
+			break;
+		}
 		case 64: {
 			/* "Direktbefehl 1" (2-Byte): 0100-0000 (0x40 = 64) X8 X7 X6 X5 - X4 X3 X2 X1
 			* 

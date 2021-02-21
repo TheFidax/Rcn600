@@ -56,7 +56,7 @@ typedef struct {
 	uint8_t		DATA_pin;			//pin a cui è collegata la linea "Data";		puo' essere qualsiasi pin (compresi analogici)
 	uint32_t	lastByte_time;		//tempo a cui è stato letto l'ultimo Byte
 	uint32_t	lastbit_time;		//tempo a cui è stato letto l'ultimo bit
-	uint8_t		MessageByte[3];		//Byte di cui è composto un comando
+	uint8_t		MessageByte[4];		//Byte di cui è composto un comando
 	uint8_t		bitCounter;			//Indica quale bit si deve leggere
 	uint8_t		ByteCounter;		//Indica quale Byte sta venendo letto
 	bool		MessageComplete;	//indica se è stato ricevuto un messaggio completo
