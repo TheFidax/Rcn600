@@ -656,7 +656,18 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-
+		case 0: {
+			/* "No Operation" : 0000-0000 (0x00 = 0) X X X X - X X X X
+			*
+			* Der Befehl bewirkt keine Aktion im Slave. Die Daten können einen
+			* beliebigen Wert haben. Der Befehl kann als Lückenfüller oder zu
+			* Testzwecken verwendet werden. 
+			* 
+			* Il comando non esegue alcuna azione nello slave. 
+			* I dati possono avere qualsiasi valore. Il comando puo' essere utilizzato come gap filler o a scopo di test. 
+			*/
+			break;
+		}
 
 
 		/* METODI MANIPOLAZIONE CVs */
