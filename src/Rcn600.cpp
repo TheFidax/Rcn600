@@ -740,7 +740,7 @@ void Rcn600::process(void) {
 							CV_Value = MANUFACTER_ID;
 						}
 						else { //identificano la versione software
-							CV_Value = LIB_VER;
+							CV_Value = SUSI_VER;
 						}
 					}
 					else {
