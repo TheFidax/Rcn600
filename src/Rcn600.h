@@ -1,10 +1,15 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
+//#define	CHECK_FREE_RAM						//Se decommentata attiva i controlli sulla quantita' di ram disponibile prima di allocare risorse; per il corretto funzionamento e' necessaria una lireria esterna
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "Arduino.h"
+#ifdef CHECK_FREE_RAM
 #include "MemoryFree.h"						// disponibile qui: https://github.com/McNeight/MemoryFree
+#endif
+
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
 #include "DataHeaders/SUSI_AN_BIT.h"

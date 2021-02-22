@@ -234,7 +234,9 @@ void Rcn600::process(void) {
 			*	L = 0 (trasmissione) disattiva (D = 0) o attiva tutte le funzioni da 1 a 127 (D = 1)
 			*/
 
+#ifdef CHECK_FREE_RAM
 			if ((uint16_t)freeMemory() >= (sizeof(uint8_t) * 2)) {				// Controllo di avere abbastanza memoria per le variabili
+#endif
 				static uint8_t functionNumber, funcState;
 				funcState = bitRead(SusiData.MessageByte[1], 7);	// leggo il valore dello stato 'D'
 				bitWrite(SusiData.MessageByte[1], 7, 0);			// elimino il valore dello stato
@@ -260,7 +262,9 @@ void Rcn600::process(void) {
 						notifySusiBinaryState(functionNumber, funcState);
 					}
 				}
+#ifdef CHECK_FREE_RAM
 			}
+#endif
 			break;
 		}
 		case 110: {	// && 111
@@ -291,7 +295,9 @@ void Rcn600::process(void) {
 			*	H = bit di qualita' superiore dello stato binario numero alto 1 ... 32767 
 			*/
 
+#ifdef CHECK_FREE_RAM
 			if ((uint16_t)freeMemory() >= (sizeof(uint8_t) + sizeof(uint16_t))) {	// Controllo di avere abbastanza memoria per le variabili
+#endif
 				if (SusiData.MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
 					if (notifySusiBinaryState) {						// Controllo se e' presente il metodo per gestire il comando
 						static uint16_t Command;
@@ -306,7 +312,9 @@ void Rcn600::process(void) {
 						notifySusiBinaryState(Command, State);
 					}
 				}
+#ifdef CHECK_FREE_RAM
 			}
+#endif
 			break;
 		}
 		case 64: {
@@ -668,7 +676,9 @@ void Rcn600::process(void) {
 
 
 			if (SusiData.MessageByte[2] == 95) {	//i byte di comando devono susseguirsi
+#ifdef CHECK_FREE_RAM
 				if ((uint16_t)freeMemory() >= (sizeof(uint16_t))) {	// Controllo di avere abbastanza memoria per le variabili
+#endif
 					if (notifySusiMasterAddress) {					// Controllo se e' presente il metodo per gestire il comando
 						static uint16_t MasterAddress;
 
@@ -678,7 +688,9 @@ void Rcn600::process(void) {
 
 						notifySusiMasterAddress(MasterAddress);
 					}
+#ifdef CHECK_FREE_RAM
 				}
+#endif
 			}
 			break;
 		}
@@ -723,7 +735,9 @@ void Rcn600::process(void) {
 			*	Pacchetti da 3 byte secondo [RCN-214]
 			*/
 
+#ifdef CHECK_FREE_RAM
 			if ((uint16_t)freeMemory() >= (sizeof(uint16_t) + sizeof(uint8_t))) {	// Controllo di avere abbastanza memoria per le variabili
+#endif
 				static uint16_t CV_Number;
 				static uint8_t CV_Value;
 
@@ -757,7 +771,9 @@ void Rcn600::process(void) {
 						Data_ACK();
 					}
 				}
+#ifdef CHECK_FREE_RAM
 			}
+#endif
 			break;
 		}
 		case 123: {	
@@ -778,7 +794,9 @@ void Rcn600::process(void) {
 			* Lo slave conferma la scrittura con un riconoscimento.
 			*/
 
+#ifdef CHECK_FREE_RAM
 			if ((uint16_t)freeMemory() >= (sizeof(uint16_t) + sizeof(uint8_t) * 4)) {	// Controllo di avere abbastanza memoria per le variabili
+#endif
 				static uint16_t CV_Number;
 
 				CV_Number = 897 + (SusiData.MessageByte[1] - 128);
@@ -827,7 +845,9 @@ void Rcn600::process(void) {
 					}
 					}
 				}
+#ifdef CHECK_FREE_RAM
 			}
+#endif
 			break;
 		}
 		case 127: {	
@@ -842,7 +862,10 @@ void Rcn600::process(void) {
 			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
 			* D = valore per la scrittura nel CV. Lo Slave conferma la scrittura con un riconoscimento.
 			*/
+
+#ifdef CHECK_FREE_RAM
 			if ((uint16_t)freeMemory() >= (sizeof(uint16_t))) {	// Controllo di avere abbastanza memoria per le variabili
+#endif
 				static uint16_t CV_Number;
 
 				CV_Number = 897 + (SusiData.MessageByte[1] - 128);
@@ -874,7 +897,9 @@ void Rcn600::process(void) {
 						}
 					}
 				}
+#ifdef CHECK_FREE_RAM
 			}
+#endif
 			break;
 		}
 		default: {}
