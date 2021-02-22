@@ -12,14 +12,14 @@
 //#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
-#define	LIB_VER						10		//identifica la versione della libreria: 1.0
+#define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 
-#define	SYNC_TIME			9		//tempo necessario a sincronizzare Master e Slave: 9ms
+#define	SYNC_TIME			9				//tempo necessario a sincronizzare Master e Slave: 9ms
 
 typedef enum {
-	SUSI_DIR_REV = 0,				// Il master sta procedendo in direzione 'Reverse'
-	SUSI_DIR_FWD = 1,				// Il master sta procedendo in direzione 'ForWard'
+	SUSI_DIR_REV = 0,						// Il master sta procedendo in direzione 'Reverse'
+	SUSI_DIR_FWD = 1,						// Il master sta procedendo in direzione 'ForWard'
 } SUSI_DIRECTION;
 
 typedef enum {
@@ -53,21 +53,21 @@ typedef enum {
 } SUSI_AN_GROUP;
 
 typedef struct {
-	uint8_t		CLK_pin;			//pin a cui è collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
-	uint8_t		DATA_pin;			//pin a cui è collegata la linea "Data";		puo' essere qualsiasi pin (compresi analogici)
-	uint32_t	lastByte_time;		//tempo a cui è stato letto l'ultimo Byte
-	uint32_t	lastbit_time;		//tempo a cui è stato letto l'ultimo bit
-	uint8_t		MessageByte[4];		//Byte di cui è composto un comando
-	uint8_t		bitCounter;			//Indica quale bit si deve leggere
-	uint8_t		ByteCounter;		//Indica quale Byte sta venendo letto
-	bool		MessageComplete;	//indica se è stato ricevuto un messaggio completo
+	uint8_t		CLK_pin;			//pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
+	uint8_t		DATA_pin;			//pin a cui e' collegata la linea "Data";		puo' essere qualsiasi pin (compresi analogici)
+	uint32_t	lastByte_time;		//tempo a cui e' stato letto l'ultimo Byte
+	uint32_t	lastbit_time;		//tempo a cui e' stato letto l'ultimo bit
+	uint8_t		MessageByte[4];		//Byte di cui e' composto un comando
+	uint8_t		bitCounter;			//indica quale bit si deve leggere
+	uint8_t		ByteCounter;		//indica quale Byte sta venendo letto
+	bool		MessageComplete;	//indica se e' stato ricevuto un messaggio completo
 } SUSI_t;
 
 extern SUSI_t SusiData;
 
 class Rcn600 {
 	private:
-		uint8_t	SlaveNumber;			//Identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
+		uint8_t	SlaveNumber;			//identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
 		void Data_ACK(void);			//funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);	//ritorna True se il numero della CV passato e' valido per questo modulo Slave
 
@@ -91,7 +91,7 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiRawMessage(uint8_t *rawMessage, uint8_t messageLength) __attribute__((weak));
-#endif // NOTIFY_RAW_MESSAGE
+#endif
 	/*
 	*	notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
 	*	Input:
