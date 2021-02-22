@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "Arduino.h"
+#include "MemoryFree.h"						// disponibile qui: https://github.com/McNeight/MemoryFree
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
 #include "DataHeaders/SUSI_AN_BIT.h"
-#include "MemoryFree/MemoryFree.h"
 
 //#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 

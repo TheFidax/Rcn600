@@ -3,6 +3,8 @@ Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore
 
 Libreria testa su Arduino UNO.
 
+**NOTA**: Per poter funzionare e' necessaria la libreria 'freeMemory' disponibile qui: https://github.com/McNeight/MemoryFree
+
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI possono essere a 5v!** 
 
 Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI (Clock e Dati); la linea Clock va collegata ad un pin di tipo **Interrupt**.
