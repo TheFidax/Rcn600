@@ -3,7 +3,7 @@ Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore
 
 Libreria testa su Arduino UNO.
 
-**NOTA**: Per poter funzionare e' necessaria la libreria 'freeMemory' disponibile qui: https://github.com/McNeight/MemoryFree
+**NOTA**: Se attivi i controlli sulla memoria Ram disponibile prima di allocare risorse, e' necessaria la libreria 'freeMemory' disponibile qui: https://github.com/McNeight/MemoryFree
 
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI possono essere a 5v!** 
 
