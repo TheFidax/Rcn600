@@ -77,13 +77,13 @@ class Rcn600 {
 		void process(void);								//funzione che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
 };
 
-// Funzioni Esterne, implementabili a descrizione dell'utente
+// Funzioni Esterne, implementabili a discrizione dell'utente
 #if defined (__cplusplus)
 extern "C" {
 #endif
 #ifdef NOTIFY_RAW_MESSAGE
 	/*
-	*	notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio da decodificare
+	*	notifySusiRawMessage() viene invocato ogni volta che Ã¨ presente un messaggio da decodificare
 	*	Input:
 	*		- i byte che compongono il messaggio acquisito dalla libreria
 	*		- la lunghezza del messaggio
