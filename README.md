@@ -51,7 +51,9 @@ Viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni di
   - lo stato del gruppo funzioni
 * Restituisce:
   - Nulla
+
 ------------
+
 ```c
 void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);
 ```
@@ -61,7 +63,9 @@ Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specific
   - lo stato della Funzione (attiva = 1, disattiva = 0)
 - Restituisce:
   - Nulla
+
 ------------
+
 ```c
 void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState);
 ```
@@ -71,7 +75,9 @@ Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specific
   - lo stato dell'uscita (attiva = 1, disattiva = 0)
 - Restituisce:
   - Nulla
+
 ------------
+
 ```c
 void notifySusiTriggerPulse(uint8_t state);
 ```
@@ -80,7 +86,9 @@ Viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione)
   - stato del comando Trigger/Pulse
 - Restituisce:
   - Nulla
+
 ------------
+
 ```c
 void notifySusiMotorCurrent(int current);
 ```
@@ -89,4 +97,26 @@ Viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente
   - Assorbimento di Corrente: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
 - Restituisce:
   - Nulla
+
 ------------
+
+```c
+void notifySusiRequestSpeed(uint8_t Speed, SUSI_DIRECTION Dir);
+```
+Viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
+- Input:
+  - la velocita' (128 step) richiesta
+  - la direzione richiesta
+- Restituisce:
+  - Nulla
+
+------------
+
+```c
+void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir);
+```
+Viene invocato quando: si riceve dal Master i dati sul carico del Motore
+- Input:
+  - Carico del Motore: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
+- Restituisce:
+  - Nulla
