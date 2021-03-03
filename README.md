@@ -1,7 +1,7 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Obbligatori](#Metodi-Obbligatori)
-* [Metodi Facoltativi](#Metodi-Facoltativi])
+* [Metodi Facoltativi](#Metodi-Facoltativi)
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
 
 
