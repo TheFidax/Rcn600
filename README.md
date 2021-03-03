@@ -115,7 +115,7 @@ Viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione rich
 ```c
 void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir);
 ```
-notifySusiRealSpeed() viene invocato quando: si ricevono i dati dal Master sulla Velocita' e sulla Direzione reali 
+*notifySusiRealSpeed()* viene invocato quando: si ricevono i dati dal Master sulla Velocita' e sulla Direzione reali 
 - Input:
   - la velocita' (128 step) reale
   - la direzione reale
@@ -124,12 +124,23 @@ notifySusiRealSpeed() viene invocato quando: si ricevono i dati dal Master sulla
 
 ------------
 
-
 ```c
 void notifySusiMotorLoad(int load);
 ```
-Viene invocato quando: si riceve dal Master i dati sul carico del Motore
+*notifySusiAnalogFunction()* viene invocato quando: si riceve dal Master i dati sul carico del Motore
 - Input:
   - Carico del Motore: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
 - Restituisce:
   - Nulla
+
+------------
+
+```c
+void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState);
+```
+*notifySusiAnalogFunction()* viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni analogiche
+- Input:
+  - il gruppo Analogico decodificato
+  - lo stato del gruppo
+- Restituisce:
+ - Nulla
