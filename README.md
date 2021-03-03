@@ -3,7 +3,7 @@
 * [Metodi Obbligatori](#Metodi-Obbligatori)
 * [Metodi Facoltativi](#Metodi-Facoltativi)
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
-# [Funzionalita' Extra](#Funzionalita'-Extra)
+* [Funzionalita' Extra](#Funzionalita'-Extra)
 
 
 # Rcn600 SUSI
@@ -230,7 +230,7 @@ void notifyCVResetFactoryDefault(void);
 
 
 # Funzionalita' Extra
-Le seguenti funzionalita' vengono abilitate attivando delle #define nel file **Rcn600.h**
+Le seguenti funzionalita' vengono comandate *manualmente* agendo su delle #define nel file **Rcn600.h**
 
 ------------
 
