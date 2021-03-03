@@ -233,7 +233,7 @@ extern "C" {
 	*  Returns:
 	*    None
 	*/
-	extern void    notifyCVResetFactoryDefault(void) __attribute__((weak));
+	extern void notifyCVResetFactoryDefault(void) __attribute__((weak));
 
 #if defined (__cplusplus)
 }
