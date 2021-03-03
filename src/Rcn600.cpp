@@ -546,56 +546,56 @@ void Rcn600::process(void) {
 			*	Gli otto comandi di questo gruppo consentono la trasmissione di otto diversi valori analogici in modalita' digitale.
 			*/
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_0_7, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_0_7, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 41: {
 			/*	"Analogfunktionsgruppe 2" : 0010-1001 (0x29 = 41) A15 A14 A13 A12 - A11 A10 A9 A8 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_8_15, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_8_15, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 42: {
 			/*	"Analogfunktionsgruppe 3" : 0010-1010 (0x2A = 42) A23 A22 A21 A20 - A19 A18 A17 A16 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_16_23, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_16_23, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 43: {
 			/*	"Analogfunktionsgruppe 4" : 0010-1011 (0x2B = 43) A31 A30 A29 A28 - A27 A26 A25 A24 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_24_31, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_24_31, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 44: {
 			/*	"Analogfunktionsgruppe 5" : 0010-1100 (0x2C = 44) A39 A38 A37 A36 - A35 A34 A33 A32 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_32_39, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_32_39, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 45: {
 			/*	"Analogfunktionsgruppe 6" : 0010-1101 (0x2D = 45) A47 A46 A45 A44 - A43 A42 A42 A40 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_40_47, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_40_47, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 46: {
 			/*	"Analogfunktionsgruppe 7" : 0010-1110 (0x2E = 46) A55 A54 A53 A52 - A51 A50 A49 A48 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_48_55, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_48_55, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 47: {
 			/*	"Analogfunktionsgruppe 8" : 0010-1111 (0x2F = 47) A63 A62 A61 A60 - A59 A58 A57 A56 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_56_63, SusiData.MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_56_63, SusiData.MessageByte[1]);
 			}
 			break;
 		}
