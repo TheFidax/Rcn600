@@ -25,6 +25,7 @@ Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.<br/>
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).
+
 ------------
 
 ```c
