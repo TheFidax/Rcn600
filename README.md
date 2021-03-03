@@ -44,6 +44,9 @@ void process(void);
 
 # Metodi Implementabili Facoltativamente
 I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
+
+------------
+
 ```c
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ```
@@ -183,7 +186,9 @@ void notifySusiControllModule(uint8_t ModuleControll);
 
 # Metodi Manipolazione CVs
 I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), ma permettono alla libreria di dialogare con il Decoder Master in caso di *Lettura/Scrittura CVs*</br>
-La libreria, se almeno il metodo *notifySusiCVRead* e' implementato, gestisce l'ACK che permette al decoder di conoscere il valore della CV richiesta.
+La libreria gestisce l'ACK che permette al decoder di conoscere l'esito dell'operazione richiesta.
+
+------------
 
 ```c
 uint8_t notifySusiCVRead(uint16_t CV);
@@ -193,3 +198,15 @@ uint8_t notifySusiCVRead(uint16_t CV);
   - il numero della CV da leggere
 - Restituisce:
   - ritorna il valore della CV letta
+
+------------
+
+```c
+uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value)
+```
+*notifySusiCVWrite()* viene invocato quando: e' richiesta la Scrittura di una CV.
+- Input:
+  - il numero della CV richiesta
+  - il Nuovo valore della CV
+- Restituisce:
+  - il valore letto (post scrittura) nella posizione richiesta
