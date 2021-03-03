@@ -3,7 +3,7 @@
 * [Metodi Obbligatori](#Metodi-Obbligatori)
 * [Metodi Facoltativi](#Metodi-Facoltativi)
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
-* [Tipi Dati](#Tipi-Dati)
+* [Tipi di Dati](#Tipi-di-Dati)
 * [Funzionalita' Extra](#Funzionalita-Extra)
 
 
@@ -230,7 +230,21 @@ void notifyCVResetFactoryDefault(void);
   - None
 
 
-# Tipi Dati
+# Tipi di Dati
+I seguenti tipi di dati vengono utilizzati dai metodi della libreria.
+```c
+SUSI_DIRECTION
+```
+Tipo *enum*, identifica *simbolicamente* la direzione trasmessa dal Decoder
+- SUSI_DIR_REV : Direzione *reverse*
+- SUSI_DIR_FWD : Direzione *forward*
+
+------------
+
+```c
+SUSI_FN_GROUP
+```
+Identifica il *gruppo funzioni*:</br>
 
 
 # Funzionalita' Extra
