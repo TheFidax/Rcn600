@@ -1,5 +1,5 @@
 # Indice
-* [Rcn600 SUSI](#Rcn600 SUSI)
+* [Rcn600 SUSI](#Rcn600-SUSI)
 * [Supported clock frequencies](#supported-clock-frequencies)
 * [Bootloader option](#bootloader-option)
 * [BOD option](#bod-option)
