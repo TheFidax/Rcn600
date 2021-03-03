@@ -247,3 +247,14 @@ Stato di *default*: **Disattivata**</br>
 ```c
 #define	NOTIFY_RAW_MESSAGE
 ```
+Questa define rende disponibile un metodo che permette di *esportare* il messaggio *grezzo* per poterlo manipolare in maniera Esterna alla libreria.</br>
+Stato di *default*: **Disattivata**</br>
+```c
+void notifySusiRawMessage(uint8_t *rawMessage, uint8_t messageLength);
+```
+*notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio da decodificare
+- Input:
+  - i byte che compongono il messaggio acquisito dalla libreria
+  - la lunghezza del messaggio
+- Restituisce:
+  - Nulla
