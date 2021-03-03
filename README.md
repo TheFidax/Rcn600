@@ -63,6 +63,8 @@ Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
 
 * Restituisce:
   - Nulla
+* Restituisce:
+  - Nulla
 
 ------------
 
