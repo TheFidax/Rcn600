@@ -29,11 +29,11 @@ E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt
 # Metodi Implementabili a Discrezione dell'utente
 `void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);`
 Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
-*Input:
- **il gruppo Funzioni decodificato
- **lo stato del gruppo funzioni
-*Restituisce:
- **Nulla
+* Input:
+ - il gruppo Funzioni decodificato
+ - lo stato del gruppo funzioni
+* Restituisce:
+ - Nulla
 ------------
 `void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);`
 Invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
