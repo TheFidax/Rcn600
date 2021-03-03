@@ -42,7 +42,7 @@ void process(void);
 ```c
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ```
-Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
+Viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
 * Input:
   - il gruppo Funzioni decodificato
   - lo stato del gruppo funzioni
@@ -52,7 +52,7 @@ Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
 ```c
 void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);
 ```
-Invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
+Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
 - Input:
   - il numero della funzione (da 1 a 127)
   - lo stato della Funzione (attiva = 1, disattiva = 0)
@@ -62,11 +62,28 @@ Invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funz
 ```c
 void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState);
 ```
-viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX:
+Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX:
 - Input:
   - il numero dell'AUX
   - lo stato dell'uscita (attiva = 1, disattiva = 0)
 - Restituisce:
   - Nulla
 ------------
-`void notifySusiTriggerPulse(uint8_t state);`
+```c
+void notifySusiTriggerPulse(uint8_t state);
+```
+Viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione) per eventuali sbuffi di vapore
+- Input:
+  - stato del comando Trigger/Pulse
+- Restituisce:
+  - Nulla
+------------
+```c
+void notifySusiMotorCurrent(int current);
+```
+Viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
+- Input:
+  - Assorbimento di Corrente: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
+- Restituisce:
+  - Nulla
+------------
