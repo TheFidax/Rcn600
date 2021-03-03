@@ -39,6 +39,7 @@ Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bu
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).<br/>
 
 
+
 ```c
 void init(void);
 ```
