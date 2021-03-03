@@ -15,11 +15,10 @@ Clock ---> 470Ω ---> Pin Interrupt
 
 Maggiori informazioni della specifiva "*RCN-600.pdf*".
 
-# Metodi Disponibili nella libreria
+# Metodi Della libreria
 ```c
 Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
-
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).
 
@@ -38,15 +37,21 @@ void process(void);
 *E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
 
 # Metodi Implementabili a Discrezione dell'utente
-`void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);`
+```c
+void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
+```
 Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
 * Input: 
  - il gruppo Funzioni decodificato
  - lo stato del gruppo funzioni
 * Restituisce:
  - Nulla
+
 ------------
-`void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);`
+
+```c
+void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);
+```
 Invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
 - Input:
  - il numero della funzione (da 1 a 127)
