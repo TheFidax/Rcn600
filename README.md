@@ -2,16 +2,6 @@
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Della Libreria](#Metodi-Della-Libreria)
 * [Metodi Implementabili a Scelta](#Metodi-Implementabili-a-Scelta)
-* [Programmers](#programmers)
-* [Write to own flash](#write-to-own-flash)
-* **[How to install](#how-to-install)**
-  - [Boards Manager Installation](#boards-manager-installation)
-  - [Manual Installation](#manual-installation)
-  - [PlatformIO](#platformio)
-* **[Getting started with MegaCore](#getting-started-with-megacore)**
-* [Wiring reference](#wiring-reference)
-* **[Pinout](#pinout)**
-* **[Minimal setup](#minimal-setup)**
 
 ------------
 
@@ -34,7 +24,7 @@ Maggiori informazioni della specifiva "*RCN-600.pdf*".
 ```c
 Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
-Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.
+Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.<br/>
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).<br/>
 ------------
 ```c
