@@ -1,21 +1,21 @@
-#ifndef SUSI_AN_BIT_h
-#define SUSI_AN_BIT_h
+#ifndef SUSI_AN_FN_BIT_h
+#define SUSI_AN_FN_BIT_h
 
 // bit che identificano lo stato delle funzioni
 
-#define SUSI_AN_BIT_00	0x01
-#define SUSI_AN_BIT_01	0x02
-#define SUSI_AN_BIT_02	0x04
-#define SUSI_AN_BIT_03	0x08
-#define SUSI_AN_BIT_04	0x10
-#define SUSI_AN_BIT_05	0x20
-#define SUSI_AN_BIT_06	0x40
-#define SUSI_AN_BIT_07	0x80
+#define SUSI_AN_FN_BIT_00	0x01
+#define SUSI_AN_FN_BIT_01	0x02
+#define SUSI_AN_FN_BIT_02	0x04
+#define SUSI_AN_FN_BIT_03	0x08
+#define SUSI_AN_FN_BIT_04	0x10
+#define SUSI_AN_FN_BIT_05	0x20
+#define SUSI_AN_FN_BIT_06	0x40
+#define SUSI_AN_FN_BIT_07	0x80
 
-#define SUSI_AN_BIT_08	0x01
-#define SUSI_AN_BIT_09	0x02
-#define SUSI_AN_BIT_10	0x04
-#define SUSI_AN_BIT_11	0x08
+#define SUSI_AN_FN_BIT_08	0x01
+#define SUSI_AN_FN_BIT_09	0x02
+#define SUSI_AN_FN_BIT_10	0x04
+#define SUSI_AN_FN_BIT_11	0x08
 #define SUSI_AN_BIT_12	0x10
 #define SUSI_AN_BIT_13	0x20
 #define SUSI_AN_BIT_14	0x40
