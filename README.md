@@ -1,7 +1,7 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
-* [Metodi Della Libreria](#Metodi-Della-Libreria)
-* [Metodi Implementabili Facoltativamente](#Metodi-Implementabili-Facoltativamente])
+* [Metodi Obbligatori](#Metodi-Obbligatori)
+* [Metodi Facoltativi](#Metodi-Facoltativi])
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
 
 
@@ -20,7 +20,11 @@ Clock ---> 470Ω ---> Pin Interrupt<br/>
 Maggiori informazioni della specifiva "*RCN-600.pdf*".
 
 
-# Metodi Della Libreria
+# Metodi Obbligatori
+I seguenti metodi sono **obbligatori** per il corretto funzionamento della libreria.
+
+------------
+
 ```c
 Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
@@ -42,7 +46,7 @@ void process(void);
 **E' necessario invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
 
 
-# Metodi Implementabili Facoltativamente
+# Metodi Facoltativi
 I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
 
 ------------
@@ -202,7 +206,7 @@ uint8_t notifySusiCVRead(uint16_t CV);
 ------------
 
 ```c
-uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value)
+uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
 ```
 *notifySusiCVWrite()* viene invocato quando: e' richiesta la Scrittura di una CV.
 - Input:
@@ -210,3 +214,15 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value)
   - il Nuovo valore della CV
 - Restituisce:
   - il valore letto (post scrittura) nella posizione richiesta
+
+------------
+
+```c
+uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
+```
+RESET CVs, viene utilizzato lo stesso metodo della Libreria NmraDcc: </br>
+*notifyCVResetFactoryDefault()* Called when CVs must be reset. This is called when CVs must be reset to their factory defaults.
+- Inputs:
+  - None                                                                                                       
+- Returns:
+  - None
