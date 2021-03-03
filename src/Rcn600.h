@@ -23,8 +23,8 @@
 #define	SYNC_TIME			9				//tempo necessario a sincronizzare Master e Slave: 9ms
 
 typedef enum {
-	SUSI_DIR_REV = 0,						// Il master sta procedendo in direzione 'Reverse'
-	SUSI_DIR_FWD = 1,						// Il master sta procedendo in direzione 'ForWard'
+	SUSI_DIR_REV = 0,						// direzione 'Reverse'
+	SUSI_DIR_FWD = 1,						// 'ForWard'
 } SUSI_DIRECTION;
 
 typedef enum {
