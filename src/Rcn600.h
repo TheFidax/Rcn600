@@ -47,14 +47,14 @@ typedef enum {
 } SUSI_AUX_GROUP;
 
 typedef enum {
-	SUSI_AN_0_7 = 1,
-	SUSI_AN_8_15,
-	SUSI_AN_16_23,
-	SUSI_AN_24_31,
-	SUSI_AN_32_39,
-	SUSI_AN_40_47,
-	SUSI_AN_48_55,
-	SUSI_AN_56_63,
+	SUSI_AN_FN_0_7 = 1,
+	SUSI_AN_FN_8_15,
+	SUSI_AN_FN_16_23,
+	SUSI_AN_FN_24_31,
+	SUSI_AN_FN_32_39,
+	SUSI_AN_FN_40_47,
+	SUSI_AN_FN_48_55,
+	SUSI_AN_FN_56_63,
 } SUSI_AN_GROUP;
 
 typedef struct {
