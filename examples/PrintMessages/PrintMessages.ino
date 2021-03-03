@@ -251,98 +251,98 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
   switch( SUSI_AnalogGrp ) {
      case SUSI_AN_0_7:
        Serial.print(" AN 0 - 7 : ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_00) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_01) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_02) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_03) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_04) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_05) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_06) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_07) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_00) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_01) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_02) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_03) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_04) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_05) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_06) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_07) ? "1  ": "0  ");
        break;
     
      case SUSI_AN_8_15:
        Serial.print(" FN 8-15: ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_08) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_09) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_10) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_11) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_12) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_13) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_14) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_15) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_08) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_09) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_10) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_11) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_12) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_13) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_14) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_15) ? "1  ": "0  ");
        break;
 
      case SUSI_AN_16_23:
        Serial.print(" FN 16-23: ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_16) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_17) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_18) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_19) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_20) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_21) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_22) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_23) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_16) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_17) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_18) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_19) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_20) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_21) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_22) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_23) ? "1  ": "0  ");
        break;
   
      case SUSI_AN_24_31:
        Serial.print(" FN 24-31: ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_24) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_25) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_26) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_27) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_28) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_29) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_30) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_31) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_24) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_25) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_26) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_27) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_28) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_29) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_30) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_31) ? "1  ": "0  ");
        break;  
      
      case SUSI_AN_32_39:
        Serial.print(" FN 32-39: ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_32) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_33) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_34) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_35) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_36) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_37) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_38) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_39) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_32) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_33) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_34) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_35) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_36) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_37) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_38) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_39) ? "1  ": "0  ");
        break;  
 
      case SUSI_AN_40_47:
        Serial.print(" FN 40-47: ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_40) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_41) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_42) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_43) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_44) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_45) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_46) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_47) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_40) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_41) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_42) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_43) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_44) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_45) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_46) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_47) ? "1  ": "0  ");
        break;  
 
      case SUSI_AN_48_55:
        Serial.print(" FN 48-55: ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_48) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_49) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_50) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_51) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_52) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_53) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_54) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_55) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_48) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_49) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_50) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_51) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_52) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_53) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_54) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_55) ? "1  ": "0  ");
        break;  
 
      case SUSI_AN_56_63:
        Serial.print(" FN 56-63: ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_56) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_57) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_58) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_59) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_60) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_61) ? "1  ": "0  ");
-       Serial.print((SUSI_AnalogState & SUSI_AN_BIT_62) ? "1  ": "0  ");
-       Serial.println((SUSI_AnalogState & SUSI_AN_BIT_63) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_56) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_57) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_58) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_59) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_60) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_61) ? "1  ": "0  ");
+       Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_62) ? "1  ": "0  ");
+       Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_63) ? "1  ": "0  ");
        break; 
    }
 }
