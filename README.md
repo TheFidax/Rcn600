@@ -1,4 +1,25 @@
-# Rcn600 SUSI
+# Indice
+* [Rcn600 SUSI](#Rcn600 SUSI)
+* [Supported clock frequencies](#supported-clock-frequencies)
+* [Bootloader option](#bootloader-option)
+* [BOD option](#bod-option)
+* [EEPROM retain option](#eeprom-option)
+* [Link time optimization / LTO](#link-time-optimization--lto)
+* [Printf support](#printf-support)
+* [Pin macros](#pin-macros)
+* [PROGMEM with flash sizes greater than 64kB](#progmem-with-flash-sizes-greater-than-64kb)
+* [Programmers](#programmers)
+* [Write to own flash](#write-to-own-flash)
+* **[How to install](#how-to-install)**
+  - [Boards Manager Installation](#boards-manager-installation)
+  - [Manual Installation](#manual-installation)
+  - [PlatformIO](#platformio)
+* **[Getting started with MegaCore](#getting-started-with-megacore)**
+* [Wiring reference](#wiring-reference)
+* **[Pinout](#pinout)**
+* **[Minimal setup](#minimal-setup)**
+
+## Rcn600 SUSI
 Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.
 
 Libreria testa su Arduino UNO.
@@ -14,6 +35,8 @@ Data  ---> 470Ω ---> Pin generico (anche di tipo analogico)
 Clock ---> 470Ω ---> Pin Interrupt
 
 Maggiori informazioni della specifiva "*RCN-600.pdf*".
+
+------------
 
 # Metodi Della libreria
 ```c
@@ -35,6 +58,8 @@ E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt
 void process(void);
 ```
 *E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
+
+------------
 
 # Metodi Implementabili a Discrezione dell'utente
 ```c
