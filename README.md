@@ -26,7 +26,7 @@ E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt
 `void process(void);`
 *E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
 
-#Metodi Implementabili a Discrezione dell'utente
+# Metodi Implementabili a Discrezione dell'utente
 `void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);`
 Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
 	*	Input:
