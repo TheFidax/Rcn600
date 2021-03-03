@@ -12,7 +12,7 @@
 
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
-#include "DataHeaders/SUSI_AN_BIT.h"
+#include "DataHeaders/SUSI_AN_fn_BIT.h"
 
 //#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 
