@@ -3,6 +3,7 @@
 * [Metodi Obbligatori](#Metodi-Obbligatori)
 * [Metodi Facoltativi](#Metodi-Facoltativi)
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
+* [Tipi Dati](#Tipi-Dati)
 * [Funzionalita' Extra](#Funzionalita-Extra)
 
 
@@ -227,6 +228,9 @@ void notifyCVResetFactoryDefault(void);
   - None                                                                                                       
 - Returns:
   - None
+
+
+# Tipi Dati
 
 
 # Funzionalita' Extra
