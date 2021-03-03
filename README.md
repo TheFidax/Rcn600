@@ -244,7 +244,16 @@ Tipo *enum*, identifica *simbolicamente* la direzione trasmessa dal Decoder
 ```c
 SUSI_FN_GROUP
 ```
-Identifica il *gruppo funzioni*:</br>
+Tipo *enum*, identifica il *gruppo funzioni*:</br>
+- SUSI_FN_0_4 : Funzioni dalla 0 alla 4
+- SUSI_FN_5_12 : Funzioni dalla 5 alla 12
+- SUSI_FN_13_20 : Funzioni dalla 13 alla 20
+- SUSI_FN_21_28 : Funzioni dalla 21 alla 28
+- SUSI_FN_29_36 : Funzioni dalla 29 alla 36
+- SUSI_FN_37_44 : Funzioni dalla 37 alla 44
+- SUSI_FN_45_52 : Funzioni dalla 45 alla 52
+- SUSI_FN_53_60 : Funzioni dalla 53 alla 60
+- SUSI_FN_61_68 : Funzioni dalla 61 alla 68
 
 
 # Funzionalita' Extra
