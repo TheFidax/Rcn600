@@ -116,9 +116,9 @@ extern "C" {
 	*/
 	extern	void notifySusiBinaryState(uint16_t Command, uint8_t CommandState) __attribute__((weak));
 	/*
-	*	notifySusiAux() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione
+	*	notifySusiAux() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX
 	*	Input:
-	*		- il numero dell'Uscita
+	*		- il numero dell'AUX
 	*		- lo stato dell'uscita (attiva = 1, disattiva = 0)
 	*	Restituisce:
 	*		- Nulla
@@ -212,15 +212,6 @@ extern "C" {
 	*		- ritorna il valore della CV letta
 	*/
 	extern uint8_t notifySusiCVRead(uint16_t CV) __attribute__((weak));
-	/*
-	*	notifySusiCVWrite() viene invocato quando: e' richiesta la Scrittura di una CV.
-	*	Input:
-	*		- il numero della CV richiesta
-	*		- il Nuovo valore della CV
-	*	Restituisce:
-	*		- il valore letto (post scrittura) nella posizione richiesta
-	*/
-	extern uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) __attribute__((weak));
 	/*
 	*	notifySusiCVWrite() viene invocato quando: e' richiesta la Scrittura di una CV.
 	*	Input:
