@@ -29,7 +29,6 @@ Clock ---> 470Ω ---> Pin Interrupt<br/>
 
 Maggiori informazioni della specifiva "*RCN-600.pdf*".
 
-------------
 
 # Metodi Della Libreria
 ```c
@@ -37,18 +36,17 @@ Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).<br/>
-
+------------
 ```c
 void init(void);
 ```
 E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.<br/>
-
+------------
 ```c
 void process(void);
 ```
 *E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.<br/>
 
-------------
 
 # Metodi Implementabili a Scelta
 ```c
@@ -71,17 +69,14 @@ Invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funz
 - Restituisce:
   - Nulla
 ------------
-`void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState);`
+```c
+void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState);
+```
 viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX:
 - Input:
- - il numero dell'AUX
- - lo stato dell'uscita (attiva = 1, disattiva = 0)
+  - il numero dell'AUX
+  - lo stato dell'uscita (attiva = 1, disattiva = 0)
 - Restituisce:
- - Nulla
+  - Nulla
 ------------
 `void notifySusiTriggerPulse(uint8_t state);`
-
-
-* A
- - B
-* C
