@@ -1,7 +1,8 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Della Libreria](#Metodi-Della-Libreria)
-* [Metodi Implementabili a Scelta](#Metodi-Implementabili-a-Scelta)
+* [Metodi Implementabili Facoltativamente](#Metodi-Implementabili-Facoltativamente])
+* [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
 
 
 # Rcn600 SUSI
@@ -41,7 +42,8 @@ void process(void);
 **E' necessario invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
 
 
-# Metodi Implementabili a Scelta
+# Metodi Implementabili Facoltativamente
+I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
 ```c
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ```
@@ -178,3 +180,16 @@ void notifySusiControllModule(uint8_t ModuleControll);
   - byte contenete il controllo del modulo
 - Restituisce:
   - Nulla
+
+# Metodi Manipolazione CVs
+I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), ma permettono alla libreria di dialogare con il Decoder Master in caso di *Lettura/Scrittura CVs*</br>
+La libreria, se almeno il metodo *notifySusiCVRead* e' implementato, gestisce l'ACK che permette al decoder di conoscere il valore della CV richiesta.
+
+```c
+uint8_t notifySusiCVRead(uint16_t CV);
+```
+*notifySusiCVRead()* viene invocato quando: e' richiesta la lettura di una CV
+- Input:
+  - il numero della CV da leggere
+- Restituisce:
+  - ritorna il valore della CV letta
