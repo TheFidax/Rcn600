@@ -38,21 +38,10 @@ void notifyDccFunc(uint16_t Addr, DCC_ADDR_TYPE AddrType, FN_GROUP FuncGrp, uint
   Serial.print(FuncGrp,DEC);
 
   switch( FuncGrp )
-   {
-#ifdef NMRA_DCC_ENABLE_14_SPEED_STEP_MODE    
-     case FN_0:
-       Serial.print(" FN0: ");
-       Serial.println((FuncState & FN_BIT_00) ? "1  " : "0  "); 
-       break;
-#endif
-       
+   {    
      case FN_0_4:
-       if(Dcc.getCV(CV_29_CONFIG) & CV29_F0_LOCATION) // Only process Function 0 in this packet if we're not in Speed Step 14 Mode
-       {
-         Serial.print(" FN 0: ");
-         Serial.print((FuncState & FN_BIT_00) ? "1  ": "0  ");
-       }
-       
+       Serial.print(" FN 0: ");
+       Serial.print((FuncState & FN_BIT_00) ? "1  ": "0  ");
        Serial.print(" FN 1-4: ");
        Serial.print((FuncState & FN_BIT_01) ? "1  ": "0  ");
        Serial.print((FuncState & FN_BIT_02) ? "1  ": "0  ");
