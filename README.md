@@ -21,11 +21,15 @@ Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).
-
-`void init(void);`
+------------
+```c
+void init(void);
+```
 E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.
-
-`void process(void);`
+------------
+```c
+void process(void);
+```
 *E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
 
 # Metodi Implementabili a Discrezione dell'utente
