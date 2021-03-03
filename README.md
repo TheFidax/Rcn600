@@ -1,7 +1,7 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Della libreria](#Metodi-Della-libreria)
-* [Bootloader option](#bootloader-option)
+* [Metodi Implementabili a Discrezione dell'utente](#Metodi-Implementabili-a-Discrezione-dell'utente)
 * [Programmers](#programmers)
 * [Write to own flash](#write-to-own-flash)
 * **[How to install](#how-to-install)**
