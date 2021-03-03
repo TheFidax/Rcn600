@@ -190,7 +190,7 @@ void notifySusiControllModule(uint8_t ModuleControll);
 
 # Metodi Manipolazione CVs
 I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), ma permettono alla libreria di dialogare con il Decoder Master in caso di *Lettura/Scrittura CVs*</br>
-La libreria gestisce l'ACK che permette al decoder di conoscere l'esito dell'operazione richiesta.
+La libreria **gestisce l'ACK** che permette al decoder di conoscere l'esito dell'operazione richiesta.
 
 ------------
 
@@ -220,7 +220,7 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
 ```c
 uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
 ```
-RESET CVs, viene utilizzato lo stesso metodo della Libreria NmraDcc:</br>
+RESET CVs, viene utilizzato lo stesso metodo della Libreria [NmraDcc](https://www.google.it/):</br>
 *notifyCVResetFactoryDefault()* Called when CVs must be reset. This is called when CVs must be reset to their factory defaults.
 - Inputs:
   - None                                                                                                       
