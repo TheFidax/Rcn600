@@ -1,7 +1,7 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Della libreria](#Metodi-Della-libreria)
-* [Metodi Implementabili a Discrezione dell'utente](#Metodi-Implementabili-a-Discrezione-dell-'-utente)
+* [Metodi Implementabili a Scelta](#Metodi-Implementabili-a-Scelta)
 * [Programmers](#programmers)
 * [Write to own flash](#write-to-own-flash)
 * **[How to install](#how-to-install)**
@@ -12,6 +12,8 @@
 * [Wiring reference](#wiring-reference)
 * **[Pinout](#pinout)**
 * **[Minimal setup](#minimal-setup)**
+
+------------
 
 # Rcn600 SUSI
 Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.<br/>
@@ -34,23 +36,23 @@ Maggiori informazioni della specifiva "*RCN-600.pdf*".
 Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.
-Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).
+Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).<br/>
 
 
 ```c
 void init(void);
 ```
-E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.
+E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.<br/>
 
 
 ```c
 void process(void);
 ```
-*E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
+*E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.<br/>
 
 ------------
 
-# Metodi Implementabili a Discrezione dell'utente
+# Metodi Implementabili a Scelta
 ```c
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ```
