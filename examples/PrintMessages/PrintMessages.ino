@@ -249,7 +249,7 @@ void notifySusiMotorLoad(int load) {
 void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) {
   Serial.print("notifySusiAnalog: ");
   switch( SUSI_AnalogGrp ) {
-     case SUSI_AN_0_7:
+     case SUSI_AN_FN_0_7:
        Serial.print(" AN 0 - 7 : ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_00) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_01) ? "1  ": "0  ");
@@ -261,7 +261,7 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
        Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_07) ? "1  ": "0  ");
        break;
     
-     case SUSI_AN_8_15:
+     case SUSI_AN_FN_8_15:
        Serial.print(" FN 8-15: ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_08) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_09) ? "1  ": "0  ");
@@ -273,7 +273,7 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
        Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_15) ? "1  ": "0  ");
        break;
 
-     case SUSI_AN_16_23:
+     case SUSI_AN_FN_16_23:
        Serial.print(" FN 16-23: ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_16) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_17) ? "1  ": "0  ");
@@ -285,7 +285,7 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
        Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_23) ? "1  ": "0  ");
        break;
   
-     case SUSI_AN_24_31:
+     case SUSI_AN_FN_24_31:
        Serial.print(" FN 24-31: ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_24) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_25) ? "1  ": "0  ");
@@ -297,7 +297,7 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
        Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_31) ? "1  ": "0  ");
        break;  
      
-     case SUSI_AN_32_39:
+     case SUSI_AN_FN_32_39:
        Serial.print(" FN 32-39: ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_32) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_33) ? "1  ": "0  ");
@@ -309,7 +309,7 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
        Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_39) ? "1  ": "0  ");
        break;  
 
-     case SUSI_AN_40_47:
+     case SUSI_AN_FN_40_47:
        Serial.print(" FN 40-47: ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_40) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_41) ? "1  ": "0  ");
@@ -321,7 +321,7 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
        Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_47) ? "1  ": "0  ");
        break;  
 
-     case SUSI_AN_48_55:
+     case SUSI_AN_FN_48_55:
        Serial.print(" FN 48-55: ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_48) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_49) ? "1  ": "0  ");
@@ -333,7 +333,7 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
        Serial.println((SUSI_AnalogState & SUSI_AN_FN_BIT_55) ? "1  ": "0  ");
        break;  
 
-     case SUSI_AN_56_63:
+     case SUSI_AN_FN_56_63:
        Serial.print(" FN 56-63: ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_56) ? "1  ": "0  ");
        Serial.print((SUSI_AnalogState & SUSI_AN_FN_BIT_57) ? "1  ": "0  ");
