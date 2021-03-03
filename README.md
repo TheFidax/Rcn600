@@ -226,3 +226,23 @@ void notifyCVResetFactoryDefault(void);
   - None                                                                                                       
 - Returns:
   - None
+
+
+# Funzionalita' Extra
+Le seguenti funzionalita' vengono abilitate attivando delle #define nel file **Rcn600.h**
+
+------------
+
+```c
+#define	CHECK_FREE_RAM
+```
+Questa define impone alla libreria di attuare dei controlli sulla Ram disponibile prima di prendere delle risorse.</br>
+Puo' risultare utile su microcontrollori dotati di poca Ram, in caso di memoria insufficiente il metodo che richiedere le risorse viene ignorato.</br>
+Per poter funzionare e' necessaria una libreria esterna: [MemoryFree](https://github.com/McNeight/MemoryFree)</br> 
+Stato di *default*: **Disattivata**</br>
+
+------------
+
+```c
+#define	NOTIFY_RAW_MESSAGE
+```
