@@ -30,13 +30,12 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 ```c
 void init(void);
 ```
-E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.
+*E' necessario* invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.
 ------------
-
 ```c
 void process(void);
 ```
-*E' necessario*  **invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
+**E' necessario invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
 
 
 # Metodi Implementabili a Scelta
