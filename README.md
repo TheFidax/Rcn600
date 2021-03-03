@@ -29,8 +29,7 @@ E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt
 # Metodi Implementabili a Discrezione dell'utente
 `void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);`
 Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
-* Input :
- - il gruppo Funzioni decodificato
+* Input: - il gruppo Funzioni decodificato
  - lo stato del gruppo funzioni
 * Restituisce:
  - Nulla
