@@ -221,7 +221,7 @@ extern "C" {
 	*		- il valore letto (post scrittura) nella posizione richiesta
 	*/
 	extern uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) __attribute__((weak));
-	/* RESET CVs, Utilizzato stesso metodo della Libreria NmraDcc
+	/* RESET CVs, viene utilizzato lo stesso metodo della Libreria NmraDcc:
 	* 
 	*  notifyCVResetFactoryDefault() Called when CVs must be reset.
 	*                                This is called when CVs must be reset
