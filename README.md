@@ -19,9 +19,8 @@
 * **[Pinout](#pinout)**
 * **[Minimal setup](#minimal-setup)**
 
-## Rcn600 SUSI
-Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.
-
+# Rcn600 SUSI
+Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.<br/>
 Libreria testa su Arduino UNO.
 
 **NOTA**: Se attivi i controlli sulla memoria Ram disponibile prima di allocare risorse, e' necessaria la libreria 'freeMemory' disponibile qui: https://github.com/McNeight/MemoryFree
