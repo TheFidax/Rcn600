@@ -30,7 +30,7 @@ E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt
 `void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);`
 Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
 * Input: 
-	- il gruppo Funzioni decodificato
+ - il gruppo Funzioni decodificato
  - lo stato del gruppo funzioni
 * Restituisce:
  - Nulla
@@ -52,3 +52,8 @@ viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specific
  - Nulla
 ------------
 `void notifySusiTriggerPulse(uint8_t state);`
+
+
+* A
+ - B
+* C
