@@ -32,7 +32,9 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 void init(void);
 ```
 *E' necessario* invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.
+
 ------------
+
 ```c
 void process(void);
 ```
