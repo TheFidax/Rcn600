@@ -45,7 +45,7 @@ void process(void);
 ```c
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ```
-Viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
+*notifySusiFunc()* viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
 * Input:
   - il gruppo Funzioni decodificato
   - lo stato del gruppo funzioni
@@ -57,7 +57,7 @@ Viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni di
 ```c
 void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);
 ```
-Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
+*notifySusiBinaryState()* viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
 - Input:
   - il numero della funzione (da 1 a 127)
   - lo stato della Funzione (attiva = 1, disattiva = 0)
@@ -69,7 +69,7 @@ Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specific
 ```c
 void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState);
 ```
-Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX:
+*notifySusiAux()* viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX:
 - Input:
   - il numero dell'AUX
   - lo stato dell'uscita (attiva = 1, disattiva = 0)
@@ -81,7 +81,7 @@ Viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specific
 ```c
 void notifySusiTriggerPulse(uint8_t state);
 ```
-Viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione) per eventuali sbuffi di vapore
+notifySusiTriggerPulse() viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione) per eventuali sbuffi di vapore
 - Input:
   - stato del comando Trigger/Pulse
 - Restituisce:
@@ -92,7 +92,7 @@ Viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione)
 ```c
 void notifySusiMotorCurrent(int current);
 ```
-Viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
+*notifySusiMotorCurrent()* viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
 - Input:
   - Assorbimento di Corrente: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
 - Restituisce:
@@ -103,7 +103,7 @@ Viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente
 ```c
 void notifySusiRequestSpeed(uint8_t Speed, SUSI_DIRECTION Dir);
 ```
-Viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
+*notifySusiRequestSpeed()* viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
 - Input:
   - la velocita' (128 step) richiesta
   - la direzione richiesta
@@ -143,4 +143,38 @@ void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogS
   - il gruppo Analogico decodificato
   - lo stato del gruppo
 - Restituisce:
- - Nulla
+  - Nulla
+
+------------
+
+```c
+void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command);
+```
+*notifySusiAnalogDirectCommand()* viene invocato quando: si ricevono i dati dal Master i comandi diretti per il funzionamento analogico
+- Input:
+  - il numero del comando: 1 o 2
+  - i bit del comando
+- Restituisce:
+  - Nulla
+
+------------
+
+```c
+void notifySusiMasterAddress(uint16_t MasterAddress);
+```
+*notifySusiMasterAddress()* viene invocato quando: si riceve l'indirizzo digitale del Master
+- Input:
+  - l'indirizzo Digitale del Master
+- Restituisce:
+  - Nulla
+
+------------
+
+```c
+void notifySusiControllModule(uint8_t ModuleControll);
+```
+*notifySusiControlModule()* viene invocato quando: si riceve il comando sul controllo del modulo
+- Input:
+  - byte contenete il controllo del modulo
+- Restituisce:
+  - Nulla
