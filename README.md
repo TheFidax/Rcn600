@@ -220,7 +220,7 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
 ```c
 uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
 ```
-RESET CVs, viene utilizzato lo stesso metodo della Libreria NmraDcc: </br>
+RESET CVs, viene utilizzato lo stesso metodo della Libreria NmraDcc:</br>
 *notifyCVResetFactoryDefault()* Called when CVs must be reset. This is called when CVs must be reset to their factory defaults.
 - Inputs:
   - None                                                                                                       
