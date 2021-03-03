@@ -1,6 +1,6 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
-* [Metodi Della libreria](#Metodi-Della-libreria)
+* [Metodi Della Libreria](#Metodi-Della-Libreria)
 * [Metodi Implementabili a Scelta](#Metodi-Implementabili-a-Scelta)
 * [Programmers](#programmers)
 * [Write to own flash](#write-to-own-flash)
@@ -31,20 +31,17 @@ Maggiori informazioni della specifiva "*RCN-600.pdf*".
 
 ------------
 
-# Metodi Della libreria
+# Metodi Della Libreria
 ```c
 Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).<br/>
 
-
-
 ```c
 void init(void);
 ```
 E' necessario invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.<br/>
-
 
 ```c
 void process(void);
@@ -63,6 +60,9 @@ Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
  - lo stato del gruppo funzioni
 * Restituisce:
  - Nulla
+
+* Restituisce:
+  - Nulla
 
 ------------
 
