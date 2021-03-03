@@ -3,6 +3,8 @@
 #include <NmraDcc.h>
 #include <Rcn600.h>
 
+#define This_Decoder_Address 3
+
 Rcn600 SUSI(2, 3);  //Definisco i pin a cui e' collegato il Bus SUSI
 
 /* Metodi Libreria NmraDcc */
