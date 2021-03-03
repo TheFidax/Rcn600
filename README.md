@@ -235,7 +235,7 @@ I seguenti tipi di dati vengono utilizzati dai metodi della libreria.
 ```c
 SUSI_DIRECTION
 ```
-Tipo *enum*, identifica *simbolicamente* la direzione trasmessa dal Decoder
+Tipo *enum*, identifica *simbolicamente* la direzione trasmessa dal Decoder Master: </br>
 - SUSI_DIR_REV : Direzione *reverse*
 - SUSI_DIR_FWD : Direzione *forward*
 
@@ -244,7 +244,7 @@ Tipo *enum*, identifica *simbolicamente* la direzione trasmessa dal Decoder
 ```c
 SUSI_FN_GROUP
 ```
-Tipo *enum*, identifica il *gruppo funzioni*:</br>
+Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Digitali trasmesse dal Decoder Master:</br>
 - SUSI_FN_0_4 : Funzioni dalla 0 alla 4
 - SUSI_FN_5_12 : Funzioni dalla 5 alla 12
 - SUSI_FN_13_20 : Funzioni dalla 13 alla 20
@@ -254,6 +254,17 @@ Tipo *enum*, identifica il *gruppo funzioni*:</br>
 - SUSI_FN_45_52 : Funzioni dalla 45 alla 52
 - SUSI_FN_53_60 : Funzioni dalla 53 alla 60
 - SUSI_FN_61_68 : Funzioni dalla 61 alla 68
+
+------------
+
+```c
+SUSI_FN_GROUP
+```
+Tipo *enum*, identifica *simbolicamente* il gruppo di AUXs trasmesse dal Decoder Master:</br>
+- SUSI_AUX_1_8 : AUX dalla 1 alla 8
+- SUSI_AUX_9_16 : AUX dalla 9 alla 16
+- SUSI_AUX_17_24 : AUX dalla 17 alla 24
+- SUSI_AUX_25_32 : AUX dalla 25 alla 32
 
 
 # Funzionalita' Extra
