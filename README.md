@@ -55,29 +55,21 @@ void process(void);
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ```
 Invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
-* Input: 
-  - il gruppo Funzioni decodificato
-  - lo stato del gruppo funzioni
-* Restituisce:
-  - Nulla
-
 * Input:
   - il gruppo Funzioni decodificato
   - lo stato del gruppo funzioni
 * Restituisce:
   - Nulla
-
 ------------
-
 ```c
 void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);
 ```
 Invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
 - Input:
- - il numero della funzione (da 1 a 127)
- - lo stato della Funzione (attiva = 1, disattiva = 0)
+  - il numero della funzione (da 1 a 127)
+  - lo stato della Funzione (attiva = 1, disattiva = 0)
 - Restituisce:
- - Nulla
+  - Nulla
 ------------
 `void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState);`
 viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX:
