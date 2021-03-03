@@ -269,7 +269,7 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di AUXs trasmesse dal Decoder
 ------------
 
 ```c
-SUSI_AN_GROUP
+SUSI_AN_FN_GROUP
 ```
 Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasmesse dal Decoder Master:</br>
 - SUSI_AN_FN_0_7 : Funzioni Analogiche dalla 0 alla 7
