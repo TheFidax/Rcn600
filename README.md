@@ -115,6 +115,19 @@ Viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione rich
 ```c
 void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir);
 ```
+notifySusiRealSpeed() viene invocato quando: si ricevono i dati dal Master sulla Velocita' e sulla Direzione reali 
+- Input:
+  - la velocita' (128 step) reale
+  - la direzione reale
+- Restituisce:
+  - Nulla
+
+------------
+
+
+```c
+void notifySusiMotorLoad(int load);
+```
 Viene invocato quando: si riceve dal Master i dati sul carico del Motore
 - Input:
   - Carico del Motore: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
