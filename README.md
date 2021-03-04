@@ -203,7 +203,7 @@ uint8_t notifySusiCVRead(uint16_t CV);
 - Input:
   - il numero della CV da leggere
 - Restituisce:
-  - ritorna il valore della CV letta
+  - il valore della CV letta
 
 ------------
 
@@ -215,7 +215,7 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
   - il numero della CV richiesta
   - il Nuovo valore della CV
 - Restituisce:
-  - il valore letto (post scrittura) nella posizione richiesta
+  - il valore letto (post scrittura) della CV da scrivere
 
 ------------
 
