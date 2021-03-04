@@ -44,7 +44,7 @@ void init(void);
 ------------
 
 ```c
-void inituint8_t SlaveAddress
+void init(uint8_t SlaveAddress);
 ```
 *E' necessario* invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.</br>
 *Permette di specificare l'indirizzo del modulo*, **PUO' AVERE VALORE**: 1, 2, 3 . In caso di valore diverso verra' utilizzato il valore di defualt: 1.</br>
