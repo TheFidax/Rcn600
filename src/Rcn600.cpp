@@ -93,6 +93,23 @@ void Rcn600::init(void) {
 	}
 }
 
+void Rcn600::init(uint8_t SlaveAddress) {			//Inizializzazione con indirizzo scelto dall'utente nel codice
+	if ( (SlaveAddress > 0) && (SlaveAddress < 4) ) {
+		SlaveNumber = SlaveAddress;
+	}
+	else {
+		SlaveNumber = DEFAULT_SLAVE_NUMBER;
+	}
+
+	SusiData.bitCounter = 0;
+	SusiData.ByteCounter = 0;
+	SusiData.MessageComplete = false;
+
+	SusiData.lastByte_time = SusiData.lastbit_time = 0;
+
+	attachInterrupt(digitalPinToInterrupt(SusiData.CLK_pin), ISR_SUSI, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
