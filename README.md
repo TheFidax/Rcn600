@@ -11,8 +11,6 @@
 Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.<br/>
 Libreria testata su Arduino UNO.
 
-**NOTA**: Se attivi i controlli sulla memoria Ram disponibile prima di allocare risorse, e' necessaria la libreria 'freeMemory' disponibile qui: https://github.com/McNeight/MemoryFree
-
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI possono essere a 5v!** 
 
 Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI (Clock e Dati).<br/>
@@ -293,16 +291,6 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasme
 
 # Funzionalita' Extra
 Le seguenti funzionalita' vengono comandate *manualmente* agendo su delle #define nel file **Rcn600.h**
-
-------------
-
-```c
-#define	CHECK_FREE_RAM
-```
-Questa define impone alla libreria di attuare dei controlli sulla Ram disponibile prima di prendere delle risorse.</br>
-Puo' risultare utile su microcontrollori dotati di poca Ram, in caso di memoria insufficiente il metodo che richiedere le risorse viene ignorato.</br>
-Per poter funzionare e' necessaria una libreria esterna: [MemoryFree](https://github.com/McNeight/MemoryFree)</br> 
-Stato di *default*: **Disattivata**</br>
 
 ------------
 

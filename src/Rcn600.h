@@ -6,9 +6,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "Arduino.h"
-#ifdef CHECK_FREE_RAM
-#include "MemoryFree.h"						// disponibile qui: https://github.com/McNeight/MemoryFree
-#endif
 
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"

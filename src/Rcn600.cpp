@@ -239,9 +239,9 @@ void Rcn600::process(void) {
 			}
 			break;
 		}
-		case 109: {													
-			/* "Binärzustände kurze Form" :  0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0 
-			* 
+		case 109: {
+			/* "Binärzustände kurze Form" :  0110 - 1101 (0x6D = 109) D L6 L5 L4 - L3 L2 L1 L0
+			*
 			*	D = 0 bedeutet Funktion L ausgeschaltet, D = 1 eingeschaltet
 			*	L = Funktionsnummer 1 ... 127
 			*	L = 0 (Broadcast) schaltet alle Funktionen 1 bis 127 aus (D = 0) oder an (D = 1)
@@ -251,87 +251,75 @@ void Rcn600::process(void) {
 			*	L = 0 (trasmissione) disattiva (D = 0) o attiva tutte le funzioni da 1 a 127 (D = 1)
 			*/
 
-#ifdef CHECK_FREE_RAM
-			if ((uint16_t)freeMemory() >= (sizeof(uint8_t) * 2)) {				// Controllo di avere abbastanza memoria per le variabili
-#endif
-				static uint8_t functionNumber, funcState;
-				funcState = bitRead(SusiData.MessageByte[1], 7);	// leggo il valore dello stato 'D'
-				bitWrite(SusiData.MessageByte[1], 7, 0);			// elimino il valore dello stato
-				functionNumber = SusiData.MessageByte[1];			// i restanti bit identificano la Funzione 'L'
+			static uint8_t functionNumber, funcState;
+			funcState = bitRead(SusiData.MessageByte[1], 7);	// leggo il valore dello stato 'D'
+			bitWrite(SusiData.MessageByte[1], 7, 0);			// elimino il valore dello stato
+			functionNumber = SusiData.MessageByte[1];			// i restanti bit identificano la Funzione 'L'
 
-				if (notifySusiBinaryState) {
-					if (functionNumber == 0) {
-						// Comanda tutte le funzioni
-						static uint8_t i;
-						if (funcState == 0) {	// disattivo tutte le funzioni
-							for (i = 1; i < 128; ++i) {
-								notifySusiBinaryState(i, 0);
-							}
-						}
-						else {				// attivo tutte le funzioni 
-							for (i = 1; i < 128; ++i) {
-								notifySusiBinaryState(i, 1);
-							}
+			if (notifySusiBinaryState) {
+				if (functionNumber == 0) {
+					// Comanda tutte le funzioni
+					static uint8_t i;
+					if (funcState == 0) {	// disattivo tutte le funzioni
+						for (i = 1; i < 128; ++i) {
+							notifySusiBinaryState(i, 0);
 						}
 					}
-					else {
-						// Comanda una singola funzione
-						notifySusiBinaryState(functionNumber, funcState);
+					else {				// attivo tutte le funzioni 
+						for (i = 1; i < 128; ++i) {
+							notifySusiBinaryState(i, 1);
+						}
 					}
 				}
-#ifdef CHECK_FREE_RAM
+				else {
+					// Comanda una singola funzione
+					notifySusiBinaryState(functionNumber, funcState);
+				}
 			}
-#endif
 			break;
 		}
 		case 110: {	// && 111
 			/*	"Binärzustände lange Form low Byte" : 0110-1110 (0x6E = 110) D L6 L5 L4 - L3 L2 L1 L0
 			*
-			*	Befehl wird immer paarweise vor dem Binärzustand lange Form high Byte gesendet. 
+			*	Befehl wird immer paarweise vor dem Binärzustand lange Form high Byte gesendet.
 			*	Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
 			*	D = 0 bedeutet Binärzustand L ausgeschaltet, D = 1 "eingeschaltet"
-			*	L = niederwertige Bits der Binärzustandsnummer 1 ... 32767 
-			* 
-			*	Il comando viene sempre inviato in coppie prima che lo stato binario formi lunghi byte alti. 
+			*	L = niederwertige Bits der Binärzustandsnummer 1 ... 32767
+			*
+			*	Il comando viene sempre inviato in coppie prima che lo stato binario formi lunghi byte alti.
 			*	Se i due comandi non seguono direttamente, devono essere ignorati.
 			*	D = 0 significa stato binario L spento, D = 1 "acceso"
 			*	L = bit di basso valore dello stato binario numero 1 ... 32767
-			* 
+			*
 			*
 			*	"Binärzustände lange Form high Byte" : 0110-1111 (0x6F = 111) H7 H6 H5 H4 - H3 H2 H1 H0
-			* 
+			*
 			*	Befehl wird immer paarweise nach dem Binärzustand lange Form low
 			*	Byte gesendet. Folgen die beiden Befehle nicht direkt aufeinander, so sind sie zu ignorieren.
 			*	Erst dieser Befehl führt zur Ausführung des Gesamtbefehls.
-			*	H = höherwertigen Bits der Binärzustandsnummer high 1 ... 32767 
+			*	H = höherwertigen Bits der Binärzustandsnummer high 1 ... 32767
 			*	H und L = 0 (Broadcast) schaltet alle 32767 verfügbaren Binärzustände
-			*	aus (D = 0) oder an (D = 1) 
-			* 
+			*	aus (D = 0) oder an (D = 1)
+			*
 			*	Il comando viene sempre inviato in coppie dopo che lo stato binario forma lunghi byte bassi. Se i due comandi non si sus seguono direttamente, devono essere ignorati.
 			*	Solo dopo questo comando eseguira' l'intero comando.
-			*	H = bit di qualita' superiore dello stato binario numero alto 1 ... 32767 
+			*	H = bit di qualita' superiore dello stato binario numero alto 1 ... 32767
 			*/
 
-#ifdef CHECK_FREE_RAM
-			if ((uint16_t)freeMemory() >= (sizeof(uint8_t) + sizeof(uint16_t))) {	// Controllo di avere abbastanza memoria per le variabili
-#endif
-				if (SusiData.MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
-					if (notifySusiBinaryState) {						// Controllo se e' presente il metodo per gestire il comando
-						static uint16_t Command;
-						static uint8_t State;
+			if (SusiData.MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
+				if (notifySusiBinaryState) {						// Controllo se e' presente il metodo per gestire il comando
+					static uint16_t Command;
+					static uint8_t State;
 
-						Command = SusiData.MessageByte[3];			// memorizzo i bit "piu' significativ"
-						Command = Command << 7;						// sposto i bit 7 posti a 'sinistra'
-						Command |= SusiData.MessageByte[1];			// aggiungo i 7 bit "meno significativi"
+					Command = SusiData.MessageByte[3];			// memorizzo i bit "piu' significativ"
+					Command = Command << 7;						// sposto i bit 7 posti a 'sinistra'
+					Command |= SusiData.MessageByte[1];			// aggiungo i 7 bit "meno significativi"
 
-						State = bitRead(SusiData.MessageByte[1], 7);
+					State = bitRead(SusiData.MessageByte[1], 7);
 
-						notifySusiBinaryState(Command, State);
-					}
+					notifySusiBinaryState(Command, State);
 				}
-#ifdef CHECK_FREE_RAM
 			}
-#endif
 			break;
 		}
 		case 64: {
@@ -693,21 +681,15 @@ void Rcn600::process(void) {
 
 
 			if (SusiData.MessageByte[2] == 95) {	//i byte di comando devono susseguirsi
-#ifdef CHECK_FREE_RAM
-				if ((uint16_t)freeMemory() >= (sizeof(uint16_t))) {	// Controllo di avere abbastanza memoria per le variabili
-#endif
-					if (notifySusiMasterAddress) {					// Controllo se e' presente il metodo per gestire il comando
-						static uint16_t MasterAddress;
+				if (notifySusiMasterAddress) {					// Controllo se e' presente il metodo per gestire il comando
+					static uint16_t MasterAddress;
 
-						MasterAddress = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
-						MasterAddress = MasterAddress << 8;			//sposto i bit 7 posti a 'sinistra'
-						MasterAddress |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
+					MasterAddress = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
+					MasterAddress = MasterAddress << 8;			//sposto i bit 7 posti a 'sinistra'
+					MasterAddress |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
 
-						notifySusiMasterAddress(MasterAddress);
-					}
-#ifdef CHECK_FREE_RAM
+					notifySusiMasterAddress(MasterAddress);
 				}
-#endif
 			}
 			break;
 		}
@@ -734,16 +716,16 @@ void Rcn600::process(void) {
 
 		/* METODI MANIPOLAZIONE CVs */
 
-		case 119: {	
+		case 119: {
 			/*	"CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
 			*
 			*	DCC-Befehl Byte Prüfen im Service- und Betriebsmodus
 			*	V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
 			*	D = Vergleichswert zum Prüfen. Wenn D dem gespeicherten CV-Wert
-			*	entspricht, antwortet der Slave mit einem Acknowledge. 
+			*	entspricht, antwortet der Slave mit einem Acknowledge.
 			*	Dieser und die beiden folgenden Befehle sind die in Abschnitt 4 genannten
-			*	3 Byte Pakete entsprechend [RCN-214] 
-			* 
+			*	3 Byte Pakete entsprechend [RCN-214]
+			*
 			*	Controllo byte di comando DCC in modalita' di servizio e di funzionamento
 			*	V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
 			*	D = valore di confronto per il controllo. Se D corrisponde al valore CV memorizzato
@@ -752,48 +734,43 @@ void Rcn600::process(void) {
 			*	Pacchetti da 3 byte secondo [RCN-214]
 			*/
 
-#ifdef CHECK_FREE_RAM
-			if ((uint16_t)freeMemory() >= (sizeof(uint16_t) + sizeof(uint8_t))) {	// Controllo di avere abbastanza memoria per le variabili
-#endif
-				static uint16_t CV_Number;
-				static uint8_t CV_Value;
 
-				CV_Number = 897 + (SusiData.MessageByte[1] - 128);
+			static uint16_t CV_Number;
+			static uint8_t CV_Value;
 
-				if (isCVvalid(CV_Number)) {
-					/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
+			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
 
-					if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
-						if (CV_Number == 897) {
-							CV_Value = SlaveNumber;
-						}
-						else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
-							CV_Value = MANUFACTER_ID;
-						}
-						else { //identificano la versione software
-							CV_Value = SUSI_VER;
-						}
+			if (isCVvalid(CV_Number)) {
+				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
+
+				if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
+					if (CV_Number == 897) {
+						CV_Value = SlaveNumber;
 					}
-					else {
-						if (notifySusiCVRead) { //altre CV disponibili per il modulo
-							CV_Value = notifySusiCVRead(CV_Number);
-						}
-						else {
-							CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
-						}
+					else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
+						CV_Value = MANUFACTER_ID;
 					}
-
-					/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
-					if (CV_Value == SusiData.MessageByte[2]) {
-						Data_ACK();
+					else { //identificano la versione software
+						CV_Value = SUSI_VER;
 					}
 				}
-#ifdef CHECK_FREE_RAM
+				else {
+					if (notifySusiCVRead) { //altre CV disponibili per il modulo
+						CV_Value = notifySusiCVRead(CV_Number);
+					}
+					else {
+						CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
+					}
+				}
+
+				/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
+				if (CV_Value == SusiData.MessageByte[2]) {
+					Data_ACK();
+				}
 			}
-#endif
 			break;
 		}
-		case 123: {	
+		case 123: {
 			/* "CV-Manipulation Bit manipulieren" : 0111-1011 (0x7B = 123) | 1 V6 V5 V4 - V3 V2 V1 V0 | 1 1 1 K - D B2 B1 B0
 			*
 			* DCC-Befehl Bit Manipulieren im Service- und Betriebsmodus
@@ -802,7 +779,7 @@ void Rcn600::process(void) {
 			* übereinstimmt, wird mit einem Acknowledge geantwortet.
 			* K = 1: Bit Schreiben. D wird in Bitstelle B der CV geschrieben.
 			* Der Slave bestätigt das Schreiben mit einem Acknowledge.
-			* 
+			*
 			* Manipolazione dei bit di comando DCC in modalita' di servizio e operativa
 			* V = numero CV 897 ... 1024 (valore 0 = CV 897, valore 127 = CV 1024)
 			* k = 0: bit di controllo. Se D con lo stato del bit alla posizione del bit B del CV
@@ -811,112 +788,100 @@ void Rcn600::process(void) {
 			* Lo slave conferma la scrittura con un riconoscimento.
 			*/
 
-#ifdef CHECK_FREE_RAM
-			if ((uint16_t)freeMemory() >= (sizeof(uint16_t) + sizeof(uint8_t) * 4)) {	// Controllo di avere abbastanza memoria per le variabili
-#endif
-				static uint16_t CV_Number;
+			static uint16_t CV_Number;
 
-				CV_Number = 897 + (SusiData.MessageByte[1] - 128);
+			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
 
-				if (isCVvalid(CV_Number)) {
-					static uint8_t CV_Value, operation, bitValue, bitPosition;
+			if (isCVvalid(CV_Number)) {
+				static uint8_t CV_Value, operation, bitValue, bitPosition;
 
-					operation = bitRead(SusiData.MessageByte[2], 4);																									// leggo quale operazione sui bit e' richiesta
-					bitValue = bitRead(SusiData.MessageByte[2], 3);																										// leggo il valore del bit da confrontare/scrivere
-					bitPosition = ((bitRead(SusiData.MessageByte[2], 0) * 1) + (bitRead(SusiData.MessageByte[2], 1) * 2) + (bitRead(SusiData.MessageByte[2], 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
+				operation = bitRead(SusiData.MessageByte[2], 4);																									// leggo quale operazione sui bit e' richiesta
+				bitValue = bitRead(SusiData.MessageByte[2], 3);																										// leggo il valore del bit da confrontare/scrivere
+				bitPosition = ((bitRead(SusiData.MessageByte[2], 0) * 1) + (bitRead(SusiData.MessageByte[2], 1) * 2) + (bitRead(SusiData.MessageByte[2], 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
-					if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {			//identificano il produttore dello Slave
-						CV_Value = MANUFACTER_ID;
-					}
-					else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
-						CV_Value = SUSI_VER;
+				if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {			//identificano il produttore dello Slave
+					CV_Value = MANUFACTER_ID;
+				}
+				else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
+					CV_Value = SUSI_VER;
+				}
+				else {
+					if (notifySusiCVRead) {
+						CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
 					}
 					else {
-						if (notifySusiCVRead) {
-							CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
-						}
-						else {
-							CV_Value = 254;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 254
-						}
-					}
-
-					//in base all'operazione richiesta eseguiro' un'azione
-					switch (operation) {
-					case 0: {	//confronto dei bit
-						if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
-							Data_ACK();
-						}
-						break;
-					}
-					case 1: {	//scrittura del bit
-						if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
-							if (notifySusiCVWrite) {
-								bitWrite(CV_Value, bitPosition, bitRead(SusiData.MessageByte[2], 3));	//scrivo il nuovo valore del bit
-								if (notifySusiCVWrite((897 + (SusiData.MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
-									Data_ACK();
-								}
-								//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
-							}
-						}
-						break;
-					}
+						CV_Value = 254;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 254
 					}
 				}
-#ifdef CHECK_FREE_RAM
+
+				//in base all'operazione richiesta eseguiro' un'azione
+				switch (operation) {
+				case 0: {	//confronto dei bit
+					if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
+						Data_ACK();
+					}
+					break;
+				}
+				case 1: {	//scrittura del bit
+					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
+						if (notifySusiCVWrite) {
+							bitWrite(CV_Value, bitPosition, bitRead(SusiData.MessageByte[2], 3));	//scrivo il nuovo valore del bit
+							if (notifySusiCVWrite((897 + (SusiData.MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
+								Data_ACK();
+							}
+							//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+						}
+					}
+					break;
+				}
+				}
 			}
-#endif
 			break;
 		}
-		case 127: {	
-			/* "CV-Manipulation Byte schreiben" : 0111-1111 (0x7F = 127) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0 
+		case 127: {
+			/* "CV-Manipulation Byte schreiben" : 0111-1111 (0x7F = 127) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
 			*
 			* DCC-Befehl Byte Schreiben im Service- und Betriebsmodus
 			* V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
 			* D = Wert zum Schreiben in die CV. Der Slave bestätigt das Schreiben mit
-			* einem Acknowledge. 
-			* 
+			* einem Acknowledge.
+			*
 			* Scrittura byte di comando DCC in modalita' di servizio e operativa
 			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
 			* D = valore per la scrittura nel CV. Lo Slave conferma la scrittura con un riconoscimento.
 			*/
 
-#ifdef CHECK_FREE_RAM
-			if ((uint16_t)freeMemory() >= (sizeof(uint16_t))) {	// Controllo di avere abbastanza memoria per le variabili
-#endif
-				static uint16_t CV_Number;
+			static uint16_t CV_Number;
 
-				CV_Number = 897 + (SusiData.MessageByte[1] - 128);
+			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
 
-				if (isCVvalid(CV_Number)) {
-					/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
+			if (isCVvalid(CV_Number)) {
+				/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
-					if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
-						if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (SusiData.MessageByte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
-							if (notifyCVResetFactoryDefault) {
-								notifyCVResetFactoryDefault();
+				if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
+					if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (SusiData.MessageByte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
+						if (notifyCVResetFactoryDefault) {
+							notifyCVResetFactoryDefault();
 
+							Data_ACK();
+						}
+					}
+					else {	//scrittura CVs
+						if (notifySusiCVWrite) {
+							if (notifySusiCVWrite(CV_Number, SusiData.MessageByte[2]) == SusiData.MessageByte[2]) {
 								Data_ACK();
 							}
 						}
-						else {	//scrittura CVs
-							if (notifySusiCVWrite) {
-								if (notifySusiCVWrite(CV_Number, SusiData.MessageByte[2]) == SusiData.MessageByte[2]) {
-									Data_ACK();
-								}
-							}
-						}
-						//in caso di sistema di memorizzazione CVs non implementato non eseguo l'ACK
 					}
+					//in caso di sistema di memorizzazione CVs non implementato non eseguo l'ACK
+				}
 
-					if (CV_Number == 897) {
-						if (notifySusiCVRead) {
-							SlaveNumber = notifySusiCVRead(CV_Number);
-						}
+				if (CV_Number == 897) {
+					if (notifySusiCVRead) {
+						SlaveNumber = notifySusiCVRead(CV_Number);
 					}
 				}
-#ifdef CHECK_FREE_RAM
 			}
-#endif
 			break;
 		}
 		default: {}
