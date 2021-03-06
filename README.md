@@ -21,6 +21,7 @@ Clock ---> 470Ω ---> Pin Interrupt<br/>
 
 Maggiori informazioni della specifiva "*RCN-600.pdf*".
 
+------------
 
 # Metodi Obbligatori
 I seguenti metodi sono **obbligatori** per il corretto funzionamento della libreria.
@@ -56,6 +57,7 @@ void process(void);
 ```
 **E' necessario invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
 
+------------
 
 # Metodi Facoltativi
 I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
@@ -290,6 +292,7 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasme
 - SUSI_AN_FN_48_55 : Funzioni Analogiche dalla 48 alla 55
 - SUSI_AN_FN_56_63 : Funzioni Analogiche dalla 56 alla 63
 
+------------
 
 # Funzionalita' Extra
 Le seguenti funzionalita' vengono comandate *manualmente* agendo su delle #define nel file **Rcn600.h**
