@@ -30,8 +30,6 @@ Maggiori informazioni della specifiva nel fle [RCN-600.pdf](https://github.com/T
 # Metodi Obbligatori
 I seguenti metodi sono **obbligatori** per il corretto funzionamento della libreria.
 
-------------
-
 ```c
 Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
