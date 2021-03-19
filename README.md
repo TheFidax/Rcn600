@@ -30,6 +30,8 @@ Maggiori informazioni della specifiva nel fle [RCN-600.pdf](https://github.com/T
 # Metodi Obbligatori
 I seguenti metodi sono **obbligatori** per il corretto funzionamento della libreria.
 
+------------
+
 ```c
 Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
@@ -63,6 +65,8 @@ void process(void);
 
 # Metodi Facoltativi
 I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
+
+------------
 
 ```c
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
@@ -246,6 +250,9 @@ void notifyCVResetFactoryDefault(void);
 
 # Tipi di Dati
 I seguenti tipi di dati vengono utilizzati dai metodi della libreria.
+
+------------
+
 ```c
 SUSI_DIRECTION
 ```
@@ -299,6 +306,8 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasme
 
 # Funzionalita' Extra
 Le seguenti funzionalita' vengono comandate *manualmente* agendo su delle #define nel file **Rcn600.h**
+
+------------
 
 ```c
 #define	NOTIFY_RAW_MESSAGE
