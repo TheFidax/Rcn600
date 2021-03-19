@@ -18,7 +18,7 @@ Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI
 Data  ---> 470Ω ---> Pin generico (anche di tipo analogico)<br/>
 Clock ---> 470Ω ---> Pin Interrupt<br/>
 
-Maggiori informazioni della specifiva nel fle "*RCN-600.pdf*".
+Maggiori informazioni della specifiva nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
 
 
 **Video Presentazione del Progetto:**</br>
