@@ -301,8 +301,6 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasme
 # Funzionalita' Extra
 Le seguenti funzionalita' vengono comandate *manualmente* agendo su delle #define nel file **Rcn600.h**
 
-------------
-
 ```c
 #define	NOTIFY_RAW_MESSAGE
 ```
