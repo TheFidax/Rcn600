@@ -205,6 +205,8 @@ void notifySusiControllModule(uint8_t ModuleControll);
 - Restituisce:
   - Nulla
 
+------------
+
 # Metodi Manipolazione CVs
 I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), ma permettono alla libreria di dialogare con il Decoder Master in caso di *Lettura/Scrittura CVs*</br>
 La libreria **gestisce l'ACK** che permette al decoder di conoscere l'esito dell'operazione richiesta.
@@ -244,6 +246,7 @@ void notifyCVResetFactoryDefault(void);
 - Returns:
   - None
 
+------------
 
 # Tipi di Dati
 I seguenti tipi di dati vengono utilizzati dai metodi della libreria.
