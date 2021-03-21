@@ -8,7 +8,7 @@ SUSI_t SusiData;
 void read_bit(void) {
 	bitWrite(SusiData.MessageByte[SusiData.ByteCounter], SusiData.bitCounter, digitalRead(SusiData.DATA_pin));		//salvo il valore della linea DATA
 	++SusiData.bitCounter;																							//incremento il contatore dei bit per la prossima lettura
-	SusiData.lastbit_time = micros();																				//memorizzo l'istante in cui + stato letto il bit
+	SusiData.lastbit_time = micros();																				//memorizzo l'istante in cui e' stato letto il bit
 }
 
 void ISR_SUSI() {
@@ -34,26 +34,26 @@ void ISR_SUSI() {
 				if (SusiData.ByteCounter == 0) {	/* Se e' il primo Byte letto devo leggerne un altro */
 					SusiData.ByteCounter = 1;
 				}
-				else if (SusiData.ByteCounter == 1) {	/* Se e' il secodno Byte letto, devo controllare se e' un messaggio che richiede 3 byte o 4 byte */
-					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 byte */
+				else if (SusiData.ByteCounter == 1) {	/* Se e' il secondo Byte letto, devo controllare se il un messaggio richiede 3 byte o 4 Byte */
+					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 Byte */
 						SusiData.ByteCounter = 2;
 					}
-					else if (SusiData.MessageByte[0] == 119 || SusiData.MessageByte[0] == 123 || SusiData.MessageByte[0] == 127) {	/* Comandi manipolazione CVs: 3 byte*/
+					else if (SusiData.MessageByte[0] == 119 || SusiData.MessageByte[0] == 123 || SusiData.MessageByte[0] == 127) {	/* Comandi manipolazione CV: 3 Byte*/
 						SusiData.ByteCounter = 2;
 					}
-					else { /* o se sonop sufficienti due Byte */
+					else { /* Messaggio 'normale': sono sufficienti due Byte */
 						SusiData.MessageComplete = true;
 					}
 				}
-				else if (SusiData.ByteCounter == 2) {	//comandi in sequenza (94 e 110) che richiedono 4 byte
-					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 byte */
+				else if (SusiData.ByteCounter == 2) {	// Controllo se sono messaggi in sequenza oppure comandi per le CV
+					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 Byte */
 						SusiData.ByteCounter = 3;
 					}
-					else {	// comandi a cui bastano 3 byte
+					else {	// comandi CV a cui bastano 3 Byte
 						SusiData.MessageComplete = true;
 					}
 				}
-				else {	/* Ho letto 4 byte, non ci sono messaggi di lunghezza maggiore */
+				else {	/* Ho letto 4 Byte, non ci sono messaggi di lunghezza maggiore */
 					SusiData.MessageComplete = true;
 				}
 			}
@@ -77,6 +77,14 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::init(void) {
+	/* Imposto l'indirizzo dello Slave */
+	if (notifySusiCVRead) {						/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
+		SlaveNumber = notifySusiCVRead(897);
+	}
+	else {										/* in caso contrario imposto il valore 1 */
+		SlaveNumber = DEFAULT_SLAVE_NUMBER;
+	}
+
 	SusiData.bitCounter = 0;
 	SusiData.ByteCounter = 0;
 	SusiData.MessageComplete = false;
@@ -84,20 +92,13 @@ void Rcn600::init(void) {
 	SusiData.lastByte_time = SusiData.lastbit_time = 0;
 
 	attachInterrupt(digitalPinToInterrupt(SusiData.CLK_pin), ISR_SUSI, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
-
-	if (notifySusiCVRead) {	/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
-		SlaveNumber = notifySusiCVRead(897);
-	}
-	else {	//in caso contrario imposto il valore 1
-		SlaveNumber = DEFAULT_SLAVE_NUMBER;
-	}
 }
 
-void Rcn600::init(uint8_t SlaveAddress) {			//Inizializzazione con indirizzo scelto dall'utente nel codice
+void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
 	if ( (SlaveAddress > 0) && (SlaveAddress < 4) ) {
 		SlaveNumber = SlaveAddress;
 	}
-	else {
+	else {										/* In caso di indirizzo passato non conforme alla normativa SUSI imposto il valore di Default 1 */
 		SlaveNumber = DEFAULT_SLAVE_NUMBER;
 	}
 
@@ -115,7 +116,7 @@ void Rcn600::init(uint8_t SlaveAddress) {			//Inizializzazione con indirizzo sce
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-	pinMode(SusiData.DATA_pin, OUTPUT); //un pin impostao come OUTPUT è messo in automatico a LOW (GND)
+	pinMode(SusiData.DATA_pin, OUTPUT);
 	digitalWrite(SusiData.DATA_pin, LOW);
 	
 	delay(1);
@@ -143,7 +144,7 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 	else if ((SlaveNumber == 3) && ((CV >= 980) && (CV <= 1019))) {
 		return true;
 	}
-	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {	//CV valide per tutti i moduli
+	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {	//CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
 		return true;
 	}
 	else {
@@ -155,6 +156,7 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/* Il seguente metodo e' stato copiato da qua: https://stackoverflow.com/questions/48567214/how-to-convert-a-byte-in-twos-complement-form-to-its-integer-value-c-sharp */
 static int ConvertTwosComplementByteToInteger(byte rawValue) {
 	// If a positive value, return it
 	if ((rawValue & 0x80) == 0) {
@@ -252,8 +254,11 @@ void Rcn600::process(void) {
 			*/
 
 			static uint8_t functionNumber, funcState;
+
 			funcState = bitRead(SusiData.MessageByte[1], 7);	// leggo il valore dello stato 'D'
+
 			bitWrite(SusiData.MessageByte[1], 7, 0);			// elimino il valore dello stato
+
 			functionNumber = SusiData.MessageByte[1];			// i restanti bit identificano la Funzione 'L'
 
 			if (notifySusiBinaryState) {
@@ -311,9 +316,9 @@ void Rcn600::process(void) {
 					static uint16_t Command;
 					static uint8_t State;
 
-					Command = SusiData.MessageByte[3];			// memorizzo i bit "piu' significativ"
-					Command = Command << 7;						// sposto i bit 7 posti a 'sinistra'
-					Command |= SusiData.MessageByte[1];			// aggiungo i 7 bit "meno significativi"
+					Command = SusiData.MessageByte[3];				// memorizzo i bit "piu' significativ"
+					Command = Command << 7;							// sposto i bit 7 posti a 'sinistra'
+					Command |= SusiData.MessageByte[1];				// aggiungo i 7 bit "meno significativi"
 
 					State = bitRead(SusiData.MessageByte[1], 7);
 
@@ -680,7 +685,7 @@ void Rcn600::process(void) {
 			*/
 
 
-			if (SusiData.MessageByte[2] == 95) {	//i byte di comando devono susseguirsi
+			if (SusiData.MessageByte[2] == 95) {				//i byte di comando devono susseguirsi
 				if (notifySusiMasterAddress) {					// Controllo se e' presente il metodo per gestire il comando
 					static uint16_t MasterAddress;
 
@@ -726,7 +731,7 @@ void Rcn600::process(void) {
 			*	Dieser und die beiden folgenden Befehle sind die in Abschnitt 4 genannten
 			*	3 Byte Pakete entsprechend [RCN-214]
 			*
-			*	Controllo byte di comando DCC in modalita' di servizio e di funzionamento
+			*	Controllo Byte di comando DCC in modalita' di servizio e di funzionamento
 			*	V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
 			*	D = valore di confronto per il controllo. Se D corrisponde al valore CV memorizzato
 			*	lo Slave risponde con un riconoscimento.
@@ -741,8 +746,8 @@ void Rcn600::process(void) {
 			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
 
 			if (isCVvalid(CV_Number)) {
-				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
 
+				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
 				if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
 					if (CV_Number == 897) {
 						CV_Value = SlaveNumber;
@@ -810,7 +815,7 @@ void Rcn600::process(void) {
 						CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
 					}
 					else {
-						CV_Value = 254;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 254
+						CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
 					}
 				}
 
@@ -829,8 +834,10 @@ void Rcn600::process(void) {
 							if (notifySusiCVWrite((897 + (SusiData.MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
 								Data_ACK();
 							}
-							//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
-						}
+						} 
+						/* nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+						else { }
+						*/
 					}
 					break;
 				}
@@ -872,11 +879,13 @@ void Rcn600::process(void) {
 								Data_ACK();
 							}
 						}
+						/* nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+						else { }
+						*/
 					}
-					//in caso di sistema di memorizzazione CVs non implementato non eseguo l'ACK
 				}
 
-				if (CV_Number == 897) {
+				if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
 					if (notifySusiCVRead) {
 						SlaveNumber = notifySusiCVRead(CV_Number);
 					}
