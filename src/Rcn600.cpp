@@ -93,10 +93,10 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 void Rcn600::init(void) {
 	/* Imposto l'indirizzo dello Slave */
 	if (notifySusiCVRead) {						/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
-		_SlaveNumber = notifySusiCVRead(897);
+		_slaveAddress = notifySusiCVRead(897);
 	}
 	else {										/* in caso contrario imposto il valore 1 */
-		_SlaveNumber = DEFAULT_SLAVE_NUMBER;
+		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 
 	SusiData.bitCounter = 0;
@@ -110,10 +110,10 @@ void Rcn600::init(void) {
 
 void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
 	if ( (SlaveAddress > 0) && (SlaveAddress < 4) ) {
-		_SlaveNumber = SlaveAddress;
+		_slaveAddress = SlaveAddress;
 	}
 	else {										/* In caso di indirizzo passato non conforme alla normativa SUSI imposto il valore di Default 1 */
-		_SlaveNumber = DEFAULT_SLAVE_NUMBER;
+		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 
 	SusiData.bitCounter = 0;
@@ -156,13 +156,13 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 	* Slave 3: 980 - 1019
 	* Per tutti: 1020 - 1024 */
 
-	if ((_SlaveNumber == 1) && ((CV >= 900) && (CV <= 939))) {
+	if ((_slaveAddress == 1) && ((CV >= 900) && (CV <= 939))) {
 		return true;
 	}
-	else if ((_SlaveNumber == 2) && ((CV >= 940) && (CV <= 979))) {
+	else if ((_slaveAddress == 2) && ((CV >= 940) && (CV <= 979))) {
 		return true;
 	}
-	else if ((_SlaveNumber == 3) && ((CV >= 980) && (CV <= 1019))) {
+	else if ((_slaveAddress == 3) && ((CV >= 980) && (CV <= 1019))) {
 		return true;
 	}
 	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {	//CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
@@ -771,7 +771,7 @@ void Rcn600::process(void) {
 				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
 				if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
 					if (CV_Number == 897) {
-						CV_Value = _SlaveNumber;
+						CV_Value = _slaveAddress;
 					}
 					else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
 						CV_Value = MANUFACTER_ID;
@@ -908,7 +908,7 @@ void Rcn600::process(void) {
 
 				if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
 					if (notifySusiCVRead) {
-						_SlaveNumber = notifySusiCVRead(CV_Number);
+						_slaveAddress = notifySusiCVRead(CV_Number);
 					}
 				}
 			}
