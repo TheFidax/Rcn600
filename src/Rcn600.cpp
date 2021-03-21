@@ -68,27 +68,26 @@ void ISR_SUSI() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
-	
 	SusiData.CLK_pin = CLK_pin_i;
-		
-	/* Il pin Data verra' utilizzato molto spesso: 
-	per questo i dati inerenti alla sua porta e ai suoi registri vengono memorizzati dalla libreria per bypassere le funzioni native:
-	pinMode()
-	digitalWrite()
-	digitalRead()
-	*/
-
-	SusiData.Port_DT = digitalPinToPort(DATA_pin_i);
-	SusiData.bitMask_DT = digitalPinToBitMask(DATA_pin_i);
-	SusiData.PortInputReg_DT = portInputRegister(SusiData.Port_DT);
-	SusiData.PortOutputReg_DT = portOutputRegister(SusiData.Port_DT);
-	SusiData.PortModeReg_DT = portModeRegister(SusiData.Port_DT);
+	SusiData.DATA_pin = DATA_pin_i;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::initPin(void) {
+	/* Il pin Data verra' utilizzato molto spesso:
+	per questo i dati inerenti alla sua porta e ai suoi registri vengono memorizzati dalla libreria per bypassere le funzioni native:
+	pinMode()
+	digitalWrite()
+	digitalRead()
+	*/
+	SusiData.Port_DT = digitalPinToPort(SusiData.DATA_pin);
+	SusiData.bitMask_DT = digitalPinToBitMask(SusiData.DATA_pin);
+	SusiData.PortInputReg_DT = portInputRegister(SusiData.Port_DT);
+	SusiData.PortOutputReg_DT = portOutputRegister(SusiData.Port_DT);
+	SusiData.PortModeReg_DT = portModeRegister(SusiData.Port_DT);
+	
 	/* Inizializzo i pin come Input */
 
 	//pinMode(SusiData.CLK_pin, INPUT);
