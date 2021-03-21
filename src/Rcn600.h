@@ -58,6 +58,7 @@ typedef enum {
 
 typedef struct {
 	uint8_t		CLK_pin;			// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
+	uint8_t		DATA_pin;			// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
 
 	/* Dati del pin a cui è connessa la linea DATA */
 	uint8_t				bitMask_DT;			// Identifica la il bit della porta
