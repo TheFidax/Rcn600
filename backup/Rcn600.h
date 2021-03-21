@@ -57,30 +57,30 @@ typedef enum {
 } SUSI_AN_GROUP;
 
 typedef struct {
-	uint8_t				bitMask;			// Identifica la il bit della porta
-	uint16_t			Port;				// Identifica la Porta
-	volatile uint8_t*	PortInputRegister;	// Identifica il 'input register' della porta
-	volatile uint8_t*	PortOutputRegister;	// Identifica il 'output register'
-	volatile uint8_t*	PortModeRegister;	// Identifica il registro 'mode': input, output etc	
-} pinPortRegister;
+	uint8_t		CLK_pin;			// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
+	uint8_t		DATA_pin;			// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
+
+	/* Dati del pin a cui è connessa la linea DATA */
+	uint8_t				bitMask_DT;			// Identifica la il bit della porta
+	uint16_t			Port_DT;			// Identifica la Porta
+	volatile uint8_t*	PortInputReg_DT;	// Identifica il 'input register' della porta
+	volatile uint8_t*	PortOutputReg_DT;	// Identifica il 'output register'
+	volatile uint8_t*	PortModeReg_DT;		// Identifica il registro 'mode': input, output etc
+
+	uint32_t	lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
+	uint32_t	lastbit_time;		// tempo a cui e' stato letto l'ultimo bit
+	uint8_t		MessageByte[4];		// Byte di cui e' composto un comando
+	uint8_t		bitCounter;			// indica quale bit si deve leggere
+	uint8_t		ByteCounter;		// indica quale Byte sta venendo letto
+	bool		MessageComplete;	// indica se e' stato ricevuto un messaggio completo
+} SUSI_t;
+
+extern SUSI_t SusiData;
 
 class Rcn600 {
 	private:
 		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
-		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
-		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
-		pinPortRegister _pinData;		// Dati (porta, registri) del pin DATA
-
-		uint32_t _lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
-		uint32_t _lastbit_time;			// tempo a cui e' stato letto l'ultimo bit
-		uint8_t	_MessageByte[4];		// Byte di cui e' composto un comando
-		uint8_t	_bitCounter;			// indica quale bit si deve leggere
-		uint8_t	_ByteCounter;			// indica quale Byte sta venendo letto
-		bool _MessageComplete;			// indica se e' stato ricevuto un messaggio completo
-
-		/* Metodi Privati */
-		void initRcn600(void);			// Inizializza a Input i pin a cui e' connesso il bus
-		void read_bit(void);			// Legge il bit dalla linea Data
+		void initPin(void);				// Inizializza a Input i pin a cui e' connesso il bus
 		void Data_ACK(void);			// funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);	// ritorna True se il numero della CV passato e' valido per questo modulo Slave
 
@@ -88,8 +88,7 @@ class Rcn600 {
 		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	// Creazione dell'oggetto Rcn600
 		void init(void);								// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
 		void init(uint8_t SlaveAddress);				// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
-		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
-		void ISR_SUSI(void);							// Metodo che gestisce 'acquisizione dati tramite Interrupt
+		void process(void);								// funzione che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
 };
 
 // Funzioni Esterne, implementabili a discrizione dell'utente

@@ -1,52 +1,100 @@
 #include "Rcn600.h"
 
-Rcn600* pointerToRcn600; // declare a pointer to testLib class
+SUSI_t SusiData;
 
-static void Rcn600InterruptHandler(void) { // define global handler
-		pointerToRcn600->ISR_SUSI(); // calls class member handler
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void read_bit(void) {
+	//salvo il valore della linea DATA
+	bitWrite(SusiData.MessageByte[SusiData.ByteCounter], SusiData.bitCounter, digitalReadFast(SusiData.PortInputReg_DT, SusiData.bitMask_DT));	
+	
+	++SusiData.bitCounter;				//incremento il contatore dei bit per la prossima lettura
+	SusiData.lastbit_time = micros();	//memorizzo l'istante in cui e' stato letto il bit
+}
+
+void ISR_SUSI() {
+	//controllo che l'ultimo messaggio ricevuto sia stato processato: in caso positivo procedo con la lettura di uno nuvo
+
+	if (!SusiData.MessageComplete) {
+		if (millis() - SusiData.lastByte_time > SYNC_TIME) {	//se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
+			SusiData.bitCounter = 0;							//dopo il SYNC leggero' il primo bit
+			SusiData.ByteCounter = 0;
+			SusiData.lastByte_time = millis();					//imposto questo istante come ultimo Byte letto
+
+			read_bit();
+		}
+		else if (((micros() - SusiData.lastbit_time) > 10) && ((micros() - SusiData.lastbit_time) < 500)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+			read_bit();
+
+			/* Controllo se ho letto un Byte (8 bit) */
+			if (SusiData.bitCounter == 8) {
+				/* Se ho letto un Byte, memorizzo il momento in cui la lettura è avvenuta e resetto il contatore dei bit */
+				SusiData.lastByte_time = millis();
+				SusiData.bitCounter = 0;
+
+				if (SusiData.ByteCounter == 0) {	/* Se e' il primo Byte letto devo leggerne un altro */
+					SusiData.ByteCounter = 1;
+				}
+				else if (SusiData.ByteCounter == 1) {	/* Se e' il secondo Byte letto, devo controllare se il un messaggio richiede 3 byte o 4 Byte */
+					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 Byte */
+						SusiData.ByteCounter = 2;
+					}
+					else if (SusiData.MessageByte[0] == 119 || SusiData.MessageByte[0] == 123 || SusiData.MessageByte[0] == 127) {	/* Comandi manipolazione CV: 3 Byte*/
+						SusiData.ByteCounter = 2;
+					}
+					else { /* Messaggio 'normale': sono sufficienti due Byte */
+						SusiData.MessageComplete = true;
+					}
+				}
+				else if (SusiData.ByteCounter == 2) {	// Controllo se sono messaggi in sequenza oppure comandi per le CV
+					if (SusiData.MessageByte[0] == 110 || SusiData.MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 Byte */
+						SusiData.ByteCounter = 3;
+					}
+					else {	// comandi CV a cui bastano 3 Byte
+						SusiData.MessageComplete = true;
+					}
+				}
+				else {	/* Ho letto 4 Byte, non ci sono messaggi di lunghezza maggiore */
+					SusiData.MessageComplete = true;
+				}
+			}
+
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
-	_CLK_pin = CLK_pin_i;
-	_DATA_pin = DATA_pin_i;
+	SusiData.CLK_pin = CLK_pin_i;
+	SusiData.DATA_pin = DATA_pin_i;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Rcn600::initRcn600(void) {
-	pointerToRcn600 = this;
-
+void Rcn600::initPin(void) {
 	/* Il pin Data verra' utilizzato molto spesso:
 	per questo i dati inerenti alla sua porta e ai suoi registri vengono memorizzati dalla libreria per bypassere le funzioni native:
 	pinMode()
 	digitalWrite()
 	digitalRead()
 	*/
-	_pinData.Port = digitalPinToPort(_DATA_pin);
-	_pinData.bitMask = digitalPinToBitMask(_DATA_pin);
-	_pinData.PortInputRegister = portInputRegister(_pinData.Port);
-	_pinData.PortOutputRegister = portOutputRegister(_pinData.Port);
-	_pinData.PortModeRegister = portModeRegister(_pinData.Port);
+	SusiData.Port_DT = digitalPinToPort(SusiData.DATA_pin);
+	SusiData.bitMask_DT = digitalPinToBitMask(SusiData.DATA_pin);
+	SusiData.PortInputReg_DT = portInputRegister(SusiData.Port_DT);
+	SusiData.PortOutputReg_DT = portOutputRegister(SusiData.Port_DT);
+	SusiData.PortModeReg_DT = portModeRegister(SusiData.Port_DT);
 	
 	/* Inizializzo i pin come Input */
 
 	//pinMode(SusiData.CLK_pin, INPUT);
-	pinModeFastInput(portModeRegister(digitalPinToPort(_CLK_pin)), portOutputRegister(digitalPinToPort(_CLK_pin)), digitalPinToBitMask(_CLK_pin)); /**/
+	pinModeFastInput(portModeRegister(digitalPinToPort(SusiData.CLK_pin)), portOutputRegister(digitalPinToPort(SusiData.CLK_pin)), digitalPinToBitMask(SusiData.CLK_pin)); /**/
 
 	//pinMode(SusiData.DATA_pin, INPUT);
-	pinModeFastInput(_pinData.PortModeRegister, _pinData.PortOutputRegister, _pinData.bitMask);
-
-	_bitCounter = 0;
-	_ByteCounter = 0;
-	_MessageComplete = false;
-
-	_lastByte_time = _lastbit_time = 0;
-
-	attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+	pinModeFastInput(SusiData.PortModeReg_DT, SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
 }
 
 void Rcn600::init(void) {
@@ -58,7 +106,15 @@ void Rcn600::init(void) {
 		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 
-	initRcn600();
+	initPin();
+
+	SusiData.bitCounter = 0;
+	SusiData.ByteCounter = 0;
+	SusiData.MessageComplete = false;
+
+	SusiData.lastByte_time = SusiData.lastbit_time = 0;
+
+	attachInterrupt(digitalPinToInterrupt(SusiData.CLK_pin), ISR_SUSI, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
 }
 
 void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
@@ -69,86 +125,35 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 
-	initRcn600();	
+	initPin();
+
+	SusiData.bitCounter = 0;
+	SusiData.ByteCounter = 0;
+	SusiData.MessageComplete = false;
+
+	SusiData.lastByte_time = SusiData.lastbit_time = 0;
+
+	attachInterrupt(digitalPinToInterrupt(SusiData.CLK_pin), ISR_SUSI, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void Rcn600::read_bit(void) {
-	//salvo il valore della linea DATA
-	bitWrite(_MessageByte[_ByteCounter], _bitCounter, digitalReadFast(_pinData.PortInputRegister, _pinData.bitMask));
-
-	++_bitCounter;				//incremento il contatore dei bit per la prossima lettura
-	_lastbit_time = micros();	//memorizzo l'istante in cui e' stato letto il bit
-}
-
-void Rcn600::ISR_SUSI(void) {
-	//controllo che l'ultimo messaggio ricevuto sia stato processato: in caso positivo procedo con la lettura di uno nuvo
-
-	if (!_MessageComplete) {
-		if (millis() - _lastByte_time > SYNC_TIME) {	//se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
-			_bitCounter = 0;							//dopo il SYNC leggero' il primo bit
-			_ByteCounter = 0;
-			_lastByte_time = millis();					//imposto questo istante come ultimo Byte letto
-
-			read_bit();
-		}
-		else if (((micros() - _lastbit_time) > 10) && ((micros() - _lastbit_time) < 500)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
-			read_bit();
-
-			/* Controllo se ho letto un Byte (8 bit) */
-			if (_bitCounter == 8) {
-				/* Se ho letto un Byte, memorizzo il momento in cui la lettura è avvenuta e resetto il contatore dei bit */
-				_lastByte_time = millis();
-				_bitCounter = 0;
-
-				if (_ByteCounter == 0) {	/* Se e' il primo Byte letto devo leggerne un altro */
-					_ByteCounter = 1;
-				}
-				else if (_ByteCounter == 1) {	/* Se e' il secondo Byte letto, devo controllare se il un messaggio richiede 3 byte o 4 Byte */
-					if (_MessageByte[0] == 110 || _MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 Byte */
-						_ByteCounter = 2;
-					}
-					else if (_MessageByte[0] == 119 || _MessageByte[0] == 123 || _MessageByte[0] == 127) {	/* Comandi manipolazione CV: 3 Byte*/
-						_ByteCounter = 2;
-					}
-					else { /* Messaggio 'normale': sono sufficienti due Byte */
-						_MessageComplete = true;
-					}
-				}
-				else if (_ByteCounter == 2) {	// Controllo se sono messaggi in sequenza oppure comandi per le CV
-					if (_MessageByte[0] == 110 || _MessageByte[0] == 94) {	/* comandi in sequenza che richiedono 4 Byte */
-						_ByteCounter = 3;
-					}
-					else {	// comandi CV a cui bastano 3 Byte
-						_MessageComplete = true;
-					}
-				}
-				else {	/* Ho letto 4 Byte, non ci sono messaggi di lunghezza maggiore */
-					_MessageComplete = true;
-				}
-			}
-
-		}
-	}
-}
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 	/*pinMode(SusiData.DATA_pin, OUTPUT);*/
-	pinModeFastOutput(_pinData.PortModeRegister, _pinData.bitMask);
+	pinModeFastOutput(SusiData.PortModeReg_DT, SusiData.bitMask_DT);
 
 	/*digitalWrite(SusiData.DATA_pin, LOW);*/
-	digitalWriteFastLow(_pinData.PortOutputRegister, _pinData.bitMask);
+	digitalWriteFastLow(SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
 
 	delay(1);
 
 	/*digitalWrite(SusiData.DATA_pin, HIGH);*/
-	digitalWriteFastHigh(_pinData.PortOutputRegister, _pinData.bitMask);
+	digitalWriteFastHigh(SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
 	
 	/*pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-	pinModeFastInput(_pinData.PortModeRegister, _pinData.PortOutputRegister, _pinData.bitMask);
+	pinModeFastInput(SusiData.PortModeReg_DT, SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,7 +199,7 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 }
 
 void Rcn600::process(void) {
-	if (_MessageComplete) {		//controllo che sia stato ricevuto un messaggio completo
+	if (SusiData.MessageComplete) {		//controllo che sia stato ricevuto un messaggio completo
 		/* Devo controllare il valore del primo Byte */
 
 #ifdef NOTIFY_RAW_MESSAGE
@@ -203,67 +208,67 @@ void Rcn600::process(void) {
 		}
 #endif // NOTIFY_RAW_MESSAGE
 
-		switch (_MessageByte[0]) {
+		switch (SusiData.MessageByte[0]) {
 		case 96: {
 			/* "Funktionsgruppe 1" : 0110-0000 (0x60 = 96) 0 0 0 F0 - F4 F3 F2 F1 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_0_4, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_0_4, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 97: {
 			/* "Funktionsgruppe 2" : 0110-0001 (0x61 = 97) F12 F11 F10 F9 - F8 F7 F6 F5 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_5_12, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_5_12, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 98: {
 			/* "Funktionsgruppe 3" : 0110-0010 (0x62 = 98) F20 F19 F18 F17 - F16 F15 F14 F13 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_13_20, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_13_20, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 99: {
 			/* "Funktionsgruppe 4" : 0110-0011 (0x63 = 99) F28 F27 F26 F25 - F24 F23 F22 F21 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_21_28, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_21_28, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 100: {
 			/* "Funktionsgruppe 5" : 0110-0100 (0x64 = 100) F36 F35 F34 F33 - F32 F31 F30 F29 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_29_36, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_29_36, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 101: {
 			/* "Funktionsgruppe 6" : 0110-0101 (0x65 = 101) F44 F43 F42 F41 - F40 F39 F38 F37 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_37_44, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_37_44, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 102: {
 			/* "Funktionsgruppe 7" : 0110-0110 (0x66 = 102) F52 F51 F50 F49 - F48 F47 F46 F45 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_45_52, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_45_52, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 103: {
 			/* "Funktionsgruppe 8" : 0110-0111 (0x67 = 103) F60 F59 F58 F57 - F56 F55 F54 F53 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_53_60, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_53_60, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 104: {
 			/* "Funktionsgruppe 9" : 0110-1000 (0x68 = 104) F68 F67 F66 F65 - F64 F63 F62 F61 */
 			if (notifySusiFunc) {
-				notifySusiFunc(SUSI_FN_61_68, _MessageByte[1]);
+				notifySusiFunc(SUSI_FN_61_68, SusiData.MessageByte[1]);
 			}
 			break;
 		}
@@ -281,11 +286,11 @@ void Rcn600::process(void) {
 
 			static uint8_t functionNumber, funcState;
 
-			funcState = bitRead(_MessageByte[1], 7);	// leggo il valore dello stato 'D'
+			funcState = bitRead(SusiData.MessageByte[1], 7);	// leggo il valore dello stato 'D'
 
-			bitWrite(_MessageByte[1], 7, 0);			// elimino il valore dello stato
+			bitWrite(SusiData.MessageByte[1], 7, 0);			// elimino il valore dello stato
 
-			functionNumber = _MessageByte[1];			// i restanti bit identificano la Funzione 'L'
+			functionNumber = SusiData.MessageByte[1];			// i restanti bit identificano la Funzione 'L'
 
 			if (notifySusiBinaryState) {
 				if (functionNumber == 0) {
@@ -337,16 +342,16 @@ void Rcn600::process(void) {
 			*	H = bit di qualita' superiore dello stato binario numero alto 1 ... 32767
 			*/
 
-			if (_MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
+			if (SusiData.MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
 				if (notifySusiBinaryState) {						// Controllo se e' presente il metodo per gestire il comando
 					static uint16_t Command;
 					static uint8_t State;
 
-					Command = _MessageByte[3];				// memorizzo i bit "piu' significativ"
-					Command = Command << 7;					// sposto i bit 7 posti a 'sinistra'
-					Command |= _MessageByte[1];				// aggiungo i 7 bit "meno significativi"
+					Command = SusiData.MessageByte[3];				// memorizzo i bit "piu' significativ"
+					Command = Command << 7;							// sposto i bit 7 posti a 'sinistra'
+					Command |= SusiData.MessageByte[1];				// aggiungo i 7 bit "meno significativi"
 
-					State = bitRead(_MessageByte[1], 7);
+					State = bitRead(SusiData.MessageByte[1], 7);
 
 					notifySusiBinaryState(Command, State);
 				}
@@ -365,28 +370,28 @@ void Rcn600::process(void) {
 			*	Un bit = 1 significa che l'uscita corrispondente è attivata.
 			*/
 			if (notifySusiAux) {
-				notifySusiAux(SUSI_AUX_1_8, _MessageByte[1]);
+				notifySusiAux(SUSI_AUX_1_8, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 65: {
 			/*	"Direktbefehl 2" : 0100-0001 (0x41 = 65) X16 X15 X14 X13 - X12 X11 X10 X9 */
 			if (notifySusiAux) {
-				notifySusiAux(SUSI_AUX_9_16, _MessageByte[1]);
+				notifySusiAux(SUSI_AUX_9_16, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 66: {
 			/*	"Direktbefehl 3" : 0100-0010 (0x42 = 66) X24 X23 X22 X21 - X20 X19 X18 X17 */
 			if (notifySusiAux) {
-				notifySusiAux(SUSI_AUX_17_24, _MessageByte[1]);
+				notifySusiAux(SUSI_AUX_17_24, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 67: {
 			/*	"Direktbefehl 4" : 0100-0011 (0x43 = 67) X32 X31 X30 X29 - X28 X27 X26 X25 */
 			if (notifySusiAux) {
-				notifySusiAux(SUSI_AUX_25_32, _MessageByte[1]);
+				notifySusiAux(SUSI_AUX_25_32, SusiData.MessageByte[1]);
 			}
 			break;
 		}
@@ -403,7 +408,7 @@ void Rcn600::process(void) {
 			*	I bit da 1 a 7 sono per uso futuro, Applicazioni riservate.
 			*/
 			if (notifySusiTriggerPulse) {
-				notifySusiTriggerPulse(_MessageByte[1]);
+				notifySusiTriggerPulse(SusiData.MessageByte[1]);
 			}
 			break;
 		}
@@ -421,7 +426,7 @@ void Rcn600::process(void) {
 			*	significa un feed back come e' possibile con le moderne locomotive elettriche.
 			*/
 			if (notifySusiMotorCurrent) {
-				notifySusiMotorCurrent(ConvertTwosComplementByteToInteger(_MessageByte[1]));
+				notifySusiMotorCurrent(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
 			}
 			break;
 		}
@@ -450,11 +455,11 @@ void Rcn600::process(void) {
 			*	L'uso dei comandi 0x24 e 0x25 e' conforme allo standard.
 			*/
 			if (notifySusiRealSpeed) {
-				if (bitRead(_MessageByte[1], 7) == 1) {
-					notifySusiRealSpeed(_MessageByte[1] - 128, SUSI_DIR_FWD);
+				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
+					notifySusiRealSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
 				}
 				else {
-					notifySusiRealSpeed(_MessageByte[1] - 128, SUSI_DIR_REV);
+					notifySusiRealSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_REV);
 				}
 			}
 			break;
@@ -471,11 +476,11 @@ void Rcn600::process(void) {
 			*	R = senso di marcia con R = 0 indietro e R = 1 avanti
 			*/
 			if (notifySusiRequestSpeed) {
-				if (bitRead(_MessageByte[1], 7) == 1) {
-					notifySusiRequestSpeed(_MessageByte[1] - 128, SUSI_DIR_FWD);
+				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
+					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
 				}
 				else {
-					notifySusiRequestSpeed(_MessageByte[1] - 128, SUSI_DIR_REV);
+					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_REV);
 				}
 			}
 			break;
@@ -495,7 +500,7 @@ void Rcn600::process(void) {
 			*/
 
 			if (notifySusiMotorLoad) {
-				notifySusiMotorLoad(ConvertTwosComplementByteToInteger(_MessageByte[1]));
+				notifySusiMotorLoad(ConvertTwosComplementByteToInteger(SusiData.MessageByte[1]));
 			}
 			break;
 		}
@@ -518,11 +523,11 @@ void Rcn600::process(void) {
 			*	con R = 0 per indietro e R = 1 per avanti
 			*/
 			if (notifySusiRealSpeed) {
-				if (bitRead(_MessageByte[1], 7) == 1) {
-					notifySusiRealSpeed(_MessageByte[1] - 128, SUSI_DIR_FWD);
+				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
+					notifySusiRealSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
 				}
 				else {
-					notifySusiRealSpeed(_MessageByte[1] - 128, SUSI_DIR_REV);
+					notifySusiRealSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_REV);
 				}
 			}
 			break;
@@ -553,11 +558,11 @@ void Rcn600::process(void) {
 			*	Soprattutto, e' importante che i comandi per la velocita' effettiva e di destinazione si comportino allo stesso modo.
 			*/
 			if (notifySusiRequestSpeed) {
-				if (bitRead(_MessageByte[1], 7) == 1) {
-					notifySusiRequestSpeed(_MessageByte[1] - 128, SUSI_DIR_FWD);
+				if (bitRead(SusiData.MessageByte[1], 7) == 1) {
+					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_FWD);
 				}
 				else {
-					notifySusiRequestSpeed(_MessageByte[1] - 128, SUSI_DIR_REV);
+					notifySusiRequestSpeed(SusiData.MessageByte[1] - 128, SUSI_DIR_REV);
 				}
 			}
 			break;
@@ -582,56 +587,56 @@ void Rcn600::process(void) {
 			*	Gli otto comandi di questo gruppo consentono la trasmissione di otto diversi valori analogici in modalita' digitale.
 			*/
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_0_7, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_0_7, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 41: {
 			/*	"Analogfunktionsgruppe 2" : 0010-1001 (0x29 = 41) A15 A14 A13 A12 - A11 A10 A9 A8 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_8_15, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_8_15, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 42: {
 			/*	"Analogfunktionsgruppe 3" : 0010-1010 (0x2A = 42) A23 A22 A21 A20 - A19 A18 A17 A16 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_16_23, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_16_23, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 43: {
 			/*	"Analogfunktionsgruppe 4" : 0010-1011 (0x2B = 43) A31 A30 A29 A28 - A27 A26 A25 A24 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_24_31, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_24_31, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 44: {
 			/*	"Analogfunktionsgruppe 5" : 0010-1100 (0x2C = 44) A39 A38 A37 A36 - A35 A34 A33 A32 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_32_39, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_32_39, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 45: {
 			/*	"Analogfunktionsgruppe 6" : 0010-1101 (0x2D = 45) A47 A46 A45 A44 - A43 A42 A42 A40 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_40_47, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_40_47, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 46: {
 			/*	"Analogfunktionsgruppe 7" : 0010-1110 (0x2E = 46) A55 A54 A53 A52 - A51 A50 A49 A48 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_48_55, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_48_55, SusiData.MessageByte[1]);
 			}
 			break;
 		}
 		case 47: {
 			/*	"Analogfunktionsgruppe 8" : 0010-1111 (0x2F = 47) A63 A62 A61 A60 - A59 A58 A57 A56 */
 			if (notifySusiAnalogFunction) {
-				notifySusiAnalogFunction(SUSI_AN_FN_56_63, _MessageByte[1]);
+				notifySusiAnalogFunction(SUSI_AN_FN_56_63, SusiData.MessageByte[1]);
 			}
 			break;
 		}
@@ -651,7 +656,7 @@ void Rcn600::process(void) {
 			*	- Bit 7: Volume ridotto
 			*/
 			if (notifySusiAnalogDirectCommand) {
-				notifySusiAnalogDirectCommand(1, _MessageByte[1]);
+				notifySusiAnalogDirectCommand(1, SusiData.MessageByte[1]);
 			}
 			break;
 		}
@@ -671,7 +676,7 @@ void Rcn600::process(void) {
 			*	- Bit 3-7: riservato
 			*/
 			if (notifySusiAnalogDirectCommand) {
-				notifySusiAnalogDirectCommand(2, _MessageByte[1]);
+				notifySusiAnalogDirectCommand(2, SusiData.MessageByte[1]);
 			}
 			break;
 		}
@@ -711,13 +716,13 @@ void Rcn600::process(void) {
 			*/
 
 
-			if (_MessageByte[2] == 95) {				//i byte di comando devono susseguirsi
+			if (SusiData.MessageByte[2] == 95) {				//i byte di comando devono susseguirsi
 				if (notifySusiMasterAddress) {					// Controllo se e' presente il metodo per gestire il comando
 					static uint16_t MasterAddress;
 
-					MasterAddress = _MessageByte[3];	//memorizzo i bit "piu' significativ"
+					MasterAddress = SusiData.MessageByte[3];	//memorizzo i bit "piu' significativ"
 					MasterAddress = MasterAddress << 8;			//sposto i bit 7 posti a 'sinistra'
-					MasterAddress |= _MessageByte[1];	//aggiungo i 7 bit "meno significativi"
+					MasterAddress |= SusiData.MessageByte[1];	//aggiungo i 7 bit "meno significativi"
 
 					notifySusiMasterAddress(MasterAddress);
 				}
@@ -739,7 +744,7 @@ void Rcn600::process(void) {
 			*/
 
 			if (notifySusiControllModule) {
-				notifySusiControllModule(_MessageByte[1]);
+				notifySusiControllModule(SusiData.MessageByte[1]);
 			}
 			break;
 		}
@@ -769,7 +774,7 @@ void Rcn600::process(void) {
 			static uint16_t CV_Number;
 			static uint8_t CV_Value;
 
-			CV_Number = 897 + (_MessageByte[1] - 128);
+			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
 
 			if (isCVvalid(CV_Number)) {
 
@@ -795,7 +800,7 @@ void Rcn600::process(void) {
 				}
 
 				/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
-				if (CV_Value == _MessageByte[2]) {
+				if (CV_Value == SusiData.MessageByte[2]) {
 					Data_ACK();
 				}
 			}
@@ -821,14 +826,14 @@ void Rcn600::process(void) {
 
 			static uint16_t CV_Number;
 
-			CV_Number = 897 + (_MessageByte[1] - 128);
+			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
 
 			if (isCVvalid(CV_Number)) {
 				static uint8_t CV_Value, operation, bitValue, bitPosition;
 
-				operation = bitRead(_MessageByte[2], 4);																									// leggo quale operazione sui bit e' richiesta
-				bitValue = bitRead(_MessageByte[2], 3);																										// leggo il valore del bit da confrontare/scrivere
-				bitPosition = ((bitRead(_MessageByte[2], 0) * 1) + (bitRead(_MessageByte[2], 1) * 2) + (bitRead(_MessageByte[2], 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
+				operation = bitRead(SusiData.MessageByte[2], 4);																									// leggo quale operazione sui bit e' richiesta
+				bitValue = bitRead(SusiData.MessageByte[2], 3);																										// leggo il valore del bit da confrontare/scrivere
+				bitPosition = ((bitRead(SusiData.MessageByte[2], 0) * 1) + (bitRead(SusiData.MessageByte[2], 1) * 2) + (bitRead(SusiData.MessageByte[2], 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
 				if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {			//identificano il produttore dello Slave
 					CV_Value = MANUFACTER_ID;
@@ -856,8 +861,8 @@ void Rcn600::process(void) {
 				case 1: {	//scrittura del bit
 					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
 						if (notifySusiCVWrite) {
-							bitWrite(CV_Value, bitPosition, bitRead(_MessageByte[2], 3));	//scrivo il nuovo valore del bit
-							if (notifySusiCVWrite((897 + (_MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
+							bitWrite(CV_Value, bitPosition, bitRead(SusiData.MessageByte[2], 3));	//scrivo il nuovo valore del bit
+							if (notifySusiCVWrite((897 + (SusiData.MessageByte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
 								Data_ACK();
 							}
 						} 
@@ -886,13 +891,13 @@ void Rcn600::process(void) {
 
 			static uint16_t CV_Number;
 
-			CV_Number = 897 + (_MessageByte[1] - 128);
+			CV_Number = 897 + (SusiData.MessageByte[1] - 128);
 
 			if (isCVvalid(CV_Number)) {
 				/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
 				if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
-					if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (_MessageByte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
+					if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (SusiData.MessageByte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
 						if (notifyCVResetFactoryDefault) {
 							notifyCVResetFactoryDefault();
 
@@ -901,7 +906,7 @@ void Rcn600::process(void) {
 					}
 					else {	//scrittura CVs
 						if (notifySusiCVWrite) {
-							if (notifySusiCVWrite(CV_Number, _MessageByte[2]) == _MessageByte[2]) {
+							if (notifySusiCVWrite(CV_Number, SusiData.MessageByte[2]) == SusiData.MessageByte[2]) {
 								Data_ACK();
 							}
 						}
@@ -923,9 +928,9 @@ void Rcn600::process(void) {
 		}
 
 		/* Resetto il buffer e i contatori per decodificre un nuovo Comando */
-		_bitCounter = 0;
-		_ByteCounter = 0;
-		_MessageComplete = false;
+		SusiData.bitCounter = 0;
+		SusiData.ByteCounter = 0;
+		SusiData.MessageComplete = false;
 	}
 }
 
