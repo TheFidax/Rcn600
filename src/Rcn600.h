@@ -55,21 +55,28 @@ typedef enum {
 } SUSI_AN_GROUP;
 
 typedef struct {
-	uint8_t		CLK_pin;			//pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
-	uint8_t		DATA_pin;			//pin a cui e' collegata la linea "Data";		puo' essere qualsiasi pin (compresi analogici)
-	uint32_t	lastByte_time;		//tempo a cui e' stato letto l'ultimo Byte
-	uint32_t	lastbit_time;		//tempo a cui e' stato letto l'ultimo bit
-	uint8_t		MessageByte[4];		//Byte di cui e' composto un comando
-	uint8_t		bitCounter;			//indica quale bit si deve leggere
-	uint8_t		ByteCounter;		//indica quale Byte sta venendo letto
-	bool		MessageComplete;	//indica se e' stato ricevuto un messaggio completo
+	uint8_t		CLK_pin;			// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
+
+	/* Dati del pin a cui è connessa la linea DATA */
+	uint8_t				bitMask_DT;			// Identifica la il bit della porta
+	uint16_t			Port_DT;			// Identifica la Porta
+	volatile uint8_t*	PortInputReg_DT;	// Identifica il 'input register' della porta
+	volatile uint8_t*	PortOutputReg_DT;	// Identifica il 'output register'
+	volatile uint8_t*	PortModeReg_DT;			// Identifica il registro 'mode': input, output etc
+
+	uint32_t	lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
+	uint32_t	lastbit_time;		// tempo a cui e' stato letto l'ultimo bit
+	uint8_t		MessageByte[4];		// Byte di cui e' composto un comando
+	uint8_t		bitCounter;			// indica quale bit si deve leggere
+	uint8_t		ByteCounter;		// indica quale Byte sta venendo letto
+	bool		MessageComplete;	// indica se e' stato ricevuto un messaggio completo
 } SUSI_t;
 
 extern SUSI_t SusiData;
 
 class Rcn600 {
 	private:
-		uint8_t	SlaveNumber;			//identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
+		uint8_t	_SlaveNumber;			//identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
 		void Data_ACK(void);			//funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);	//ritorna True se il numero della CV passato e' valido per questo modulo Slave
 

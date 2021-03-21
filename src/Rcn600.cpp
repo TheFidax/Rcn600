@@ -6,9 +6,9 @@ SUSI_t SusiData;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void read_bit(void) {
-	bitWrite(SusiData.MessageByte[SusiData.ByteCounter], SusiData.bitCounter, digitalRead(SusiData.DATA_pin));		//salvo il valore della linea DATA
-	++SusiData.bitCounter;																							//incremento il contatore dei bit per la prossima lettura
-	SusiData.lastbit_time = micros();																				//memorizzo l'istante in cui e' stato letto il bit
+	bitWrite(SusiData.MessageByte[SusiData.ByteCounter], SusiData.bitCounter, (*SusiData.PortInputReg_DT & SusiData.bitMask_DT));		//salvo il valore della linea DATA
+	++SusiData.bitCounter;																												//incremento il contatore dei bit per la prossima lettura
+	SusiData.lastbit_time = micros();																									//memorizzo l'istante in cui e' stato letto il bit
 }
 
 void ISR_SUSI() {
@@ -67,10 +67,24 @@ void ISR_SUSI() {
 
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 	SusiData.CLK_pin = CLK_pin_i;
-	SusiData.DATA_pin = DATA_pin_i;
-
 	pinMode(SusiData.CLK_pin, INPUT);
-	pinMode(SusiData.DATA_pin, INPUT);
+
+	/* Il pin Data verra' utilizzato molto spesso, 
+	per questo i dati inerenti alla sua porta e ai suoi registri vengono memorizzati dalla libreria per bypassere le funzioni native:
+	pinMode()
+	digitalWrite()
+	digitalRead()
+	*/
+
+	SusiData.Port_DT = digitalPinToPort(DATA_pin_i);
+	SusiData.bitMask_DT = digitalPinToBitMask(DATA_pin_i);
+	SusiData.PortInputReg_DT = portInputRegister(SusiData.Port_DT);
+	SusiData.PortOutputReg_DT = portOutputRegister(SusiData.Port_DT);
+	SusiData.PortModeReg_DT = portModeRegister(SusiData.Port_DT);
+
+	/* pinMode(SusiData.DATA_pin, INPUT); */
+	*SusiData.PortModeReg_DT &= ~SusiData.bitMask_DT;
+	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,10 +93,10 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 void Rcn600::init(void) {
 	/* Imposto l'indirizzo dello Slave */
 	if (notifySusiCVRead) {						/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
-		SlaveNumber = notifySusiCVRead(897);
+		_SlaveNumber = notifySusiCVRead(897);
 	}
 	else {										/* in caso contrario imposto il valore 1 */
-		SlaveNumber = DEFAULT_SLAVE_NUMBER;
+		_SlaveNumber = DEFAULT_SLAVE_NUMBER;
 	}
 
 	SusiData.bitCounter = 0;
@@ -96,10 +110,10 @@ void Rcn600::init(void) {
 
 void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
 	if ( (SlaveAddress > 0) && (SlaveAddress < 4) ) {
-		SlaveNumber = SlaveAddress;
+		_SlaveNumber = SlaveAddress;
 	}
 	else {										/* In caso di indirizzo passato non conforme alla normativa SUSI imposto il valore di Default 1 */
-		SlaveNumber = DEFAULT_SLAVE_NUMBER;
+		_SlaveNumber = DEFAULT_SLAVE_NUMBER;
 	}
 
 	SusiData.bitCounter = 0;
@@ -116,13 +130,20 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-	pinMode(SusiData.DATA_pin, OUTPUT);
-	digitalWrite(SusiData.DATA_pin, LOW);
-	
+	/*pinMode(SusiData.DATA_pin, OUTPUT);*/
+	*SusiData.PortModeReg_DT |= SusiData.bitMask_DT;
+
+	/*digitalWrite(SusiData.DATA_pin, LOW);*/
+	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
+
 	delay(1);
 
-	digitalWrite(SusiData.DATA_pin, HIGH);
-	pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit
+	/*digitalWrite(SusiData.DATA_pin, HIGH);*/
+	*SusiData.PortOutputReg_DT |= SusiData.bitMask_DT;
+	
+	/*pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
+	*SusiData.PortModeReg_DT &= ~SusiData.bitMask_DT;
+	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,13 +156,13 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 	* Slave 3: 980 - 1019
 	* Per tutti: 1020 - 1024 */
 
-	if ((SlaveNumber == 1) && ((CV >= 900) && (CV <= 939))) {
+	if ((_SlaveNumber == 1) && ((CV >= 900) && (CV <= 939))) {
 		return true;
 	}
-	else if ((SlaveNumber == 2) && ((CV >= 940) && (CV <= 979))) {
+	else if ((_SlaveNumber == 2) && ((CV >= 940) && (CV <= 979))) {
 		return true;
 	}
-	else if ((SlaveNumber == 3) && ((CV >= 980) && (CV <= 1019))) {
+	else if ((_SlaveNumber == 3) && ((CV >= 980) && (CV <= 1019))) {
 		return true;
 	}
 	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {	//CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
@@ -750,7 +771,7 @@ void Rcn600::process(void) {
 				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
 				if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
 					if (CV_Number == 897) {
-						CV_Value = SlaveNumber;
+						CV_Value = _SlaveNumber;
 					}
 					else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
 						CV_Value = MANUFACTER_ID;
@@ -887,7 +908,7 @@ void Rcn600::process(void) {
 
 				if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
 					if (notifySusiCVRead) {
-						SlaveNumber = notifySusiCVRead(CV_Number);
+						_SlaveNumber = notifySusiCVRead(CV_Number);
 					}
 				}
 			}
