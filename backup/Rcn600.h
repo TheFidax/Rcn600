@@ -7,8 +7,6 @@
 #include <stdbool.h>
 #include "Arduino.h"
 
-#include "FastIOMode.h"
-
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
 #include "DataHeaders/SUSI_AN_fn_BIT.h"
@@ -64,7 +62,7 @@ typedef struct {
 	uint16_t			Port_DT;			// Identifica la Porta
 	volatile uint8_t*	PortInputReg_DT;	// Identifica il 'input register' della porta
 	volatile uint8_t*	PortOutputReg_DT;	// Identifica il 'output register'
-	volatile uint8_t*	PortModeReg_DT;		// Identifica il registro 'mode': input, output etc
+	volatile uint8_t*	PortModeReg_DT;			// Identifica il registro 'mode': input, output etc
 
 	uint32_t	lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
 	uint32_t	lastbit_time;		// tempo a cui e' stato letto l'ultimo bit
@@ -78,16 +76,15 @@ extern SUSI_t SusiData;
 
 class Rcn600 {
 	private:
-		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
-		void initPin(void);				// Inizializza a Input i pin a cui e' connesso il bus
-		void Data_ACK(void);			// funzione per esguire l'ACK della linea DATA quando necessario
-		bool isCVvalid(uint16_t CV);	// ritorna True se il numero della CV passato e' valido per questo modulo Slave
+		uint8_t	_slaveAddress;			//identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
+		void Data_ACK(void);			//funzione per esguire l'ACK della linea DATA quando necessario
+		bool isCVvalid(uint16_t CV);	//ritorna True se il numero della CV passato e' valido per questo modulo Slave
 
 	public:
-		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	// Creazione dell'oggetto Rcn600
-		void init(void);								// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
-		void init(uint8_t SlaveAddress);				// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
-		void process(void);								// funzione che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
+		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	//Creazione dell'oggetto Rcn600
+		void init(void);								//Inizializzazione della libreria: collegamento Interrupt, reset Contatori
+		void init(uint8_t SlaveAddress);				//Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
+		void process(void);								//funzione che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
 };
 
 // Funzioni Esterne, implementabili a discrizione dell'utente

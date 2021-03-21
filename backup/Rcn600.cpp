@@ -6,11 +6,9 @@ SUSI_t SusiData;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void read_bit(void) {
-	//salvo il valore della linea DATA
-	bitWrite(SusiData.MessageByte[SusiData.ByteCounter], SusiData.bitCounter, digitalReadFast(SusiData.PortInputReg_DT, SusiData.bitMask_DT));	
-	
-	++SusiData.bitCounter;				//incremento il contatore dei bit per la prossima lettura
-	SusiData.lastbit_time = micros();	//memorizzo l'istante in cui e' stato letto il bit
+	bitWrite(SusiData.MessageByte[SusiData.ByteCounter], SusiData.bitCounter, (*SusiData.PortInputReg_DT & SusiData.bitMask_DT));		//salvo il valore della linea DATA
+	++SusiData.bitCounter;																												//incremento il contatore dei bit per la prossima lettura
+	SusiData.lastbit_time = micros();																									//memorizzo l'istante in cui e' stato letto il bit
 }
 
 void ISR_SUSI() {
@@ -68,10 +66,10 @@ void ISR_SUSI() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
-	
 	SusiData.CLK_pin = CLK_pin_i;
-		
-	/* Il pin Data verra' utilizzato molto spesso: 
+	pinMode(SusiData.CLK_pin, INPUT);
+
+	/* Il pin Data verra' utilizzato molto spesso, 
 	per questo i dati inerenti alla sua porta e ai suoi registri vengono memorizzati dalla libreria per bypassere le funzioni native:
 	pinMode()
 	digitalWrite()
@@ -83,20 +81,14 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 	SusiData.PortInputReg_DT = portInputRegister(SusiData.Port_DT);
 	SusiData.PortOutputReg_DT = portOutputRegister(SusiData.Port_DT);
 	SusiData.PortModeReg_DT = portModeRegister(SusiData.Port_DT);
+
+	/* pinMode(SusiData.DATA_pin, INPUT); */
+	*SusiData.PortModeReg_DT   &= ~SusiData.bitMask_DT;
+	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void Rcn600::initPin(void) {
-	/* Inizializzo i pin come Input */
-
-	//pinMode(SusiData.CLK_pin, INPUT);
-	pinModeFastInput(portModeRegister(digitalPinToPort(SusiData.CLK_pin)), portOutputRegister(digitalPinToPort(SusiData.CLK_pin)), digitalPinToBitMask(SusiData.CLK_pin)); /**/
-
-	//pinMode(SusiData.DATA_pin, INPUT);
-	pinModeFastInput(SusiData.PortModeReg_DT, SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
-}
 
 void Rcn600::init(void) {
 	/* Imposto l'indirizzo dello Slave */
@@ -106,8 +98,6 @@ void Rcn600::init(void) {
 	else {										/* in caso contrario imposto il valore 1 */
 		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
-
-	initPin();
 
 	SusiData.bitCounter = 0;
 	SusiData.ByteCounter = 0;
@@ -126,8 +116,6 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 
-	initPin();
-
 	SusiData.bitCounter = 0;
 	SusiData.ByteCounter = 0;
 	SusiData.MessageComplete = false;
@@ -143,18 +131,19 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 	/*pinMode(SusiData.DATA_pin, OUTPUT);*/
-	pinModeFastOutput(SusiData.PortModeReg_DT, SusiData.bitMask_DT);
+	*SusiData.PortModeReg_DT |= SusiData.bitMask_DT;
 
 	/*digitalWrite(SusiData.DATA_pin, LOW);*/
-	digitalWriteFastLow(SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
+	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
 
 	delay(1);
 
 	/*digitalWrite(SusiData.DATA_pin, HIGH);*/
-	digitalWriteFastHigh(SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
+	*SusiData.PortOutputReg_DT |= SusiData.bitMask_DT;
 	
 	/*pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-	pinModeFastInput(SusiData.PortModeReg_DT, SusiData.PortOutputReg_DT, SusiData.bitMask_DT);
+	*SusiData.PortModeReg_DT   &= ~SusiData.bitMask_DT;
+	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
