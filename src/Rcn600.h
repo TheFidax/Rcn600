@@ -76,7 +76,7 @@ extern SUSI_t SusiData;
 
 class Rcn600 {
 	private:
-		uint8_t	_SlaveNumber;			//identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
+		uint8_t	_slaveAddress;			//identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
 		void Data_ACK(void);			//funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);	//ritorna True se il numero della CV passato e' valido per questo modulo Slave
 
