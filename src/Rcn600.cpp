@@ -83,7 +83,7 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 	SusiData.PortModeReg_DT = portModeRegister(SusiData.Port_DT);
 
 	/* pinMode(SusiData.DATA_pin, INPUT); */
-	*SusiData.PortModeReg_DT &= ~SusiData.bitMask_DT;
+	*SusiData.PortModeReg_DT   &= ~SusiData.bitMask_DT;
 	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
 }
 
@@ -142,7 +142,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	*SusiData.PortOutputReg_DT |= SusiData.bitMask_DT;
 	
 	/*pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-	*SusiData.PortModeReg_DT &= ~SusiData.bitMask_DT;
+	*SusiData.PortModeReg_DT   &= ~SusiData.bitMask_DT;
 	*SusiData.PortOutputReg_DT &= ~SusiData.bitMask_DT;
 }
 
