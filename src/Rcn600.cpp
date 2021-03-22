@@ -826,7 +826,10 @@ void Rcn600::process(void) {
 				bitValue = bitRead(_MessageByte[2], 3);																										// leggo il valore del bit da confrontare/scrivere
 				bitPosition = ((bitRead(_MessageByte[2], 0) * 1) + (bitRead(_MessageByte[2], 1) * 2) + (bitRead(_MessageByte[2], 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
-				if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {			//identificano il produttore dello Slave
+				if (CV_Number == 897) {
+					CV_Value = _slaveAddress;
+				}
+				else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {			//identificano il produttore dello Slave
 					CV_Value = MANUFACTER_ID;
 				}
 				else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
