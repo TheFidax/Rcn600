@@ -119,13 +119,13 @@ void Rcn600::ISR_SUSI(void) {
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-	pinMode(SusiData.DATA_pin, OUTPUT);
-	digitalWrite(SusiData.DATA_pin, LOW);
+	pinMode(_DATA_pin, OUTPUT);
+	digitalWrite(_DATA_pin, LOW);
 
 	delay(1);
 
-	digitalWrite(SusiData.DATA_pin, HIGH);
-	pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
+	digitalWrite(_DATA_pin, HIGH);
+	pinMode(_DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
