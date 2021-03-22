@@ -43,15 +43,15 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 ```c
 void init(void);
 ```
-*oppure*
+***oppure***
 ```c
 void init(uint8_t SlaveAddress);
 ```
-*E' necessario* invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.</br>
+**E' necessario** invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.
 
-Il metodo **senza il parametro** utilizza, *se presente*, il metodo di lettura CVs per determinare l'indirizzo del modulo, *se esso e' assente utilizza indirizzo 1*./br>
+Il metodo **senza il parametro** utilizza, *se presente*, il metodo di lettura CVs per determinare l'indirizzo del modulo (*salvato nella CV 897*), se il metodo *e' assente* utilizza indirizzo **di default: 1**.
 
-Il metodo **con il parametro** *permette di specificare l'indirizzo del modulo*: **PUO' AVERE VALORE**: 1, 2, 3. In caso di valore diverso verra' utilizzato il valore di *default*: 1.</br>
+Il metodo **con il parametro** *permette di specificare l'indirizzo del modulo*: **PUO' AVERE VALORE**: 1, 2, 3. In caso di valore diverso verra' utilizzato il valore **di default: 1**.
 
 ------------
 
