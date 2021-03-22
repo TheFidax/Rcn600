@@ -7,8 +7,6 @@
 #include <stdbool.h>
 #include "Arduino.h"
 
-#include "FastIOMode.h"
-
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
 #include "DataHeaders/SUSI_AN_fn_BIT.h"
@@ -56,20 +54,11 @@ typedef enum {
 	SUSI_AN_FN_56_63,
 } SUSI_AN_GROUP;
 
-typedef struct {
-	uint8_t				bitMask;			// Identifica la il bit della porta
-	uint16_t			Port;				// Identifica la Porta
-	volatile uint8_t*	PortInputRegister;	// Identifica il 'input register' della porta
-	volatile uint8_t*	PortOutputRegister;	// Identifica il 'output register'
-	volatile uint8_t*	PortModeRegister;	// Identifica il registro 'mode': input, output etc	
-} pinPortRegister;
-
 class Rcn600 {
 	private:
 		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
-		pinPortRegister _pinData;		// Dati (porta, registri) del pin DATA
 
 		uint32_t _lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
 		uint32_t _lastbit_time;			// tempo a cui e' stato letto l'ultimo bit
