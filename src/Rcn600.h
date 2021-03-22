@@ -79,7 +79,7 @@ class Rcn600 {
 		bool _MessageComplete;			// indica se e' stato ricevuto un messaggio completo
 
 		/* Metodi Privati */
-		void initRcn600(void);			// Inizializza a Input i pin a cui e' connesso il bus
+		void initClass(void);			// Inizializza a Input i pin a cui e' connesso il bus
 		void read_bit(void);			// Legge il bit dalla linea Data
 		void Data_ACK(void);			// funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);	// ritorna True se il numero della CV passato e' valido per questo modulo Slave
