@@ -5,7 +5,10 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#if !defined (_ArduinoDue_) 
 #include "Arduino.h"
+#endif
 
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
