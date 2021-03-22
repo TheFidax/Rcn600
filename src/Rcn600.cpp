@@ -21,8 +21,8 @@ void Rcn600::initClass(void) {
 	pointerToRcn600 = this;
 	
 	/* Inizializzo i pin come Input */
-	pinMode(SusiData.CLK_pin, INPUT);
-	pinMode(SusiData.DATA_pin, INPUT);
+	pinMode(_CLK_pin, INPUT);
+	pinMode(_DATA_pin, INPUT);
 
 	_bitCounter = 0;
 	_ByteCounter = 0;
