@@ -17,7 +17,7 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Rcn600::initRcn600(void) {
+void Rcn600::initClass(void) {
 	pointerToRcn600 = this;
 
 	/* Il pin Data verra' utilizzato molto spesso:
@@ -50,15 +50,11 @@ void Rcn600::initRcn600(void) {
 }
 
 void Rcn600::init(void) {
-	/* Imposto l'indirizzo dello Slave */
-	if (notifySusiCVRead) {						/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
+	if (notifySusiCVRead) {			/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
 		_slaveAddress = notifySusiCVRead(897);
 	}
-	else {										/* in caso contrario imposto il valore 1 */
-		_slaveAddress = DEFAULT_SLAVE_NUMBER;
-	}
-
-	initRcn600();
+	
+	init(_slaveAddress);			/* Controllo che l'indirizzo passato sia compatibile */
 }
 
 void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
@@ -69,7 +65,7 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 
-	initRcn600();	
+	initClass();	
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
