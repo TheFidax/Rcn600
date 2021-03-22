@@ -1,13 +1,10 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-//#define	CHECK_FREE_RAM						//Se decommentata attiva i controlli sulla quantita' di ram disponibile prima di allocare risorse; per il corretto funzionamento e' necessaria una lireria esterna
-
-#include <stdint.h>
-#include <stdbool.h>
-
-#if !defined (_ArduinoDue_) 
-#include "Arduino.h"
+#if !defined (_VARIANT_ARDUINO_DUE_X_) 
+	#include <stdint.h>
+	#include "Arduino.h"
+	#include <stdbool.h>
 #endif
 
 #include "DataHeaders/SUSI_FN_BIT.h"
