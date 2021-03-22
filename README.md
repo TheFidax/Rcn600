@@ -43,16 +43,13 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 ```c
 void init(void);
 ```
-*E' necessario* invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.</br>
-**N.B.** Se e' presente il metodo 'notifySusiCVRead' la libreria leggera' la CV contenente l'indirizzo dello Slave SUSI, in caso contrario utilizzerà il valore di *default*: 1.</br>
-
-------------
-
+oppure
 ```c
 void init(uint8_t SlaveAddress);
 ```
 *E' necessario* invocarlo nel 'setup' del codice: avvia la gestione dell'interrupt e inizializza i contatori interni.</br>
-*Permette di specificare l'indirizzo del modulo*, **PUO' AVERE VALORE**: 1, 2, 3. In caso di valore diverso verra' utilizzato il valore di *default*: 1.</br>
+Il metodo **senza il parametro** utilizza, *se presente*, il metodo di lettura CVs per determinare l'indirizzo del modulo, *se esso e' assente utilizza indirizzo 1*./br>
+Il metodo **con il parametro** *permette di specificare l'indirizzo del modulo*: **PUO' AVERE VALORE**: 1, 2, 3. In caso di valore diverso verra' utilizzato il valore di *default*: 1.</br>
 
 ------------
 
