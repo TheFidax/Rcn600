@@ -19,26 +19,10 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 
 void Rcn600::initClass(void) {
 	pointerToRcn600 = this;
-
-	/* Il pin Data verra' utilizzato molto spesso:
-	per questo i dati inerenti alla sua porta e ai suoi registri vengono memorizzati dalla libreria per bypassere le funzioni native:
-	pinMode()
-	digitalWrite()
-	digitalRead()
-	*/
-	_pinData.Port = digitalPinToPort(_DATA_pin);
-	_pinData.bitMask = digitalPinToBitMask(_DATA_pin);
-	_pinData.PortInputRegister = portInputRegister(_pinData.Port);
-	_pinData.PortOutputRegister = portOutputRegister(_pinData.Port);
-	_pinData.PortModeRegister = portModeRegister(_pinData.Port);
 	
 	/* Inizializzo i pin come Input */
-
-	//pinMode(SusiData.CLK_pin, INPUT);
-	pinModeFastInput(portModeRegister(digitalPinToPort(_CLK_pin)), portOutputRegister(digitalPinToPort(_CLK_pin)), digitalPinToBitMask(_CLK_pin)); /**/
-
-	//pinMode(SusiData.DATA_pin, INPUT);
-	pinModeFastInput(_pinData.PortModeRegister, _pinData.PortOutputRegister, _pinData.bitMask);
+	pinMode(SusiData.CLK_pin, INPUT);
+	pinMode(SusiData.DATA_pin, INPUT);
 
 	_bitCounter = 0;
 	_ByteCounter = 0;
@@ -52,6 +36,9 @@ void Rcn600::initClass(void) {
 void Rcn600::init(void) {
 	if (notifySusiCVRead) {			/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
 		_slaveAddress = notifySusiCVRead(897);
+	}
+	else {
+		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 	
 	init(_slaveAddress);			/* Controllo che l'indirizzo passato sia compatibile */
@@ -73,7 +60,7 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 
 void Rcn600::read_bit(void) {
 	//salvo il valore della linea DATA
-	bitWrite(_MessageByte[_ByteCounter], _bitCounter, digitalReadFast(_pinData.PortInputRegister, _pinData.bitMask));
+	bitWrite(_MessageByte[_ByteCounter], _bitCounter, digitalRead(_DATA_pin));
 
 	++_bitCounter;				//incremento il contatore dei bit per la prossima lettura
 	_lastbit_time = micros();	//memorizzo l'istante in cui e' stato letto il bit
@@ -132,19 +119,13 @@ void Rcn600::ISR_SUSI(void) {
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-	/*pinMode(SusiData.DATA_pin, OUTPUT);*/
-	pinModeFastOutput(_pinData.PortModeRegister, _pinData.bitMask);
-
-	/*digitalWrite(SusiData.DATA_pin, LOW);*/
-	digitalWriteFastLow(_pinData.PortOutputRegister, _pinData.bitMask);
+	pinMode(SusiData.DATA_pin, OUTPUT);
+	digitalWrite(SusiData.DATA_pin, LOW);
 
 	delay(1);
 
-	/*digitalWrite(SusiData.DATA_pin, HIGH);*/
-	digitalWriteFastHigh(_pinData.PortOutputRegister, _pinData.bitMask);
-	
-	/*pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-	pinModeFastInput(_pinData.PortModeRegister, _pinData.PortOutputRegister, _pinData.bitMask);
+	digitalWrite(SusiData.DATA_pin, HIGH);
+	pinMode(SusiData.DATA_pin, INPUT); //rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
