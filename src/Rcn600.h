@@ -1,11 +1,9 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-#if !defined (_VARIANT_ARDUINO_DUE_X_) 
-	#include <stdint.h>
-	#include "Arduino.h"
-	#include <stdbool.h>
-#endif
+#include <stdint.h>
+#include "Arduino.h"
+#include <stdbool.h>
 
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
