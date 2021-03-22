@@ -43,7 +43,7 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 ```c
 void init(void);
 ```
-oppure
+*oppure*
 ```c
 void init(uint8_t SlaveAddress);
 ```
