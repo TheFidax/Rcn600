@@ -1,9 +1,14 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-#include <stdint.h>
 #include "Arduino.h"
+#include <stdint.h>
 #include <stdbool.h>
+
+#ifdef __AVR__
+#include <digitalPinFast.h>
+#endif // __AVR__
+
 
 #include "DataHeaders/SUSI_FN_BIT.h"
 #include "DataHeaders/SUSI_AUX_BIT.h"
@@ -56,7 +61,12 @@ class Rcn600 {
 	private:
 		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
+
+#ifdef __AVR__
+		pinData _DATA_pinData;			// Struct che contiene i dati del pin a cui e' collegata la liniea Data
+#else
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
+#endif
 
 		uint32_t _lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
 		uint32_t _lastbit_time;			// tempo a cui e' stato letto l'ultimo bit
