@@ -1,3 +1,7 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheFidax/Rcn600)
+![GitHub Release Date](https://img.shields.io/github/release-date/TheFidax/Rcn600?color=blue&label=last%20release)
+![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/TheFidax/Rcn600/latest?color=orange)
+
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Obbligatori](#Metodi-Obbligatori)
