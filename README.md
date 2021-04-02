@@ -3,10 +3,10 @@
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/TheFidax/Rcn600/latest?color=orange)
 ![Hits](https://hitcounter.pythonanywhere.com/count/tag.svg?url=https%3A%2F%2Fgithub.com%2FTheFidax%2FRcn600)
 [![GitHub issues](https://img.shields.io/github/issues/TheFidax/Rcn600)](https://github.com/TheFidax/Rcn600/issues)
-[![Fork](https://img.shields.io/github/forks/TheFidax/Rcn600.svg)](#)
-[![Stars](https://img.shields.io/github/stars/TheFidax/Rcn600.svg)](#)
-[![License](https://img.shields.io/github/license/TheFidax/Rcn600.svg)](#)
-[![Total Downloads](https://img.shields.io/github/downloads/TheFidax/Rcn600/total.svg)](https://github.com/TheFidax/Rcn600/releases)
+[![Fork](https://img.shields.io/github/forks/TheFidax/Rcn600)](#)
+[![Stars](https://img.shields.io/github/stars/TheFidax/Rcn600)](#)
+[![License](https://img.shields.io/github/license/TheFidax/Rcn600)](#)
+[![Total Downloads](https://img.shields.io/github/downloads/TheFidax/Rcn600/total)](#)
 
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
