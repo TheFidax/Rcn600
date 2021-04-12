@@ -83,6 +83,7 @@ class Rcn600 {
 
 	public:
 		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	// Creazione dell'oggetto Rcn600
+		~Rcn600(void);									// Distruzionde dell'oggetto Rcn600
 		void init(void);								// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
 		void init(uint8_t SlaveAddress);				// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
 		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
