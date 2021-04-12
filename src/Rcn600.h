@@ -63,7 +63,7 @@ class Rcn600 {
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
 
 #ifdef __AVR__
-		pinData _DATA_pinData;			// Struct che contiene i dati del pin a cui e' collegata la liniea Data
+		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la liniea Data
 #else
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
 #endif

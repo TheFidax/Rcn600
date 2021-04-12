@@ -12,7 +12,7 @@ static void Rcn600InterruptHandler(void) { // define global handler
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 	_CLK_pin = CLK_pin_i;
 #ifdef __AVR__
-	determine_pinData(DATA_pin_i, &_DATA_pinData);
+	_DATA_pin = new digitalPinFast (DATA_pin_i);
 #else
 	_DATA_pin = DATA_pin_i;
 #endif // __AVR__	
@@ -27,7 +27,7 @@ void Rcn600::initClass(void) {
 	/* Inizializzo i pin come Input */
 	pinMode(_CLK_pin, INPUT);
 #ifdef __AVR__
-	pinModeFast(_DATA_pinData, INPUT);
+	_DATA_pin->pinModeFast(INPUT);
 #else
 	pinMode(_DATA_pin, INPUT);
 #endif
@@ -69,7 +69,7 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 void Rcn600::read_bit(void) {
 	//salvo il valore della linea DATA
 #ifdef __AVR__
-	bitWrite(_MessageByte[_ByteCounter], _bitCounter, digitalReadFast(_DATA_pinData));
+	bitWrite(_MessageByte[_ByteCounter], _bitCounter, _DATA_pin->digitalReadFast());
 #else
 	bitWrite(_MessageByte[_ByteCounter], _bitCounter, digitalRead(_DATA_pin));
 #endif
@@ -132,8 +132,8 @@ void Rcn600::ISR_SUSI(void) {
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 #ifdef __AVR__
-	pinModeFast(_DATA_pinData, OUTPUT);
-	digitalWriteFast(_DATA_pinData, LOW);
+	_DATA_pin->pinModeFast(OUTPUT);
+	_DATA_pin->digitalWriteFast(LOW);
 #else
 	pinMode(_DATA_pin, OUTPUT);
 	digitalWrite(_DATA_pin, LOW);
@@ -142,8 +142,8 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	delay(1);
 
 #ifdef __AVR__
-	digitalWriteFast(_DATA_pinData, HIGH);
-	pinModeFast(_DATA_pinData, INPUT);
+	_DATA_pin->digitalWriteFast(HIGH);
+	_DATA_pin->pinModeFast(INPUT);
 #else
 	digitalWrite(_DATA_pin, HIGH);
 	pinMode(_DATA_pin, INPUT); 
