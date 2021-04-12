@@ -13,6 +13,7 @@
 * [Metodi Obbligatori](#Metodi-Obbligatori)
 * [Metodi Facoltativi](#Metodi-Facoltativi)
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
+* [Distruzione Classe](#distruzione-classe)
 * [Tipi di Dati](#Tipi-di-Dati)
 * [Funzionalita' Extra](#Funzionalita-Extra)
 
@@ -255,6 +256,16 @@ void notifyCVResetFactoryDefault(void);
 - Returns:
   - None
 
+------------
+
+# Distruzione Classe
+E' possibile distruggere la Classe se non piu' necessaria.
+```c
+~Rcn600(void);	
+```
+
+Le risorse verranno deallocate i pin verranno messi nello stato di **INPUT** per evitare danni accidentali.
+ 
 ------------
 
 # Tipi di Dati
