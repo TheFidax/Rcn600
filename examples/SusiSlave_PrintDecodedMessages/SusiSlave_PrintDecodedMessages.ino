@@ -360,6 +360,16 @@ void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) {
 };
 #endif
 
+// Decommentare la #define sotto per stampare i comandi 'No Operation': serve a scopo di test
+#define NOTIFY_SUSI_NO_OPERATION
+#ifdef  NOTIFY_SUSI_NO_OPERATION
+void notifySusiNoOperation(uint8_t commandArgument) {
+  Serial.print("notifySusiNoOperation: ");
+  Serial.print(" commandArgument: ");
+  Serial.println(commandArgument);
+};
+#endif
+
 // Decommentare la #define sotto per stampare l'indirizzo del Decoder Master
 #define NOTIFY_SUSI_MASTER_ADDRESS
 #ifdef  NOTIFY_SUSI_MASTER_ADDRESS

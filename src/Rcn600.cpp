@@ -102,7 +102,7 @@ void Rcn600::ISR_SUSI(void) {
 
 			read_bit();
 		}
-		else if (((micros() - _lastbit_time) > 10) && ((micros() - _lastbit_time) < 500)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+		else if (((micros() - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 			read_bit();
 
 			/* Controllo se ho letto un Byte (8 bit) */
@@ -195,6 +195,7 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef NOTIFY_RAW_MESSAGE
 /* Il seguente metodo e' stato copiato da qua: https://stackoverflow.com/questions/48567214/how-to-convert-a-byte-in-twos-complement-form-to-its-integer-value-c-sharp */
 static int ConvertTwosComplementByteToInteger(byte rawValue) {
 	// If a positive value, return it
@@ -205,6 +206,7 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 	// Otherwise perform the 2's complement math on the value
 	return (byte)(~(rawValue - 0x01)) * -1;
 }
+#endif
 
 void Rcn600::process(void) {
 	if (_MessageComplete) {		//controllo che sia stato ricevuto un messaggio completo
@@ -212,9 +214,9 @@ void Rcn600::process(void) {
 
 #ifdef NOTIFY_RAW_MESSAGE
 		if (notifySusiRawMessage) {
-			notifySusiRawMessage(SusiData.MessageByte, (SusiData.ByteCounter + 1));
+			notifySusiRawMessage(_MessageByte, (_ByteCounter + 1));
 		}
-#endif // NOTIFY_RAW_MESSAGE
+#endif
 
 		switch (_MessageByte[0]) {
 		case 96: {
@@ -698,6 +700,9 @@ void Rcn600::process(void) {
 			*	Il comando non esegue alcuna azione nello slave. 
 			*	I dati possono avere qualsiasi valore. Il comando puo' essere utilizzato come gap filler o a scopo di test. 
 			*/
+			if (notifySusiNoOperation) {
+				notifySusiNoOperation(_MessageByte[1]);
+			}
 			break;
 		}
 		case 94: {	//&& 95

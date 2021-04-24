@@ -17,7 +17,9 @@
 #define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 
-#define	SYNC_TIME			9				//tempo necessario a sincronizzare Master e Slave: 9ms
+#define	SYNC_TIME					9		//tempo necessario a sincronizzare Master e Slave: 9ms
+#define MIN_LEVEL_CLOCK_TIME		20		//minima durata di un livello di Clock
+#define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
 
 class Rcn600 {
 	private:
@@ -25,7 +27,7 @@ class Rcn600 {
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
 
 #ifdef __AVR__
-		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la liniea Data
+		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
 #else
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
 #endif
@@ -154,6 +156,14 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
+	/*
+	*	notifySusiNoOperation() viene invocato quando: si riceve il comando "no operation", serve prevalentemente a scopo di test
+	*	Input:
+	*		- l'argomento del comando
+	*	Restituisce:
+	*		- Nulla
+	*/
+	extern	void notifySusiNoOperation(uint8_t commandArgument) __attribute__((weak));
 	/*
 	*	notifySusiMasterAddress() viene invocato quando: si riceve l'indirizzo digitale del Master
 	*	Input:

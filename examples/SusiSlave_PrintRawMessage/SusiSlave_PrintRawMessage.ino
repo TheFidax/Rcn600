@@ -7,16 +7,6 @@ Per eseguire tale operazione E' INDISPENSABILE ABILITARE LA MODALITA' DI NOTIFY_
 
 Rcn600 SUSI(2, 3);			// (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
-uint8_t notifySusiCVRead(uint16_t CV) {
-    return EEPROM.read(CV);
-}
-
-uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
-    EEPROM.update(CV, Value);
-
-    return EEPROM.read(CV);
-}
-
 void notifySusiRawMessage(uint8_t* rawMessage, uint8_t messageLength) {
     static uint8_t i;
 
@@ -39,6 +29,16 @@ void notifySusiRawMessage(uint8_t* rawMessage, uint8_t messageLength) {
     }
 
     Serial.println(" )");
+}
+
+uint8_t notifySusiCVRead(uint16_t CV) {
+    return EEPROM.read(CV);
+}
+
+uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
+    EEPROM.update(CV, Value);
+
+    return EEPROM.read(CV);
 }
 
 void setup() {
