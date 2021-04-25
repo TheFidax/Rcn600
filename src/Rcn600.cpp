@@ -353,7 +353,7 @@ void Rcn600::process(void) {
 			*/
 
 			if (_MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
-				if (notifySusiBinaryState) {						// Controllo se e' presente il metodo per gestire il comando
+				if (notifySusiBinaryState) {				// Controllo se e' presente il metodo per gestire il comando
 					static uint16_t Command;
 					static uint8_t State;
 
@@ -406,7 +406,7 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 33: {
-			/*	"Trigger-Puls" : 0010-0001 (0x21 = 33) 0 0 0 0 - 0 0 0 1 
+			/*	"Trigger-Pulse" : 0010-0001 (0x21 = 33) 0 0 0 0 - 0 0 0 1 
 			*
 			*	Der Befehl dient zur Synchronisation eines Dampfstoßes. Er wird je
 			*	Dampfstoß einmal gesendet. Die Bits 1 bis 7 sind für zukünftige

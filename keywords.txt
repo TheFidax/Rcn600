@@ -1,5 +1,6 @@
 Rcn600	KEYWORD1
 Rcn600Master	KEYWORD1
+SUSI	LITERAL1
 
 SUSI_DIRECTION	LITERAL1
 SUSI_FN_GROUP	LITERAL1
@@ -33,6 +34,8 @@ notifySusiCVWrite	KEYWORD2
 
 //////////////////////// SUSI Master
 sendSusiFunc	KEYWORD2
+sendSusiRealSpeed	KEYWORD2
+sendSusiRequestSpeed	KEYWORD2
 
 //////////////////////// Costanti SUSI_DIRECTION
 SUSI_DIR_REV = 0	LITERAL1
