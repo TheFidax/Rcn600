@@ -4,12 +4,12 @@
 
 #include <Rcn600Master.h>      // Includo la libreria per la gestione della SUSI
 
-Rcn600Master SUSI(2, 3);      // (CLK pin, DATA pin)
+Rcn600Master SusiMaster(2, 3);      // (CLK pin, DATA pin)
 
 #define DELAY   500
 
 void setup() {  
-	SUSI.init();
+	SusiMaster.init();
 }
 
 void loop() {
@@ -19,12 +19,12 @@ void loop() {
 		static bool state = true;
 
 		if (state) {
-			SUSI.sendSusiRealSpeed(0, SUSI_DIR_FWD);
-			SUSI.sendSusiRequestSpeed(127, SUSI_DIR_FWD);
+			SusiMaster.sendSusiRealSpeed(0, SUSI_DIR_FWD);
+			SusiMaster.sendSusiRequestSpeed(127, SUSI_DIR_FWD);
 		}
 		else {
-			SUSI.sendSusiRealSpeed(127, SUSI_DIR_FWD);
-			SUSI.sendSusiRequestSpeed(0, SUSI_DIR_FWD);
+			SusiMaster.sendSusiRealSpeed(127, SUSI_DIR_FWD);
+			SusiMaster.sendSusiRequestSpeed(0, SUSI_DIR_FWD);
 		}
 
 		state = !state;

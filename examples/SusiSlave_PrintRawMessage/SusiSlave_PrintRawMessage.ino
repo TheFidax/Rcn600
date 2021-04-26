@@ -5,7 +5,7 @@ Per eseguire tale operazione E' INDISPENSABILE ABILITARE LA MODALITA' DI NOTIFY_
 #include <Rcn600.h>			// Includo la libreria per la gestione della SUSI
 #include <EEPROM.h>
 
-Rcn600 SUSI(2, 3);			// (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
+Rcn600 SusiSlave(2, 3);			// (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
 void notifySusiRawMessage(uint8_t* rawMessage, uint8_t messageLength) {
     static uint8_t i;
@@ -46,9 +46,9 @@ void setup() {
 
     while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
 
-    SUSI.init();			// Avvio la libreria
+    SusiSlave.init();			// Avvio la libreria
 }
 
 void loop() {
-    SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
+    SusiSlave.process();			// Elaboro piu' volte possibile i dati acquisiti
 }
