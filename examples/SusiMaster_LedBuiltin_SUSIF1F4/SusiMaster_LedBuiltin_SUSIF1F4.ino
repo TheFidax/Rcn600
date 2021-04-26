@@ -34,15 +34,15 @@ void loop() {
 			digitalWrite(LED_BUILTIN, HIGH);
 		}
 		else {
-			functState -= SUSI_FN_BIT_00;
-			SusiMaster.sendSusiFunc(SUSI_FN_0_4, functState);
-			functState -= SUSI_FN_BIT_01;
-			SusiMaster.sendSusiFunc(SUSI_FN_0_4, functState);
-			functState -= SUSI_FN_BIT_02;
+			functState -= SUSI_FN_BIT_04;
 			SusiMaster.sendSusiFunc(SUSI_FN_0_4, functState);
 			functState -= SUSI_FN_BIT_03;
 			SusiMaster.sendSusiFunc(SUSI_FN_0_4, functState);
-			functState -= SUSI_FN_BIT_04;
+			functState -= SUSI_FN_BIT_02;
+			SusiMaster.sendSusiFunc(SUSI_FN_0_4, functState);
+			functState -= SUSI_FN_BIT_01;
+			SusiMaster.sendSusiFunc(SUSI_FN_0_4, functState);
+			functState -= SUSI_FN_BIT_00;
 			SusiMaster.sendSusiFunc(SUSI_FN_0_4, functState);
 			digitalWrite(LED_BUILTIN, LOW);
 		}
