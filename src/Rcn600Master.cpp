@@ -4,8 +4,6 @@ Rcn600Master* pointerToRcn600Master;
 
 ISR(TIMER2_OVF_vect) { // define global handler
 	pointerToRcn600Master->ISR_SUSI(); // calls class member handler
-
-	setTimerRetard(TIMER_RETARD);
 }
 
 void Rcn600Master::printBuffer(void) {
@@ -64,6 +62,8 @@ void Rcn600Master::init(void) {
 	pinMode(_DATA_pin, OUTPUT);
 #endif
 
+	modeISR = ClockMode;
+
 	/* Inizializzo il Timer2 per l'utilizzo */
 	setTimer(TIMER_PRESCALER);
 	startTimer();
@@ -83,6 +83,19 @@ void Rcn600Master::writeLine(uint8_t Pin, uint8_t bit) {
 #endif
 
 void Rcn600Master::ISR_SUSI(void) {
+	switch (modeISR)
+	{
+	case ClockMode:
+		ISR_Clock();
+		setTimerRetard(TIMER_RETARD);
+		break;
+	case SyncMode:
+		ISR_Sync();
+		break;
+	}
+}
+
+void Rcn600Master::ISR_Clock(void) {
 	static uint8_t ClockState = HIGH;
 	static uint8_t bitCounter = 0;		// indica quale bit si deve leggere
 	static uint8_t MessageCounter = 0;	// indica quale Messaggio sta venendo spedito
@@ -90,7 +103,9 @@ void Rcn600Master::ISR_SUSI(void) {
 	if (ClockState == HIGH) {
 		/* Scrivo il valore del bit sulla linea DATA sul fronte di salita */
 		if (_Buffer[MessageCounter].sent == false) {
-			writeLine(_DATA_pin, bitRead(_Buffer[MessageCounter].Bytes[bitCounter / 8], bitCounter));
+			writeLine(_DATA_pin, bitRead(_Buffer[MessageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
+			//Serial.print(bitRead(_Buffer[MessageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
+			//Serial.print(" ("); Serial.print(bitCounter / 8); Serial.println(")");
 		}
 		else {
 			writeLine(_DATA_pin, 0);
@@ -100,12 +115,19 @@ void Rcn600Master::ISR_SUSI(void) {
 		++bitCounter;
 
 		if ((bitCounter % 8) == 0) {
+			//Serial.println(_Buffer[MessageCounter].Bytes[((bitCounter - 1) / 8)]);
 			if (bitCounter == 16) {
 				if (!_Buffer[MessageCounter].isCvManipulating) {
 					_Buffer[MessageCounter].sent = true,
-					
 					bitCounter = 0;
 					++MessageCounter;
+
+					if ((MessageCounter % MESSAGES_BEFORE_SYNC) == 0) {
+						modeISR = SyncMode;
+
+						setTimer(0x07);
+						setTimerRetard(90);
+					}
 				}
 			}
 			else if (bitCounter == 24) {
@@ -114,11 +136,6 @@ void Rcn600Master::ISR_SUSI(void) {
 
 			if (MessageCounter == BUFFER_LENGTH) {
 				MessageCounter = 0;
-			}
-
-			if ((MessageCounter % MESSAGES_BEFORE_SYNC) == 0) {
-				_SyncNeeded = true;
-				stopTimer();
 			}
 		}
 	}
@@ -130,24 +147,10 @@ void Rcn600Master::ISR_SUSI(void) {
 	ClockState = !ClockState;
 }
 
-void Rcn600Master::process(void) {
-	if (_SyncNeeded) {
-		static uint32_t timePreSync;
-		static bool inSync = false;
-
-		if (!inSync) {
-			timePreSync = micros();
-			inSync = true;
-		}
-
-		if((micros() - timePreSync) > (SYNC_TIME * 1000)) {
-			// Tempo per la sincronia trascorso
-			_SyncNeeded = false;
-			inSync = false;
-
-			startTimer();
-		}
-	}
+void Rcn600Master::ISR_Sync(void) {
+	modeISR = ClockMode;
+	//Serial.println("sync");
+	setTimer(TIMER_PRESCALER);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

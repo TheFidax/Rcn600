@@ -2,7 +2,8 @@
 
 void setTimer(uint8_t prescaler) {
 	TCCR2A = 0;				//'normal mode': solo incremento
-	TCCR2B = prescaler;			//prescaler
+	TCCR2B = prescaler;		//prescaler
+	TCNT2 = 0;
 }
 
 void startTimer(void) {

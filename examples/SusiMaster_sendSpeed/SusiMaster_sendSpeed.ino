@@ -15,8 +15,6 @@ void setup() {
 void loop() {
 	static uint32_t t = millis();
 
-	SUSI.process();
-
 	if (millis() - t > DELAY) {
 		static bool state = true;
 

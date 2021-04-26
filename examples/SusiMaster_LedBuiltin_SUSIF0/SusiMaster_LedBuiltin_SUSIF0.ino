@@ -1,4 +1,3 @@
-
 /*
 *	Questo esempio configura Arduino come Master del bus SUSI e invia ciclicamente il comando sul gruppo Funzioni per verificare la correttezza della comunicazione
 */
@@ -16,8 +15,6 @@ void setup() {
 
 void loop() {
 	static uint32_t t = millis();
-
-	SUSI.process();
 
 	if (millis() - t > DELAY) {
 		static bool state = true;

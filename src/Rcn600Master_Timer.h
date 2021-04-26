@@ -14,7 +14,7 @@
 */
 void setTimer(uint8_t prescaler);
 /*
-*	startTimer() collega il Timer al ISR quando si verifica Overflow del Counter
+*	startTimer() collega il Timer al ISR quando si verifica Overflow del Counter, imposta il prescaler e resetta il registro del contatore
 *	Input:
 *		- Nulla
 *	Restituisce:

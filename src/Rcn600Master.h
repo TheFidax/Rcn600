@@ -18,10 +18,13 @@
 #define TIMER_PRESCALER			0x02		// Identifica il prescaler del Timer che genera' il Clock
 #define TIMER_RETARD			0			// Identifica da che valore il Timer usato per il ISR deve partire
 
-
-#define	SYNC_TIME				11			// Tempo necessario a sincronizzare Master e Slave: 9ms
 #define BUFFER_LENGTH			10			// Lunghezza buffer comandi da inviare agli Slave
 #define MESSAGES_BEFORE_SYNC	1			// Numero di messaggi che e' possibile inviare prima di lasciare i 9ms per la sincronizzazione
+
+typedef enum {
+	ClockMode = 0,
+	SyncMode,
+} ISR_mode;
 
 typedef struct {
 	uint8_t Bytes[3];
@@ -32,6 +35,7 @@ typedef struct {
 
 class Rcn600Master {
 	private:
+		ISR_mode	modeISR;
 #ifdef __AVR__
 		digitalPinFast *_CLK_pin;		// Oggetto che contiene i dati del pin a cui e' collegata la linea Clock
 		digitalPinFast *_DATA_pin;		// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
@@ -57,9 +61,10 @@ class Rcn600Master {
 		void printBuffer(void);
 
 		void init(void);										// Inizializza il bus e attiva la generazione del Clock
-		void process(void);										// Gestisce la sincronizzazione fra Slave e master mediante ritardo di 9mS
 
 		void ISR_SUSI(void);									// Genera il Clock e scrive i dati sulla linea DATA
+		void ISR_Clock(void);
+		void ISR_Sync(void);
 
 		bool sendSusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);		// Invia agli Slave lo stato delle funzioni
 		bool sendSusiRealSpeed(uint8_t realSpeed, SUSI_DIRECTION dir);				// Invia agli Slave la velocita' reale a cui viaggia il modello
