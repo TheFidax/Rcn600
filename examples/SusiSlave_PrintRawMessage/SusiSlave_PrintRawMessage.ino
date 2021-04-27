@@ -7,13 +7,20 @@ Per eseguire tale operazione E' INDISPENSABILE ABILITARE LA MODALITA' DI NOTIFY_
 
 Rcn600 SusiSlave(2, 3);			// (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
-void notifySusiRawMessage(uint8_t* rawMessage, uint8_t messageLength) {
-    static uint8_t i;
+void notifySusiRawMessage(Rcn600_Message message) {
+    uint8_t i, messageLength;
+
+    if( (message.Bytes[0] == 119) || (message.Bytes[0] == 123) || (message.Bytes[0] == 127) ) {
+        messageLength = 3;
+    }
+    else {
+        messageLength = 2;
+    }
 
     Serial.print("notifySusiRawMessage : ");
 
     for (i = 0; i < messageLength; ++i) {
-        Serial.print(rawMessage[i], BIN);
+        Serial.print(message.Bytes[i], BIN);
         if (i < (messageLength - 1)) {
             Serial.print(" - ");
         }
@@ -22,7 +29,7 @@ void notifySusiRawMessage(uint8_t* rawMessage, uint8_t messageLength) {
     Serial.print(" ( ");
 
     for (i = 0; i < messageLength; ++i) {
-        Serial.print(rawMessage[i]);
+        Serial.print(message.Bytes[i]);
         if (i < (messageLength - 1)) {
             Serial.print(" - ");
         }

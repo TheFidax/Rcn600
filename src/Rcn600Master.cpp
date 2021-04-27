@@ -98,13 +98,13 @@ void Rcn600Master::ISR_SUSI(void) {
 void Rcn600Master::ISR_Clock(void) {
 	static uint8_t ClockState = HIGH;
 	static uint8_t bitCounter = 0;		// indica quale bit si deve leggere
-	static uint8_t MessageCounter = 0;	// indica quale Messaggio sta venendo spedito
+	static uint8_t messageCounter = 0;	// indica quale Messaggio sta venendo spedito
 
 	if (ClockState == HIGH) {
 		/* Scrivo il valore del bit sulla linea DATA sul fronte di salita */
-		if (_Buffer[MessageCounter].sent == false) {
-			writeLine(_DATA_pin, bitRead(_Buffer[MessageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
-			//Serial.print(bitRead(_Buffer[MessageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
+		if (_Buffer[messageCounter].sent == false) {
+			writeLine(_DATA_pin, bitRead(_Buffer[messageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
+			//Serial.print(bitRead(_Buffer[messageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
 			//Serial.print(" ("); Serial.print(bitCounter / 8); Serial.println(")");
 		}
 		else {
@@ -115,14 +115,14 @@ void Rcn600Master::ISR_Clock(void) {
 		++bitCounter;
 
 		if ((bitCounter % 8) == 0) {
-			//Serial.println(_Buffer[MessageCounter].Bytes[((bitCounter - 1) / 8)]);
+			//Serial.println(_Buffer[messageCounter].Bytes[((bitCounter - 1) / 8)]);
 			if (bitCounter == 16) {
-				if (!_Buffer[MessageCounter].isCvManipulating) {
-					_Buffer[MessageCounter].sent = true,
+				if (!_Buffer[messageCounter].isCvManipulating) {
+					_Buffer[messageCounter].sent = true,
 					bitCounter = 0;
-					++MessageCounter;
+					++messageCounter;
 
-					if ((MessageCounter % MESSAGES_BEFORE_SYNC) == 0) {
+					if ((messageCounter % MESSAGES_BEFORE_SYNC) == 0) {
 						modeISR = SyncMode;
 
 						setTimer(0x07);
@@ -134,8 +134,8 @@ void Rcn600Master::ISR_Clock(void) {
 
 			}
 
-			if (MessageCounter == BUFFER_LENGTH) {
-				MessageCounter = 0;
+			if (messageCounter == BUFFER_LENGTH) {
+				messageCounter = 0;
 			}
 		}
 	}
