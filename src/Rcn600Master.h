@@ -26,13 +26,6 @@ typedef enum {
 	SyncMode,
 } ISR_mode;
 
-typedef struct {
-	uint8_t Bytes[3];
-
-	bool isCvManipulating;
-	bool sent;
-} Rcn600_Message;
-
 class Rcn600Master {
 	private:
 		ISR_mode	modeISR;
