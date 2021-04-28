@@ -13,7 +13,7 @@ void Rcn600Master::printBuffer(void) {
 		Serial.print(_Buffer[i].Bytes[1]); Serial.print(" - "); 
 		Serial.print(_Buffer[i].Bytes[2]); Serial.print(" ; "); 
 		Serial.print(_Buffer[i].isCvManipulating); Serial.print(" ; "); 
-		Serial.println(_Buffer[i].Complete);
+		Serial.println(_Buffer[i].sent);
 	}
 }
 
@@ -51,7 +51,7 @@ void Rcn600Master::init(void) {
 	pointerToRcn600Master = this;
 
 	for (uint8_t i = 0; i < BUFFER_LENGTH; ++i) {
-		_Buffer[i].Complete = true;
+		_Buffer[i].sent = true;
 	}
 
 #ifdef __AVR__
@@ -102,7 +102,7 @@ void Rcn600Master::ISR_Clock(void) {
 
 	if (ClockState == HIGH) {
 		/* Scrivo il valore del bit sulla linea DATA sul fronte di salita */
-		if (_Buffer[messageCounter].Complete == false) {
+		if (_Buffer[messageCounter].sent == false) {
 			writeLine(_DATA_pin, bitRead(_Buffer[messageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
 			//Serial.print(bitRead(_Buffer[messageCounter].Bytes[bitCounter / 8], (bitCounter%8)));
 			//Serial.print(" ("); Serial.print(bitCounter / 8); Serial.println(")");
@@ -118,7 +118,7 @@ void Rcn600Master::ISR_Clock(void) {
 			//Serial.println(_Buffer[messageCounter].Bytes[((bitCounter - 1) / 8)]);
 			if (bitCounter == 16) {
 				if (!_Buffer[messageCounter].isCvManipulating) {
-					_Buffer[messageCounter].Complete = true,
+					_Buffer[messageCounter].sent = true,
 					bitCounter = 0;
 					++messageCounter;
 
@@ -160,12 +160,12 @@ bool Rcn600Master::writeBuffer(bool isCvManipulating, uint8_t firstByte, uint8_t
 	/* Questo metodo inserisce nel buffer un comando */
 
 	for(uint8_t i = 0; i < BUFFER_LENGTH; ++i) {
-		if (_Buffer[i].Complete == true) {	// struct libera per nuovo comando
+		if (_Buffer[i].sent == true) {	// struct libera per nuovo comando
 			_Buffer[i].isCvManipulating = isCvManipulating;
 			_Buffer[i].Bytes[0] = firstByte;
 			_Buffer[i].Bytes[1] = secondByte;
 			_Buffer[i].Bytes[2] = thirdByte;
-			_Buffer[i].Complete = false;
+			_Buffer[i].sent = false;
 
 			return true;
 		}

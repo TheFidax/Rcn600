@@ -27,6 +27,12 @@
 #define MIN_CLOCK_TIME				20		//minima durata di un livello di Clock
 #define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
 
+typedef struct {
+	uint8_t Bytes[3];
+	
+	bool Complete;
+} Rcn600_Message;
+
 class Rcn600 {
 	private:
 		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
