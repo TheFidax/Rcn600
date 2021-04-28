@@ -19,7 +19,7 @@
 #define TIMER_RETARD			0			// Identifica da che valore il Timer usato per il ISR deve partire
 
 #define BUFFER_LENGTH			10			// Lunghezza buffer comandi da inviare agli Slave
-#define MESSAGES_BEFORE_SYNC	5			// Numero di messaggi che e' possibile inviare prima di lasciare i 9ms per la sincronizzazione
+#define MESSAGES_BEFORE_SYNC	1			// Numero di messaggi che e' possibile inviare prima di lasciare i 9ms per la sincronizzazione
 
 typedef enum {
 	ClockMode = 0,
