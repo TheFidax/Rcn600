@@ -5,15 +5,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "DataHeaders/SUSI_DATA_TYPE.h"
-
 #ifdef __AVR__
-#define __ENABLE_FAST_DIGITAL_PIN__
-#endif
-
-#ifdef __ENABLE_FAST_DIGITAL_PIN__
 #include <digitalPinFast.h>
-#endif 
+#endif // __AVR__
+
+#include "DataHeaders/SUSI_DATA_TYPE.h"
 
 //#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 
@@ -21,10 +17,8 @@
 #define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 
-#define BUFFER_LENGTH				10		// Lunghezza buffer comandi
-
 #define	SYNC_TIME					9		//tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME				20		//minima durata di un livello di Clock
+#define MIN_LEVEL_CLOCK_TIME		20		//minima durata di un livello di Clock
 #define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
 
 class Rcn600 {
@@ -32,7 +26,7 @@ class Rcn600 {
 		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
 
-#ifdef __ENABLE_FAST_DIGITAL_PIN__
+#ifdef __AVR__
 		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
 #else
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
@@ -40,13 +34,13 @@ class Rcn600 {
 
 		uint32_t _lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
 		uint32_t _lastbit_time;			// tempo a cui e' stato letto l'ultimo bit
-		Rcn600_Message	_Buffer[BUFFER_LENGTH];		// Byte di cui e' composto un comando
+		uint8_t	_MessageByte[4];		// Byte di cui e' composto un comando
 		uint8_t	_bitCounter;			// indica quale bit si deve leggere
-		uint8_t _messageCounter;		// indica quale messaggio sta venendo letto
+		uint8_t	_ByteCounter;			// indica quale Byte sta venendo letto
+		bool _MessageComplete;			// indica se e' stato ricevuto un messaggio completo
 
 		/* Metodi Privati */
 		void initClass(void);			// Inizializza a Input i pin a cui e' connesso il bus
-		void processCvMessage(Rcn600_Message message);
 		void read_bit(void);			// Legge il bit dalla linea Data
 		void Data_ACK(void);			// funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);	// ritorna True se il numero della CV passato e' valido per questo modulo Slave
@@ -73,7 +67,7 @@ extern "C" {
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiRawMessage(Rcn600_Message message) __attribute__((weak));
+	extern	void notifySusiRawMessage(uint8_t *rawMessage, uint8_t messageLength) __attribute__((weak));
 #endif
 	/*
 	*	notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
