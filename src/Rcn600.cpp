@@ -18,19 +18,6 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 #endif // __AVR__	
 }
 
-
-Rcn600::~Rcn600(void) {
-	detachInterrupt(digitalPinToInterrupt(_CLK_pin));
-
-	pinMode(_CLK_pin, INPUT);
-
-#ifdef __AVR__
-	delete _DATA_pin;
-#else
-	pinMode(_DATA_pin, INPUT);
-#endif
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -102,7 +89,7 @@ void Rcn600::ISR_SUSI(void) {
 
 			read_bit();
 		}
-		else if (((micros() - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+		else if (((micros() - _lastbit_time) > 10) && ((micros() - _lastbit_time) < 500)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 			read_bit();
 
 			/* Controllo se ho letto un Byte (8 bit) */
@@ -195,7 +182,6 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef NOTIFY_RAW_MESSAGE
 /* Il seguente metodo e' stato copiato da qua: https://stackoverflow.com/questions/48567214/how-to-convert-a-byte-in-twos-complement-form-to-its-integer-value-c-sharp */
 static int ConvertTwosComplementByteToInteger(byte rawValue) {
 	// If a positive value, return it
@@ -206,7 +192,6 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 	// Otherwise perform the 2's complement math on the value
 	return (byte)(~(rawValue - 0x01)) * -1;
 }
-#endif
 
 void Rcn600::process(void) {
 	if (_MessageComplete) {		//controllo che sia stato ricevuto un messaggio completo
@@ -214,9 +199,9 @@ void Rcn600::process(void) {
 
 #ifdef NOTIFY_RAW_MESSAGE
 		if (notifySusiRawMessage) {
-			notifySusiRawMessage(_MessageByte, (_ByteCounter + 1));
+			notifySusiRawMessage(SusiData.MessageByte, (SusiData.ByteCounter + 1));
 		}
-#endif
+#endif // NOTIFY_RAW_MESSAGE
 
 		switch (_MessageByte[0]) {
 		case 96: {
@@ -353,7 +338,7 @@ void Rcn600::process(void) {
 			*/
 
 			if (_MessageByte[2] == 111) {					// Posso eseguire il comando solo se ho ricevuto sia il Byte piu' significativo che quello meno significativo
-				if (notifySusiBinaryState) {				// Controllo se e' presente il metodo per gestire il comando
+				if (notifySusiBinaryState) {						// Controllo se e' presente il metodo per gestire il comando
 					static uint16_t Command;
 					static uint8_t State;
 
@@ -406,7 +391,7 @@ void Rcn600::process(void) {
 			break;
 		}
 		case 33: {
-			/*	"Trigger-Pulse" : 0010-0001 (0x21 = 33) 0 0 0 0 - 0 0 0 1 
+			/*	"Trigger-Puls" : 0010-0001 (0x21 = 33) 0 0 0 0 - 0 0 0 1 
 			*
 			*	Der Befehl dient zur Synchronisation eines Dampfstoßes. Er wird je
 			*	Dampfstoß einmal gesendet. Die Bits 1 bis 7 sind für zukünftige
@@ -700,9 +685,6 @@ void Rcn600::process(void) {
 			*	Il comando non esegue alcuna azione nello slave. 
 			*	I dati possono avere qualsiasi valore. Il comando puo' essere utilizzato come gap filler o a scopo di test. 
 			*/
-			if (notifySusiNoOperation) {
-				notifySusiNoOperation(_MessageByte[1]);
-			}
 			break;
 		}
 		case 94: {	//&& 95

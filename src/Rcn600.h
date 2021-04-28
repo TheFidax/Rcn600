@@ -9,7 +9,10 @@
 #include <digitalPinFast.h>
 #endif // __AVR__
 
-#include "DataHeaders/SUSI_DATA_TYPE.h"
+
+#include "DataHeaders/SUSI_FN_BIT.h"
+#include "DataHeaders/SUSI_AUX_BIT.h"
+#include "DataHeaders/SUSI_AN_fn_BIT.h"
 
 //#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 
@@ -17,9 +20,42 @@
 #define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 
-#define	SYNC_TIME					9		//tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_LEVEL_CLOCK_TIME		20		//minima durata di un livello di Clock
-#define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
+#define	SYNC_TIME			9				//tempo necessario a sincronizzare Master e Slave: 9ms
+
+typedef enum {
+	SUSI_DIR_REV = 0,						// direzione 'Reverse'
+	SUSI_DIR_FWD = 1,						// 'ForWard'
+} SUSI_DIRECTION;
+
+typedef enum {
+	SUSI_FN_0_4 = 1,
+	SUSI_FN_5_12,
+	SUSI_FN_13_20,
+	SUSI_FN_21_28,
+	SUSI_FN_29_36,
+	SUSI_FN_37_44,
+	SUSI_FN_45_52,
+	SUSI_FN_53_60,
+	SUSI_FN_61_68,
+} SUSI_FN_GROUP;
+
+typedef enum {
+	SUSI_AUX_1_8 = 1,
+	SUSI_AUX_9_16,
+	SUSI_AUX_17_24,
+	SUSI_AUX_25_32,
+} SUSI_AUX_GROUP;
+
+typedef enum {
+	SUSI_AN_FN_0_7 = 1,
+	SUSI_AN_FN_8_15,
+	SUSI_AN_FN_16_23,
+	SUSI_AN_FN_24_31,
+	SUSI_AN_FN_32_39,
+	SUSI_AN_FN_40_47,
+	SUSI_AN_FN_48_55,
+	SUSI_AN_FN_56_63,
+} SUSI_AN_GROUP;
 
 class Rcn600 {
 	private:
@@ -27,7 +63,7 @@ class Rcn600 {
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
 
 #ifdef __AVR__
-		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
+		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la liniea Data
 #else
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
 #endif
@@ -47,7 +83,6 @@ class Rcn600 {
 
 	public:
 		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	// Creazione dell'oggetto Rcn600
-		~Rcn600(void);									// Distruzionde dell'oggetto Rcn600
 		void init(void);								// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
 		void init(uint8_t SlaveAddress);				// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
 		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
@@ -156,14 +191,6 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
-	/*
-	*	notifySusiNoOperation() viene invocato quando: si riceve il comando "no operation", serve prevalentemente a scopo di test
-	*	Input:
-	*		- l'argomento del comando
-	*	Restituisce:
-	*		- Nulla
-	*/
-	extern	void notifySusiNoOperation(uint8_t commandArgument) __attribute__((weak));
 	/*
 	*	notifySusiMasterAddress() viene invocato quando: si riceve l'indirizzo digitale del Master
 	*	Input:
