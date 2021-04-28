@@ -18,6 +18,18 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 #endif // __AVR__	
 }
 
+Rcn600::~Rcn600(void) {
+	detachInterrupt(digitalPinToInterrupt(_CLK_pin));
+
+	pinMode(_CLK_pin, INPUT);
+
+#ifdef __AVR__
+	delete _DATA_pin;
+#else
+	pinMode(_DATA_pin, INPUT);
+#endif
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +101,7 @@ void Rcn600::ISR_SUSI(void) {
 
 			read_bit();
 		}
-		else if (((micros() - _lastbit_time) > 10) && ((micros() - _lastbit_time) < 500)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+		else if (((micros() - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 			read_bit();
 
 			/* Controllo se ho letto un Byte (8 bit) */
@@ -199,7 +211,7 @@ void Rcn600::process(void) {
 
 #ifdef NOTIFY_RAW_MESSAGE
 		if (notifySusiRawMessage) {
-			notifySusiRawMessage(SusiData.MessageByte, (SusiData.ByteCounter + 1));
+			notifySusiRawMessage(_MessageByte, (_ByteCounter + 1));
 		}
 #endif // NOTIFY_RAW_MESSAGE
 
@@ -685,6 +697,9 @@ void Rcn600::process(void) {
 			*	Il comando non esegue alcuna azione nello slave. 
 			*	I dati possono avere qualsiasi valore. Il comando puo' essere utilizzato come gap filler o a scopo di test. 
 			*/
+			if (notifySusiNoOperation) {
+				notifySusiNoOperation(_MessageByte[1]);
+			}
 			break;
 		}
 		case 94: {	//&& 95
