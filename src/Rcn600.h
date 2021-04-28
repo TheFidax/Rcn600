@@ -11,7 +11,7 @@
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
 
-//#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
+#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
 #define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
