@@ -5,7 +5,7 @@
 #include <Rcn600.h>      // Includo la libreria per la gestione della SUSI
 #include <EEPROM.h>
 
-Rcn600 SusiSlave(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
+Rcn600 SUSI(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
 uint8_t notifySusiCVRead(uint16_t CV){
   return EEPROM.read(CV);
@@ -22,9 +22,9 @@ void setup() {
 		EEPROM.update(897, 1);
 	}
 
-	SusiSlave.init();      // Avvio la libreria
+	SUSI.init();      // Avvio la libreria
 }
 
 void loop() {
-  SusiSlave.process();     // Elaboro piu' volte possibile i dati acquisiti
+  SUSI.process();     // Elaboro piu' volte possibile i dati acquisiti
 }

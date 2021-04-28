@@ -5,7 +5,7 @@ Questo esempio stampa tutti i dati decodificati dalla libreria
 #include <Rcn600.h>     // Includo la libreria per la gestione della SUSI
 #include <EEPROM.h>     // Includo la libreria per la gestione della EEPROM interna
 
-Rcn600 SusiSlave(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
+Rcn600 SUSI(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
 // Decommentare la #define sotto per stampare lo stato delle Funzioni Digitali
 #define NOTIFY_SUSI_FUNC
@@ -393,13 +393,13 @@ void setup() {
 
   while(!Serial) {}   // Attendo che la comunicazione seriale sia disponibile
   
-  SusiSlave.init();      // Avvio la libreria
+  SUSI.init();      // Avvio la libreria
 
   Serial.println("SUSI PrintMessage:"); //Informo l'utente che e' pronto a leggere i Byte
 }
 
 void loop() {
-  SusiSlave.process();     // Elaboro più volte possibile i dati acquisiti
+  SUSI.process();     // Elaboro più volte possibile i dati acquisiti
 }
 
 /* Metodi Per la Manipolazione delle CV */

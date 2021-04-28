@@ -4,13 +4,13 @@
 
 #include <Rcn600Master.h>      // Includo la libreria per la gestione della SUSI
 
-Rcn600Master SusiMaster(2, 3);      // (CLK pin, DATA pin)
+Rcn600Master SUSI(2, 3);      // (CLK pin, DATA pin)
 
 #define DELAY   500
 
 void setup() {  
 	pinMode(LED_BUILTIN, OUTPUT);
-	SusiMaster.init();
+	SUSI.init();
 }
 
 void loop() {
@@ -20,11 +20,11 @@ void loop() {
 		static bool state = true;
 
 		if (state) {
-			SusiMaster.sendSusiFunc(SUSI_FN_0_4, SUSI_FN_BIT_00);
+			SUSI.sendSusiFunc(SUSI_FN_0_4, SUSI_FN_BIT_00);
 			digitalWrite(LED_BUILTIN, HIGH);
 		}
 		else {
-			SusiMaster.sendSusiFunc(SUSI_FN_0_4, 0);
+			SUSI.sendSusiFunc(SUSI_FN_0_4, 0);
 			digitalWrite(LED_BUILTIN, LOW);
 		}
 

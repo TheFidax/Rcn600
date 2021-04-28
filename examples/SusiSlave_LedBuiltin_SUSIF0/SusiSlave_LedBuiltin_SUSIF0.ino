@@ -4,7 +4,7 @@
 
 #include <Rcn600.h>      // Includo la libreria per la gestione della SUSI
 
-Rcn600 SusiSlave(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
+Rcn600 SUSI(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) {
   switch( SUSI_FuncGrp ) {
@@ -18,9 +18,9 @@ void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) {
 
 void setup() {   
   pinMode(LED_BUILTIN, OUTPUT);
-  SusiSlave.init();      // Avvio la libreria
+  SUSI.init();      // Avvio la libreria
 }
 
 void loop() {
-  SusiSlave.process();     // Elaboro piu' volte possibile i dati acquisiti
+  SUSI.process();     // Elaboro piu' volte possibile i dati acquisiti
 }

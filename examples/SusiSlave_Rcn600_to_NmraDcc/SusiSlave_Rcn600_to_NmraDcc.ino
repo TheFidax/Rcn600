@@ -5,7 +5,7 @@
 
 #define This_Decoder_Address 3
 
-Rcn600 SusiSlave(2, 3);  //Definisco i pin a cui e' collegato il Bus SUSI
+Rcn600 SUSI(2, 3);  //Definisco i pin a cui e' collegato il Bus SUSI
 
 /* Metodi Libreria NmraDcc */
 
@@ -136,9 +136,9 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Interfacciamento Libreria RCN600 a NmraDcc");
 
-  SusiSlave.init();
+  SUSI.init();
 }
 
 void loop() {
-  SusiSlave.process();
+  SUSI.process();
 }
