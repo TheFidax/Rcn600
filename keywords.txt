@@ -37,8 +37,8 @@ sendSusiRealSpeed	KEYWORD2
 sendSusiRequestSpeed	KEYWORD2
 
 //////////////////////// Costanti SUSI_DIRECTION
-SUSI_DIR_REV = 0	LITERAL1
-SUSI_DIR_FWD = 1	LITERAL1
+SUSI_DIR_REV	LITERAL1
+SUSI_DIR_FWD	LITERAL1
 
 //////////////////////// Costanti SUSI_FN_GROUP
 SUSI_FN_0_4	LITERAL1
