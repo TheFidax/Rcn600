@@ -5,15 +5,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "DataHeaders/SUSI_DATA_TYPE.h"
-
 #ifdef __AVR__
-#define __ENABLE_FAST_DIGITAL_PIN__
-#endif
-
-#ifdef __ENABLE_FAST_DIGITAL_PIN__
 #include <digitalPinFast.h>
-#endif 
+#endif // __AVR__
+
+#include "DataHeaders/SUSI_DATA_TYPE.h"
 
 //#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
 
@@ -21,39 +17,34 @@
 #define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 
-#define BUFFER_LENGTH				10		// Lunghezza buffer comandi
-
-#define	SYNC_TIME					9		//tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME				20		//minima durata di un livello di Clock
-#define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
+#define	SYNC_TIME			9				//tempo necessario a sincronizzare Master e Slave: 9ms
 
 class Rcn600 {
 	private:
 		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
 
-#ifdef __ENABLE_FAST_DIGITAL_PIN__
-		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
+#ifdef __AVR__
+		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la liniea Data
 #else
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
 #endif
 
 		uint32_t _lastByte_time;		// tempo a cui e' stato letto l'ultimo Byte
 		uint32_t _lastbit_time;			// tempo a cui e' stato letto l'ultimo bit
-		Rcn600_Message	_Buffer[BUFFER_LENGTH];		// Byte di cui e' composto un comando
+		uint8_t	_MessageByte[4];		// Byte di cui e' composto un comando
 		uint8_t	_bitCounter;			// indica quale bit si deve leggere
-		uint8_t _messageCounter;		// indica quale messaggio sta venendo letto
+		uint8_t	_ByteCounter;			// indica quale Byte sta venendo letto
+		bool _MessageComplete;			// indica se e' stato ricevuto un messaggio completo
 
 		/* Metodi Privati */
 		void initClass(void);			// Inizializza a Input i pin a cui e' connesso il bus
-		void processCvMessage(Rcn600_Message message);
 		void read_bit(void);			// Legge il bit dalla linea Data
 		void Data_ACK(void);			// funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);	// ritorna True se il numero della CV passato e' valido per questo modulo Slave
 
 	public:
 		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	// Creazione dell'oggetto Rcn600
-		~Rcn600(void);									// Distruzionde dell'oggetto Rcn600
 		void init(void);								// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
 		void init(uint8_t SlaveAddress);				// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
 		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
@@ -73,7 +64,7 @@ extern "C" {
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiRawMessage(Rcn600_Message message) __attribute__((weak));
+	extern	void notifySusiRawMessage(uint8_t *rawMessage, uint8_t messageLength) __attribute__((weak));
 #endif
 	/*
 	*	notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
@@ -162,14 +153,6 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
-	/*
-	*	notifySusiNoOperation() viene invocato quando: si riceve il comando "no operation", serve prevalentemente a scopo di test
-	*	Input:
-	*		- l'argomento del comando
-	*	Restituisce:
-	*		- Nulla
-	*/
-	extern	void notifySusiNoOperation(uint8_t commandArgument) __attribute__((weak));
 	/*
 	*	notifySusiMasterAddress() viene invocato quando: si riceve l'indirizzo digitale del Master
 	*	Input:
