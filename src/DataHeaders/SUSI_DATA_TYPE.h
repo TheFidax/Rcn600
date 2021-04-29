@@ -40,11 +40,4 @@ typedef enum {
 	SUSI_AN_FN_56_63,
 } SUSI_AN_GROUP;
 
-typedef struct {
-	uint8_t Bytes[3];
-
-	bool isCvManipulating;
-	bool Complete;
-} Rcn600_Message;
-
 #endif
