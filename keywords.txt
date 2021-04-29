@@ -31,7 +31,7 @@ notifySusiCVRead	KEYWORD2
 notifySusibitManipulation	KEYWORD2
 notifySusiCVWrite	KEYWORD2
 
-//////////////////////// SUSI Master
+//////////////////////// Rcn600Master
 sendSusiFunc	KEYWORD2
 sendSusiRealSpeed	KEYWORD2
 sendSusiRequestSpeed	KEYWORD2
