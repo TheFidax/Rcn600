@@ -361,7 +361,7 @@ void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) {
 #endif
 
 // Decommentare la #define sotto per stampare i comandi 'No Operation': serve a scopo di test
-#define NOTIFY_SUSI_NO_OPERATION
+//#define NOTIFY_SUSI_NO_OPERATION
 #ifdef  NOTIFY_SUSI_NO_OPERATION
 void notifySusiNoOperation(uint8_t commandArgument) {
   Serial.print("notifySusiNoOperation: ");
@@ -388,6 +388,47 @@ void notifySusiControllModule(uint8_t ModuleControll) {
 };
 #endif
 
+
+
+/* Metodi Per la Manipolazione delle CV */
+
+// Decommentare la #define sotto per mostrare il comando di Confronto CV
+#define NOTIFY_SUSI_CV_READ
+uint8_t notifySusiCVRead(uint16_t CV) {
+#ifdef  NOTIFY_SUSI_CV_READ
+    Serial.print("notifySusiCVRead: ");
+    Serial.print(" CV: ");
+    Serial.print(CV, DEC);
+    Serial.print(" Read Value: ");
+    Serial.println(EEPROM.read(CV), DEC);
+#endif
+
+    return EEPROM.read(CV);
+}
+
+// Decommentare la #define sotto per mostrare il comando di Scrittura CV
+#define NOTIFY_SUSI_WRITE
+uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
+#ifdef  NOTIFY_SUSI_WRITE
+    Serial.print("notifySusiCVWrite: ");
+    Serial.print(" CV: ");
+    Serial.print(CV, DEC);
+    Serial.print(" Value to Check: ");
+    Serial.print(Value, DEC);
+#endif
+
+    EEPROM.update(CV, Value);
+#ifdef  NOTIFY_SUSI_WRITE 
+    Serial.print(" New CV Value: ");
+    Serial.println(EEPROM.read(CV), DEC);
+#endif
+
+    return EEPROM.read(CV);
+}
+
+
+
+
 void setup() {   
   Serial.begin(115200); // Avvio la comunicazione Seriale
 
@@ -400,39 +441,4 @@ void setup() {
 
 void loop() {
   SUSI.process();     // Elaboro più volte possibile i dati acquisiti
-}
-
-/* Metodi Per la Manipolazione delle CV */
-// Decommentare la #define sotto per mostrare il comando di Confronto CV
-#define NOTIFY_SUSI_CV_READ
-uint8_t notifySusiCVRead(uint16_t CV){
-#ifdef  NOTIFY_SUSI_CV_READ
-  Serial.print("notifySusiCVRead: ");
-  Serial.print(" CV: ");
-  Serial.print(CV,DEC);
-  Serial.print(" Read Value: ");
-  Serial.println(EEPROM.read(CV),DEC);
-#endif
-
-  return EEPROM.read(CV);
-}
-
-// Decommentare la #define sotto per mostrare il comando di Scrittura CV
-#define NOTIFY_SUSI_WRITE
-uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value){
-#ifdef  NOTIFY_SUSI_WRITE
-  Serial.print("notifySusiCVWrite: ");
-  Serial.print(" CV: ");
-  Serial.print(CV,DEC);
-  Serial.print(" Value to Check: ");
-  Serial.print(Value,DEC);
-#endif
-
-  EEPROM.update(CV, Value);
-#ifdef  NOTIFY_SUSI_WRITE 
-  Serial.print(" New CV Value: ");
-  Serial.println(EEPROM.read(CV),DEC);
-#endif
-
-  return EEPROM.read(CV);
 }

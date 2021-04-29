@@ -136,7 +136,6 @@ void Rcn600::ISR_SUSI(void) {
 					_MessageComplete = true;
 				}
 			}
-
 		}
 	}
 }
