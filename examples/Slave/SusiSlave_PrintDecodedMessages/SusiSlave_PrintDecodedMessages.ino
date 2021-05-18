@@ -430,7 +430,7 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
 
 
 void setup() {   
-  Serial.begin(250000); // Avvio la comunicazione Seriale
+  Serial.begin(115200); // Avvio la comunicazione Seriale
 
   while(!Serial) {}   // Attendo che la comunicazione seriale sia disponibile
   
