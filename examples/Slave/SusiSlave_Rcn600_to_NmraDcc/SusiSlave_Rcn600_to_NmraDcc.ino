@@ -133,7 +133,7 @@ void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) {
 
 
 void setup() {
-  Serial.begin(250000); // Avvio la comunicazione Seriale
+  Serial.begin(115200); // Avvio la comunicazione Seriale
   Serial.println("Interfacciamento Libreria RCN600 a NmraDcc");
 
   SUSI.init();
