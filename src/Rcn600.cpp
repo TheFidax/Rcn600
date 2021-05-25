@@ -9,7 +9,37 @@ static void Rcn600InterruptHandler(void) { // define global handler
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef DEBUG_RCN600
+void Rcn600::setDebugStream(Stream* debugStream) {
+	_debugStream = debugStream;
+}
+
+void Rcn600::sendDebugMessage(char* message) {
+	if (_debugStream != NULL) {
+		_debugStream->write(message);
+	}
+}
+
+void sendDebugMessagey(uint16_t message) {
+	//if (_debugStream != NULL) {
+		//_debugStream->write(message);
+	//}
+}
+
+#endif // DEBUG_RCN600
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 (CLK_PIN: ");
+	//sendDebugMessagey((uint16_t)CLK_pin_i);
+	sendDebugMessage((char*)", DATA_PIN: ");
+	//sendDebugMessagey((uint16_t)DATA_pin_i);
+	sendDebugMessage((char*)")\n");
+#endif // DEBUG_RCN600
+
 	_CLK_pin = CLK_pin_i;
 #ifdef DIGITAL_PIN_FAST
 	_DATA_pin = new digitalPinFast (DATA_pin_i);
