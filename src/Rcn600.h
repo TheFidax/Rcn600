@@ -1,9 +1,14 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
+#define DEBUG_RCN600	// Permette di abilitare il debug tramite stream
+
 #include "Arduino.h"
 #include <stdint.h>
 #include <stdbool.h>
+#ifdef DEBUG_RCN600
+	#include <stream.h>
+#endif
 
 #ifdef __AVR__	// Se la piattaforma e' AVR posso usare la libreria digitalPinFast; e' escludibile per risparmiare RAM
 	#define	DIGITAL_PIN_FAST
@@ -50,21 +55,33 @@ class Rcn600 {
 		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
 #endif
 
-														/* Metodi Privati */
+#ifdef DEBUG_RCN600
+		Stream* _debugStream = NULL;
+#endif // DEBUG_RCN600
+
+
+	private:				/* Metodi Privati */
 		void initClass(void);							// Inizializza a Input i pin a cui e' connesso il bus
 		uint8_t readData(void);							// Legge il bit dalla linea Data
 		Rcn600Message* searchFreeMessage(void);			// Cerca nel Buffer uno slot dove salvare il messaggio in ricezione
 		void setNextMessage(Rcn600Message* nextMessage);// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
 		void Data_ACK(void);							// funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);					// ritorna True se il numero della CV passato e' valido per questo modulo Slave
+#ifdef DEBUG_RCN600
+		void sendDebugMessage(char* message);			// Spedisce un messaggio tramite lo Stream di Debug
+#endif // DEBUG_RCN600
 
-	public:
+
+	public:					/* Metodi Pubblici */
 		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	// Creazione dell'oggetto Rcn600
 		~Rcn600(void);									// Distruzionde dell'oggetto Rcn600
 		void init(void);								// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
 		void init(uint8_t SlaveAddress);				// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
 		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
 		void ISR_SUSI(void);							// Metodo che gestisce 'acquisizione dati tramite Interrupt
+#ifdef DEBUG_RCN600
+		void setDebugStream(Stream* debugStream);		// Imposta lo Stream sul quale eseguire il debug
+#endif // DEBUG_RCN600
 };
 
 // Funzioni Esterne, implementabili a discrizione dell'utente
