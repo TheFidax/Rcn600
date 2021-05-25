@@ -69,6 +69,7 @@ class Rcn600 {
 		bool isCVvalid(uint16_t CV);					// ritorna True se il numero della CV passato e' valido per questo modulo Slave
 #ifdef DEBUG_RCN600
 		void sendDebugMessage(char* message);			// Spedisce un messaggio tramite lo Stream di Debug
+		void sendDebugMessagey(uint16_t message);
 #endif // DEBUG_RCN600
 
 
