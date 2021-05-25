@@ -20,20 +20,17 @@ void Rcn600::sendDebugMessage(char* message) {
 	}
 }
 
+char* NumToChar(uint32_t n) {
+	char buf[11];
+	sprintf(buf, "%lu", n);
+	return buf;
+}
 #endif // DEBUG_RCN600
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 (CLK_PIN: ");
-	//sendDebugMessage(CLK_pin_i);
-	sendDebugMessage((char*)", DATA_PIN: ");
-	//sendDebugMessage((uint16_t)DATA_pin_i);
-	sendDebugMessage((char*)")\n");
-#endif // DEBUG_RCN600
-
 	_CLK_pin = CLK_pin_i;
 #ifdef DIGITAL_PIN_FAST
 	_DATA_pin = new digitalPinFast (DATA_pin_i);
@@ -58,6 +55,16 @@ Rcn600::~Rcn600(void) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::initClass(void) {
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 initClass (CLK_PIN: ");
+	sendDebugMessage(NumToChar(_CLK_pin));
+	sendDebugMessage((char*)", DATA_PIN: ");
+	sendDebugMessage(NumToChar((uint32_t)_DATA_pin));
+	sendDebugMessage((char*)", slaveAddress: ");
+	sendDebugMessage(NumToChar(_slaveAddress));
+	sendDebugMessage((char*)")\n");
+#endif // DEBUG_RCN600
+
 	pointerToRcn600 = this;
 	
 	/* Inizializzo i pin come Input */
