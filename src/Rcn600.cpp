@@ -20,12 +20,6 @@ void Rcn600::sendDebugMessage(char* message) {
 	}
 }
 
-void sendDebugMessagey(uint16_t message) {
-	//if (_debugStream != NULL) {
-		//_debugStream->write(message);
-	//}
-}
-
 #endif // DEBUG_RCN600
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,9 +28,9 @@ void sendDebugMessagey(uint16_t message) {
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 #ifdef DEBUG_RCN600
 	sendDebugMessage((char*)"Rcn600 (CLK_PIN: ");
-	//sendDebugMessagey((uint16_t)CLK_pin_i);
+	//sendDebugMessage(CLK_pin_i);
 	sendDebugMessage((char*)", DATA_PIN: ");
-	//sendDebugMessagey((uint16_t)DATA_pin_i);
+	//sendDebugMessage((uint16_t)DATA_pin_i);
 	sendDebugMessage((char*)")\n");
 #endif // DEBUG_RCN600
 
