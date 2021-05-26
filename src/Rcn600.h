@@ -11,7 +11,7 @@
 #endif
 
 #ifdef __AVR__	// Se la piattaforma e' AVR posso usare la libreria digitalPinFast; e' escludibile per risparmiare RAM
-	//#define	DIGITAL_PIN_FAST
+	#define	DIGITAL_PIN_FAST
 #endif // __AVR__
 
 #ifdef DIGITAL_PIN_FAST
