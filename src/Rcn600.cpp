@@ -10,21 +10,18 @@ static void Rcn600InterruptHandler(void) { // define global handler
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG_RCN600
-void Rcn600::setDebugStream(Stream* debugStream) {
-	_debugStream = debugStream;
+void sendDebugMessage(char* message) {
+	Wire.beginTransmission(0);
+	Wire.write(message);
+	Wire.endTransmission();
 }
 
-void Rcn600::sendDebugMessage(char* message) {
-	if (_debugStream != NULL) {
-		_debugStream->write(message);
-	}
-}
-
-char* NumToChar(uint32_t n) {
+void sendDebugMessage(uint32_t n) {
 	char buf[11];
 	sprintf(buf, "%lu", n);
-	return buf;
+	sendDebugMessage(buf);
 }
+
 #endif // DEBUG_RCN600
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,6 +34,12 @@ Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 #else
 	_DATA_pin = DATA_pin_i;
 #endif // DIGITAL_PIN_FAST	
+
+#ifdef DEBUG_RCN600
+	Wire.end();
+	Wire.begin(1);
+	Wire.setClock(400000);
+#endif // DEBUG_RCN600
 }
 
 Rcn600::~Rcn600(void) {
@@ -49,6 +52,10 @@ Rcn600::~Rcn600(void) {
 #else
 	pinMode(_DATA_pin, INPUT);
 #endif
+
+#ifdef DEBUG_RCN600
+	Wire.end();
+#endif // DEBUG_RCN600
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,34 +63,37 @@ Rcn600::~Rcn600(void) {
 
 void Rcn600::initClass(void) {
 #ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 initClass (CLK_PIN: ");
-	sendDebugMessage(NumToChar(_CLK_pin));
-	sendDebugMessage((char*)", DATA_PIN: ");
-	sendDebugMessage(NumToChar((uint32_t)_DATA_pin));
-	sendDebugMessage((char*)", slaveAddress: ");
-	sendDebugMessage(NumToChar(_slaveAddress));
-	sendDebugMessage((char*)")\n");
+	sendDebugMessage((char*)"Rcn600 initClass (Start)\n");
 #endif // DEBUG_RCN600
 
 	pointerToRcn600 = this;
-	
+
 	/* Inizializzo i pin come Input */
 	pinMode(_CLK_pin, INPUT);
+
 #ifdef DIGITAL_PIN_FAST
 	_DATA_pin->pinModeFast(INPUT);
 #else
 	pinMode(_DATA_pin, INPUT);
 #endif
 
-	for (uint8_t i = 0; i < BUFFER_LENGTH; ++i) {	// Imposto gli slot del Buffer come liberi
-		_Buffer[i].nextMessage = (Rcn600Message*)FREE_MESSAGE;
+	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {	// Imposto gli slot del Buffer come liberi
+		_Buffer[i].nextMessage = NULL;
 	}
+
 	_BufferPointer = NULL;	// Nessun messaggio da decodificare
 
 	attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 initClass (End)\n");
+#endif // DEBUG_RCN600
 }
 
 void Rcn600::init(void) {
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 init(void) (Start)\n");
+#endif // DEBUG_RCN600
 	if (notifySusiCVRead) {			/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
 		_slaveAddress = notifySusiCVRead(897);
 
@@ -97,28 +107,40 @@ void Rcn600::init(void) {
 	}
 	
 	initClass();
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 init(void) (End)\n");
+#endif // DEBUG_RCN600
 }
 
 void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 init(uint8_t) (Start)\n");
+#endif // DEBUG_RCN600
+
 	_slaveAddress = SlaveAddress;
 
 	if (_slaveAddress > MAX_ADDRESS_VALUE) {	/* In caso di indirizzo passato non conforme alla normativa SUSI imposto il valore di Default 1 */
 		_slaveAddress = DEFAULT_SLAVE_NUMBER;
 	}
 
-	initClass();	
+	initClass();
+
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 init(uint8_t) (End)\n");
+#endif // DEBUG_RCN600
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600Message* Rcn600::searchFreeMessage(void) {
-	for (uint8_t i = 0; i < BUFFER_LENGTH; ++i) {
-		if (_Buffer[i].nextMessage == (Rcn600Message*)FREE_MESSAGE) {
+	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {
+		if (_Buffer[i].nextMessage == NULL) {
 			return &_Buffer[i];
 		}
 	}
-
+	
+	/* Se non trovo uno slot libero ritorno NULL */
 	return NULL;
 }
 
@@ -159,7 +181,9 @@ void Rcn600::ISR_SUSI(void) {
 	if (_bitCounter == 0) {
 		_messageSlot = searchFreeMessage();
 
-		_messageSlot->nextMessage = NULL;
+		if (_messageSlot != NULL) {
+			_messageSlot->nextMessage = NULL;
+		}
 	}
 
 	//controllo che l'ultimo messaggio ricevuto sia stato processato: in caso positivo procedo con la lettura di uno nuvo
@@ -209,7 +233,7 @@ void Rcn600::ISR_SUSI(void) {
 
 						process();
 
-						_messageSlot->nextMessage = (Rcn600Message*)FREE_MESSAGE;
+						_messageSlot->nextMessage = NULL;
 
 						_BufferPointer = restore;
 
@@ -292,12 +316,17 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 }
 
 void Rcn600::process(void) {
-	bool processNextMessage = true;	// Indica se devo processare piu' messaggi
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 process(void) (Start)\n");
+#endif // DEBUG_RCN600
 
-	while (processNextMessage) {
-		processNextMessage = false;
+	uint8_t processNextMessage = 1;	// Indica se devo processare piu' messaggi
+
+	while (processNextMessage == 1) {
+		processNextMessage = 0;
 
 		if (_BufferPointer != NULL) {		//controllo che sia stati ricevuti dei messaggi
+
 			/* Devo controllare il valore del primo Byte */
 #ifdef NOTIFY_RAW_MESSAGE
 			if (notifySusiRawMessage) {
@@ -916,7 +945,7 @@ void Rcn600::process(void) {
 						Data_ACK();
 					}
 				}
-				processNextMessage = true;
+				processNextMessage = 1;
 				break;
 			}
 			case 123: {
@@ -990,7 +1019,7 @@ void Rcn600::process(void) {
 					}
 					}
 				}
-				processNextMessage = true;
+				processNextMessage = 1;
 				break;
 			}
 			case 127: {
@@ -1039,7 +1068,7 @@ void Rcn600::process(void) {
 						}
 					}
 				}
-				processNextMessage = true;
+				processNextMessage = 1;
 				break;
 			}
 			default: {}
@@ -1047,10 +1076,14 @@ void Rcn600::process(void) {
 
 			// Aggiorno il puntatore del Buffer
 			Rcn600Message* p = _BufferPointer->nextMessage;
-			_BufferPointer->nextMessage = (Rcn600Message*)FREE_MESSAGE;
+			_BufferPointer->nextMessage = NULL;
 			_BufferPointer = p;
 		}
 	}
+
+#ifdef DEBUG_RCN600
+	sendDebugMessage((char*)"Rcn600 process(void) (End)\n");
+#endif // DEBUG_RCN600
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
