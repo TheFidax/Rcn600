@@ -413,7 +413,7 @@ void Rcn600::process(void) {
 
 				funcState = bitRead(_BufferPointer->Byte[1], 7);	// leggo il valore dello stato 'D'
 
-				bitWrite(_BufferPointer->Byte[1], 7, 0);			// elimino il valore dello stato
+				_BufferPointer->Byte[1] = bitClear(_BufferPointer->Byte[1], 7);			// elimino il valore dello stato
 
 				functionNumber = _BufferPointer->Byte[1];			// i restanti bit identificano la Funzione 'L'
 
