@@ -335,11 +335,12 @@ Le seguenti funzionalita' vengono comandate *manualmente* agendo su delle #defin
 Questa define rende disponibile un metodo che permette di *esportare* il messaggio *grezzo* per poterlo manipolare in maniera Esterna alla libreria.</br>
 Stato di *default*: **Disattivata**</br>
 ```c
-void notifySusiRawMessage(uint8_t *rawMessage, uint8_t messageLength);
+void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);
 ```
 *notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio da decodificare
 - Input:
-  - i byte che compongono il messaggio acquisito dalla libreria
-  - la lunghezza del messaggio
+  - il primo Byte del messaggio
+  - il Secondo Byte del messaggio
+  - il Byte che determina l'azione da eseguire su una CV
 - Restituisce:
   - Nulla
