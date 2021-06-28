@@ -29,7 +29,7 @@ Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI
 Data  ---> 470Ω ---> Pin generico (anche di tipo analogico)<br/>
 Clock ---> 470Ω ---> Pin Interrupt<br/>
 
-Maggiori informazioni della specifiva nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
+Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
 
 
 **Video Presentazione del Progetto:**</br>
@@ -73,8 +73,8 @@ void process(void);
 
 ------------
 
-# Metodi Facoltativi
-I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
+# Metodi CallBack
+I seguenti metodi CallBack sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
 
 ------------
 
