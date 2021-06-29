@@ -11,11 +11,11 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Obbligatori](#Metodi-Obbligatori)
-* [Metodi Facoltativi](#Metodi-Facoltativi)
+* [Metodi CallBack](#Metodi-CallBack)
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
 * [Distruzione Classe](#distruzione-classe)
 * [Tipi di Dati](#Tipi-di-Dati)
-* [Funzionalita' Extra](#Funzionalita-Extra)
+* [Gestione Manuale Messaggi](#Gestione-Manuale-Messaggi)
 
 ------------
 
@@ -324,23 +324,21 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasme
 
 ------------
 
-# Funzionalita' Extra
-Le seguenti funzionalita' vengono comandate *manualmente* agendo su delle #define nel file **Rcn600.h**
+# Gestione Manuale Messaggi
+E' possibile utilizzare questa libreria per *decodificare* pacchetti dati Rcn600 Susi anche su dispositivi non collegati al Bus.</br>
+Per questa ragione e' possibile *esportare* messaggi grezzi non decodificati da inviare a un altro dispositivo (mediante sistema scelto dall'utente) il quale a sua volta si occupera' di decodificare il messaggio *inserito manualmente* nella coda di decodifica.</br>
 
 ------------
 
 ```c
-#define	NOTIFY_RAW_MESSAGE
-```
-Questa define rende disponibile un metodo che permette di *esportare* il messaggio *grezzo* per poterlo manipolare in maniera Esterna alla libreria.</br>
-Stato di *default*: **Disattivata**</br>
-```c
 void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);
 ```
-*notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio da decodificare
+*notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio grezzo da decodificare
 - Input:
   - il primo Byte del messaggio
   - il Secondo Byte del messaggio
   - il Byte che determina l'azione da eseguire su una CV
 - Restituisce:
   - Nulla
+
+------------
