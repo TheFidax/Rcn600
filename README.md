@@ -333,7 +333,7 @@ Per questa ragione e' possibile *esportare* messaggi grezzi non decodificati da 
 ```c
 void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);
 ```
-*notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio grezzo da decodificare
+*notifySusiRawMessage()* viene invocato ogni volta (metodo Callback) che è presente un messaggio grezzo da decodificare
 - Input:
   - il primo Byte del messaggio
   - il Secondo Byte del messaggio
