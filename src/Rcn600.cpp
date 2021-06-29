@@ -29,11 +29,14 @@ void sendDebugMessage(uint32_t n) {
 
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 	_CLK_pin = CLK_pin_i;
+
+	if (_CLK_pin != MANUAL_MESSAGES) {
 #ifdef DIGITAL_PIN_FAST
-	_DATA_pin = new digitalPinFast (DATA_pin_i);
+		_DATA_pin = new digitalPinFast(DATA_pin_i);
 #else
-	_DATA_pin = DATA_pin_i;
+		_DATA_pin = DATA_pin_i;
 #endif // DIGITAL_PIN_FAST	
+	}
 
 #ifdef DEBUG_RCN600
 	Wire.end();
@@ -66,24 +69,26 @@ void Rcn600::initClass(void) {
 	sendDebugMessage((char*)"Rcn600 initClass (Start)\n");
 #endif // DEBUG_RCN600
 
-	pointerToRcn600 = this;
+	if (_CLK_pin != MANUAL_MESSAGES) {
+		pointerToRcn600 = this;
 
-	/* Inizializzo i pin come Input */
-	pinMode(_CLK_pin, INPUT);
+		/* Inizializzo i pin come Input */
+		pinMode(_CLK_pin, INPUT);
 
 #ifdef DIGITAL_PIN_FAST
-	_DATA_pin->pinModeFast(INPUT);
+		_DATA_pin->pinModeFast(INPUT);
 #else
-	pinMode(_DATA_pin, INPUT);
+		pinMode(_DATA_pin, INPUT);
 #endif
+
+		attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+	}
 
 	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {	// Imposto gli slot del Buffer come liberi
 		_Buffer[i].nextMessage = NULL;
 	}
 
-	_BufferPointer = NULL;	// Nessun messaggio da decodificare
-
-	attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+	_BufferPointer = NULL;								// Imposto il puntatore per indicare l'assenza di messaggi da decodificare
 
 #ifdef DEBUG_RCN600
 	sendDebugMessage((char*)"Rcn600 initClass (End)\n");
@@ -163,6 +168,42 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) {
+	/* Permette di aggiungere manualmente un Messaggio Rcn600 in cosa di Process */
+
+	Rcn600Message* _messageSlot = NULL;	// indica in quale slot salvare il messaggio
+
+	_messageSlot = searchFreeMessage();
+
+	if (_messageSlot != NULL) {
+			_messageSlot->nextMessage = NULL;
+			_messageSlot->Byte[0] = firstByte;
+			_messageSlot->Byte[1] = secondByte;
+			_messageSlot->cvArgument = CvManipulating;
+
+			if ((_messageSlot->Byte[0] != 119) && (_messageSlot->Byte[0] != 123) && (_messageSlot->Byte[0] != 127)) {
+				setNextMessage(_messageSlot);
+			}
+			else {
+				Rcn600Message* original = _BufferPointer;	// Salvo la posizione indicata attualmente
+				_BufferPointer = _messageSlot;				// Imposto il puntatore al messaggio appena acquisito
+
+				process();									// Processo il messaggio acquisito
+
+				_messageSlot->nextMessage = NULL;			// Libero lo Slot per scriverci dentro un nuovo messaggio
+				_BufferPointer = original;					// Ripristino la coda di messaggi acquisiti
+			}
+
+			return 0;
+	}
+	else {
+		return -1;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 uint8_t Rcn600::readData(void) {
 	// leggo il valore della linea DATA
 #ifdef DIGITAL_PIN_FAST
@@ -226,16 +267,15 @@ void Rcn600::ISR_SUSI(void) {
 						break;
 					}
 					case 24: {	// Letto un messaggio per la manipolazione CVs -> Messaggio Completo!
-						//setNextMessage(_messageSlot);
-						Rcn600Message* restore = _BufferPointer;
+						Rcn600Message* original = _BufferPointer;	// Salvo la posizione indicata attualmente
 
-						_BufferPointer = _messageSlot;
+						_BufferPointer = _messageSlot;				// Imposto il puntatore al messaggio appena acquisito
 
-						process();
+						process();									// Processo il messaggio acquisito
 
-						_messageSlot->nextMessage = NULL;
+						_messageSlot->nextMessage = NULL;			// Libero lo Slot per scriverci dentro un nuovo messaggio
 
-						_BufferPointer = restore;
+						_BufferPointer = original;					// Ripristino la coda di messaggi acquisiti
 
 						_bitCounter = 0;
 						break; 
@@ -254,23 +294,33 @@ void Rcn600::ISR_SUSI(void) {
 }
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
-	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
+
+	if (_CLK_pin != MANUAL_MESSAGES) {
+
+		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 #ifdef DIGITAL_PIN_FAST
-	_DATA_pin->pinModeFast(OUTPUT);
-	_DATA_pin->digitalWriteFast(LOW);
+		_DATA_pin->pinModeFast(OUTPUT);
+		_DATA_pin->digitalWriteFast(LOW);
 #else
-	pinMode(_DATA_pin, OUTPUT);
-	digitalWrite(_DATA_pin, LOW);
+		pinMode(_DATA_pin, OUTPUT);
+		digitalWrite(_DATA_pin, LOW);
 #endif
 
-	delay(1);
+		delay(1);
 
 #ifdef DIGITAL_PIN_FAST
-	_DATA_pin->pinModeFast(INPUT);
+		_DATA_pin->pinModeFast(INPUT);
 #else
-	pinMode(_DATA_pin, INPUT); 
+		pinMode(_DATA_pin, INPUT);
 #endif
-	//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
+		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
+
+	}
+	else {
+		if (ackManualMessage) {
+			ackManualMessage();
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -327,12 +377,11 @@ void Rcn600::process(void) {
 
 		if (_BufferPointer != NULL) {		//controllo che sia stati ricevuti dei messaggi
 
-			/* Devo controllare il valore del primo Byte */
-#ifdef NOTIFY_RAW_MESSAGE
 			if (notifySusiRawMessage) {
 				notifySusiRawMessage(_BufferPointer->Byte[0], _BufferPointer->Byte[1], _BufferPointer->cvArgument);
 			}
-#endif // NOTIFY_RAW_MESSAGE
+
+			/* Devo controllare il valore del primo Byte */
 			switch (_BufferPointer->Byte[0]) {
 			case 96: {
 				/* "Funktionsgruppe 1" : 0110-0000 (0x60 = 96) 0 0 0 F0 - F4 F3 F2 F1 */
@@ -413,7 +462,7 @@ void Rcn600::process(void) {
 
 				funcState = bitRead(_BufferPointer->Byte[1], 7);	// leggo il valore dello stato 'D'
 
-				_BufferPointer->Byte[1] = bitClear(_BufferPointer->Byte[1], 7);			// elimino il valore dello stato
+				bitWrite(_BufferPointer->Byte[1], 7, 0);			// elimino il valore dello stato
 
 				functionNumber = _BufferPointer->Byte[1];			// i restanti bit identificano la Funzione 'L'
 
@@ -591,7 +640,7 @@ void Rcn600::process(void) {
 						notifySusiRealSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_FWD);
 					}
 					else {
-						notifySusiRealSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_REV);
+						notifySusiRealSpeed(_BufferPointer->Byte[1], SUSI_DIR_REV);
 					}
 				}
 				break;
@@ -612,7 +661,7 @@ void Rcn600::process(void) {
 						notifySusiRequestSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_FWD);
 					}
 					else {
-						notifySusiRequestSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_REV);
+						notifySusiRequestSpeed(_BufferPointer->Byte[1], SUSI_DIR_REV);
 					}
 				}
 				break;
@@ -659,7 +708,7 @@ void Rcn600::process(void) {
 						notifySusiRealSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_FWD);
 					}
 					else {
-						notifySusiRealSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_REV);
+						notifySusiRealSpeed(_BufferPointer->Byte[1], SUSI_DIR_REV);
 					}
 				}
 				break;
@@ -694,7 +743,7 @@ void Rcn600::process(void) {
 						notifySusiRequestSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_FWD);
 					}
 					else {
-						notifySusiRequestSpeed(_BufferPointer->Byte[1] - 128, SUSI_DIR_REV);
+						notifySusiRequestSpeed(_BufferPointer->Byte[1], SUSI_DIR_REV);
 					}
 				}
 				break;

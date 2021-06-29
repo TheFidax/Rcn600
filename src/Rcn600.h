@@ -20,7 +20,7 @@
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
 
-//#define	NOTIFY_RAW_MESSAGE	// Permette di esportare il messaggio grezzo per poterlo interpretare in maniera esterna alla libreria
+#define	MANUAL_MESSAGES				255		//indica che la libreria funzionera' solamente come Decoder di messaggi SUSI e non si occupera' di acquisirli
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
 #define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
@@ -46,7 +46,7 @@ class Rcn600 {
 		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
 
 		Rcn600Message _Buffer[SUSI_BUFFER_LENGTH];	// Buffer contenenti i comandi SUSI ricevuti
-		Rcn600Message* _BufferPointer;			// Puntatore per scorrere il Buffer
+		Rcn600Message* _BufferPointer;				// Puntatore per scorrere il Buffer
 
 #ifdef	DIGITAL_PIN_FAST
 		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
@@ -67,6 +67,9 @@ class Rcn600 {
 		~Rcn600(void);									// Distruzionde dell'oggetto Rcn600
 		void init(void);								// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
 		void init(uint8_t SlaveAddress);				// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
+
+		int8_t addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);	// Permette di aggiungere Manualmente un messaggio alla coda da processare
+
 		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
 		void ISR_SUSI(void);							// Metodo che gestisce 'acquisizione dati tramite Interrupt
 };
@@ -75,7 +78,6 @@ class Rcn600 {
 #if defined (__cplusplus)
 extern "C" {
 #endif
-#ifdef NOTIFY_RAW_MESSAGE
 	/*
 	*	notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio da decodificare
 	*	Input:
@@ -85,7 +87,6 @@ extern "C" {
 	*		- Nulla
 	*/
 	extern	void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) __attribute__((weak));
-#endif
 	/*
 	*	notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
 	*	Input:
@@ -232,6 +233,16 @@ extern "C" {
 	*/
 	extern void notifyCVResetFactoryDefault(void) __attribute__((weak));
 
+	/* ACK PER MESSAGGI ACQUISITI DA DIVERSO DISPOSITIVO */
+	/*
+	*	ackManualMessage() viene invocato quando: e' necessario un ACK post modifiche di una CVs.
+	*	Quando la libreria Processa Solamente i messaggi senza acquisirli, e' lasciato all'utente la modalita' con cui comunicare al dispositivo master l'ACK.
+	*	Input:
+	*		- Nulla
+	*	Restituisce:
+	*		- Null
+	*/
+	extern void ackManualMessage(void) __attribute__((weak));
 #if defined (__cplusplus)
 }
 #endif

@@ -1,7 +1,3 @@
-/*
-Questo esempio permette di vedere, tramite seriale, il gruppo di Byte (con i rispettivi valori) ricveuti dal Master.
-Per eseguire tale operazione E' INDISPENSABILE ABILITARE LA MODALITA' DI NOTIFY_RAW_MESSAGE NEL FILE Rcn600.h
-*/
 #include <Rcn600.h>			// Includo la libreria per la gestione della SUSI
 #include <EEPROM.h>
 
