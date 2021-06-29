@@ -328,6 +328,11 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasme
 E' possibile utilizzare questa libreria per *decodificare* pacchetti dati Rcn600 Susi anche su dispositivi non collegati al Bus.</br>
 Per questa ragione e' possibile *esportare* messaggi grezzi non decodificati da inviare a un altro dispositivo (mediante sistema scelto dall'utente) il quale a sua volta si occupera' di decodificare il messaggio *inserito manualmente* nella coda di decodifica.</br>
 
+Durante questo utilizzo la dichiarazione dell'oggetto **deve essere fatta** nel seguente modo:
+```c
+Rcn600(MANUAL_MESSAGES, 0);
+```
+
 ------------
 
 ```c
@@ -340,5 +345,29 @@ void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManip
   - il Byte che determina l'azione da eseguire su una CV
 - Restituisce:
   - Nulla
+
+------------
+
+```c
+int8_t addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);
+```
+*addManualMessage()* Permette di inserire manualmente un messaggio in coda di decodifica
+- Input:
+  - il primo Byte del messaggio
+  - il Secondo Byte del messaggio
+  - il Byte che determina l'azione da eseguire su una CV
+- Restituisce:
+  - 0 se l'inserimento e' riuscito, -1 altrimenti
+
+------------
+
+```c
+void ackManualMessage(void);
+```
+*ackManualMessage()* viene invocato ogni volta (metodo Callback) che e' necessario comunicare al dispositivo connesso al Bus Susi (quello che acquisisce i messaggi) un ACK
+- Input:
+  - nulla
+- Restituisce:
+  - nulla
 
 ------------
