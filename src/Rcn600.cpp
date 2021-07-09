@@ -463,7 +463,7 @@ void Rcn600::process(void) {
 
 				funcState = _BufferPointer->Byte[1] & 0x80;			// leggo il valore dello stato 'D' ()
 
-				_BufferPointer->Byte[1] &= 7F;						// elimino il valore dello stato ( 7F = 127 = 0b 01 11 11 11 -> 1x xx xx xx & 01 11 11 11 = 0x xx xx xx)
+				_BufferPointer->Byte[1] &= 0x7F;					// elimino il valore dello stato ( 7F = 127 = 0b 01 11 11 11 -> 1x xx xx xx & 01 11 11 11 = 0x xx xx xx)
 
 				functionNumber = _BufferPointer->Byte[1];			// i restanti bit identificano la Funzione 'L'
 
