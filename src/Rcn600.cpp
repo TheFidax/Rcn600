@@ -234,9 +234,10 @@ void Rcn600::ISR_SUSI(void) {
 			_bitCounter = 0;							// dopo il SYNC leggero' il primo bit
 			_lastByte_time = millis();					// imposto questo istante come ultimo Byte letto
 						
-			bitWrite(_messageSlot->Byte[0], 0, readData());				// Sto leggendo il primo bit del messaggio
-			++_bitCounter;												// incremento il contatore dei bit per la prossima lettura
-			_lastbit_time = micros();									// memorizzo l'istante in cui e' stato letto il bit
+			_messageSlot->Byte[0] = readData();			// Sto leggendo il primo bit del messaggio ( readData() restituisce 0 o 1 )
+
+			_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
+			_lastbit_time = micros();					// memorizzo l'istante in cui e' stato letto il bit
 		}
 		else if (((micros() - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 			if (_bitCounter < 16) {
@@ -460,9 +461,9 @@ void Rcn600::process(void) {
 
 				static uint8_t functionNumber, funcState;
 
-				funcState = bitRead(_BufferPointer->Byte[1], 7);	// leggo il valore dello stato 'D'
+				funcState = _BufferPointer->Byte[1] & 0x80;			// leggo il valore dello stato 'D' ()
 
-				bitWrite(_BufferPointer->Byte[1], 7, 0);			// elimino il valore dello stato
+				_BufferPointer->Byte[1] &= 7F;						// elimino il valore dello stato ( 7F = 127 = 0b 01 11 11 11 -> 1x xx xx xx & 01 11 11 11 = 0x xx xx xx)
 
 				functionNumber = _BufferPointer->Byte[1];			// i restanti bit identificano la Funzione 'L'
 
