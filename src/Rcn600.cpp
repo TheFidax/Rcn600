@@ -30,7 +30,7 @@ void sendDebugMessage(uint32_t n) {
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 	_CLK_pin = CLK_pin_i;
 
-	if (_CLK_pin != MANUAL_MESSAGES) {
+	if (_CLK_pin != ONLY_DECODER) {
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin = new digitalPinFast(DATA_pin_i);
 #else
@@ -69,7 +69,7 @@ void Rcn600::initClass(void) {
 	sendDebugMessage((char*)"Rcn600 initClass (Start)\n");
 #endif // DEBUG_RCN600
 
-	if (_CLK_pin != MANUAL_MESSAGES) {
+	if (_CLK_pin != ONLY_DECODER) {
 		pointerToRcn600 = this;
 
 		/* Inizializzo i pin come Input */
@@ -179,7 +179,7 @@ int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t C
 			_messageSlot->nextMessage = NULL;
 			_messageSlot->Byte[0] = firstByte;
 			_messageSlot->Byte[1] = secondByte;
-			_messageSlot->cvArgument = CvManipulating;
+			_messageSlot->Byte[2] = CvManipulating;
 
 			if ((_messageSlot->Byte[0] != 119) && (_messageSlot->Byte[0] != 123) && (_messageSlot->Byte[0] != 127)) {
 				setNextMessage(_messageSlot);
@@ -240,12 +240,8 @@ void Rcn600::ISR_SUSI(void) {
 			_lastbit_time = micros();					// memorizzo l'istante in cui e' stato letto il bit
 		}
 		else if (((micros() - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
-			if (_bitCounter < 16) {
-				bitWrite(_messageSlot->Byte[_bitCounter/8], (_bitCounter % 8), readData());			// salvo il nuovo bit letto come Byte normale
-			}
-			else {
-				bitWrite(_messageSlot->cvArgument, (_bitCounter % 8), readData());					// salvo il nuovo bit letto come argomento CV
-			}
+			bitWrite(_messageSlot->Byte[_bitCounter/8], (_bitCounter % 8), readData());			// salvo il nuovo bit letto come Byte normale
+
 			++_bitCounter;												
 			_lastbit_time = micros();									
 
@@ -296,7 +292,7 @@ void Rcn600::ISR_SUSI(void) {
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 
-	if (_CLK_pin != MANUAL_MESSAGES) {
+	if (_CLK_pin != ONLY_DECODER) {
 
 		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 #ifdef DIGITAL_PIN_FAST
@@ -379,7 +375,7 @@ void Rcn600::process(void) {
 		if (_BufferPointer != NULL) {		//controllo che sia stati ricevuti dei messaggi
 
 			if (notifySusiRawMessage) {
-				notifySusiRawMessage(_BufferPointer->Byte[0], _BufferPointer->Byte[1], _BufferPointer->cvArgument);
+				notifySusiRawMessage(_BufferPointer->Byte[0], _BufferPointer->Byte[1], _BufferPointer->Byte[2]);
 			}
 
 			/* Devo controllare il valore del primo Byte */
@@ -991,7 +987,7 @@ void Rcn600::process(void) {
 					}
 
 					/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
-					if (CV_Value == _BufferPointer->cvArgument) {
+					if (CV_Value == _BufferPointer->Byte[2]) {
 						Data_ACK();
 					}
 				}
@@ -1023,9 +1019,9 @@ void Rcn600::process(void) {
 				if (isCVvalid(CV_Number)) {
 					static uint8_t CV_Value, operation, bitValue, bitPosition;
 
-					operation = bitRead(_BufferPointer->cvArgument, 4);																									// leggo quale operazione sui bit e' richiesta
-					bitValue = bitRead(_BufferPointer->cvArgument, 3);																										// leggo il valore del bit da confrontare/scrivere
-					bitPosition = ((bitRead(_BufferPointer->cvArgument, 0) * 1) + (bitRead(_BufferPointer->cvArgument, 1) * 2) + (bitRead(_BufferPointer->cvArgument, 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
+					operation = bitRead(_BufferPointer->Byte[2], 4);																									// leggo quale operazione sui bit e' richiesta
+					bitValue = bitRead(_BufferPointer->Byte[2], 3);																										// leggo il valore del bit da confrontare/scrivere
+					bitPosition = ((bitRead(_BufferPointer->Byte[2], 0) * 1) + (bitRead(_BufferPointer->Byte[2], 1) * 2) + (bitRead(_BufferPointer->Byte[2], 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
 					if (CV_Number == 897) {
 						CV_Value = _slaveAddress;
@@ -1056,7 +1052,7 @@ void Rcn600::process(void) {
 					case 1: {	//scrittura del bit
 						if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
 							if (notifySusiCVWrite) {
-								bitWrite(CV_Value, bitPosition, bitRead(_BufferPointer->cvArgument, 3));	//scrivo il nuovo valore del bit
+								bitWrite(CV_Value, bitPosition, bitRead(_BufferPointer->Byte[2], 3));	//scrivo il nuovo valore del bit
 								if (notifySusiCVWrite((897 + (_BufferPointer->Byte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
 									Data_ACK();
 								}
@@ -1093,7 +1089,7 @@ void Rcn600::process(void) {
 					/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
 					if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
-						if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (_BufferPointer->cvArgument == 8)) {	//si vuole eseguire un Reset delle CVs
+						if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (_BufferPointer->Byte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
 							if (notifyCVResetFactoryDefault) {
 								notifyCVResetFactoryDefault();
 
@@ -1102,7 +1098,7 @@ void Rcn600::process(void) {
 						}
 						else {	//scrittura CVs
 							if (notifySusiCVWrite) {
-								if (notifySusiCVWrite(CV_Number, _BufferPointer->cvArgument) == _BufferPointer->cvArgument) {
+								if (notifySusiCVWrite(CV_Number, _BufferPointer->Byte[2]) == _BufferPointer->Byte[2]) {
 									Data_ACK();
 								}
 							}
