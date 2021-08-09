@@ -1,7 +1,7 @@
 #include "SusiOverI2c.h"
 #include <Rcn600.h>
 
-Rcn600 SUSI(MANUAL_MESSAGES, 0);
+Rcn600 SUSI(ONLY_DECODER, 0);
 
 void setup() {  
     Serial.begin(115200);
