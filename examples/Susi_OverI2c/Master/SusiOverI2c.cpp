@@ -72,7 +72,7 @@ void sendSusiMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulati
 
         mess.Byte[0] = firstByte;
         mess.Byte[1] = secondByte;
-        mess.cvArgument = CvManipulating;
+        mess.Byte[2] = CvManipulating;
 
         for (uint8_t i = 0; i < nDevices; ++i) {
             Wire.beginTransmission(i2cDeviceAddresses[i]);
