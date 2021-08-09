@@ -204,15 +204,6 @@ int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t C
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint8_t Rcn600::readData(void) {
-	// leggo il valore della linea DATA
-#ifdef DIGITAL_PIN_FAST
-	return _DATA_pin->digitalReadFast();
-#else
-	return digitalRead(_DATA_pin);
-#endif
-}
-
 void Rcn600::ISR_SUSI(void) {
 	static uint32_t _lastByte_time = 0;			// tempo a cui e' stato letto l'ultimo Byte
 	static uint32_t _lastbit_time = 0;			// tempo a cui e' stato letto l'ultimo bit
