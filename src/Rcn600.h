@@ -32,7 +32,7 @@
 #define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
 
 #define SUSI_BUFFER_LENGTH			5		//lunghezza buffer dove sono contenuti i messaggi
-#define FREE_MESSAGE_SLOT			(Rcn600Message*) this
+#define FREE_MESSAGE_SLOT			(Rcn600Message*) this	//valore simbolico per contrassegnare gli slot del buffer come liberi
 
 typedef struct message {
 	uint8_t Byte[3];
