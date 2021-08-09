@@ -6,8 +6,8 @@
 #include <Rcn600.h>
 
 /* Indirizzi Preimpostati Dispositivi su Bus I2C */
-#define	MAIN_DECODER_ADDRESS			0x01
-#define SLAVE_DECODER_ADDRESS     0x02
+#define	MAIN_DECODER_ADDRESS		0x01
+#define SLAVE_DECODER_ADDRESS		0x02
 
 /* Funzioni da Assegnare agli eventi I2C*/
 void receiveEvent_SusiOverI2C(int bytes);
