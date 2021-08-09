@@ -17,16 +17,6 @@ void initSusiOverI2C(uint8_t I2cAddr) {
     Susi = NULL;
 }
 
-void initSusiOverI2C(uint8_t I2cAddr, Rcn600 *SUSI) {
-    Wire.onReceive(receiveEvent_SusiOverI2C);
-    Wire.onRequest(requestEvent_SusiOverI2C);
-
-    Wire.begin(I2cAddr);
-    Wire.setClock(400000);
-
-    Susi = SUSI;
-}
-
 void endSusiOverI2C(void) {
     Wire.onReceive(NULL);
     Wire.onRequest(NULL);
@@ -113,7 +103,7 @@ void receiveEvent_SusiOverI2C(int bytes) {
         Rcn600Message *m = (Rcn600Message*)&Buffer;
     
         if(Susi != NULL) {
-            Susi->addManualMessage(m->Byte[0], m->Byte[1],  m->cvArgument);
+            Susi->addManualMessage(m->Byte[0], m->Byte[1],  m->Byte[2]);
         }
     }
     else {
