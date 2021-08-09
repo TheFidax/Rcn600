@@ -330,7 +330,7 @@ Per questa ragione e' possibile *esportare* messaggi grezzi non decodificati da 
 
 Durante questo utilizzo la dichiarazione dell'oggetto **deve essere fatta** nel seguente modo:
 ```c
-Rcn600(MANUAL_MESSAGES, 0);
+Rcn600(ONLY_DECODER, 0);
 ```
 
 ------------
