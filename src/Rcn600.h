@@ -56,7 +56,6 @@ class Rcn600 {
 
 	private:				/* Metodi Privati */
 		void initClass(void);							// Inizializza a Input i pin a cui e' connesso il bus
-		uint8_t readData(void);							// Legge il bit dalla linea Data
 		Rcn600Message* searchFreeMessage(void);			// Cerca nel Buffer uno slot dove salvare il messaggio in ricezione
 		void setNextMessage(Rcn600Message* nextMessage);// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
 		void Data_ACK(void);							// funzione per esguire l'ACK della linea DATA quando necessario
