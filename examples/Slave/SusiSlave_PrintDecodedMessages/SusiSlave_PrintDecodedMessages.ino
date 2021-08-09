@@ -426,8 +426,13 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
     return EEPROM.read(CV);
 }
 
-
-
+// Decommentare la #define sotto per mostrare Quando viene richiesto un reset delle CVs
+#define NOTIFY_SUSI_CV_RESET
+#ifdef  NOTIFY_SUSI_CV_RESET
+void notifyCVResetFactoryDefault(void) {
+    Serial.println("notifyCVResetFactoryDefault");
+}
+#endif
 
 void setup() {   
   Serial.begin(115200); // Avvio la comunicazione Seriale
