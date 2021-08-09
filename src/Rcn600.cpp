@@ -297,7 +297,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 		digitalWrite(_DATA_pin, LOW);
 #endif
 
-		delayMicroseconds(1500);
+		delay(1);
 
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin->pinModeFast(INPUT);
