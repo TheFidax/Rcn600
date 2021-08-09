@@ -9,10 +9,6 @@
 #define	MAIN_DECODER_ADDRESS			0x01
 #define SLAVE_DECODER_ADDRESS     0x02
 
-/* Funzioni da Assegnare agli eventi I2C*/
-void receiveEvent_SusiOverI2C(int bytes);
-void requestEvent_SusiOverI2C(void);
-
 extern uint8_t nDevices;						// indica quanti dispositivi sono collegati al Bus I2c
 
 // Funzioni per il Master del BUS 
