@@ -62,6 +62,8 @@ class Rcn600 {
 		void Data_ACK(void);							// funzione per esguire l'ACK della linea DATA quando necessario
 		bool isCVvalid(uint16_t CV);					// ritorna True se il numero della CV passato e' valido per questo modulo Slave
 
+		void ISR_SUSI(void);							// Metodo che gestisce 'acquisizione dati tramite Interrupt
+
 	public:					/* Metodi Pubblici */
 		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);	// Creazione dell'oggetto Rcn600
 		~Rcn600(void);									// Distruzionde dell'oggetto Rcn600
@@ -71,7 +73,6 @@ class Rcn600 {
 		int8_t addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);	// Permette di aggiungere Manualmente un messaggio alla coda da processare
 
 		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
-		void ISR_SUSI(void);							// Metodo che gestisce 'acquisizione dati tramite Interrupt
 };
 
 // Funzioni Esterne, implementabili a discrizione dell'utente
