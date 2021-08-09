@@ -25,15 +25,6 @@ extern uint8_t nDevices;						// indica quanti dispositivi sono collegati al Bus
   */
 void initSusiOverI2C(uint8_t I2cAddr);
 	/*
-	*	initSusiOverI2C() inizializza il Bus I2C per spedire i messaggi - Usato dagli Slave
-	*	Input:
-	*		- L'indirizzo del Modulo sul Bus i2c
-	*		- L'Oggetto Rcn600 passato per riferimento
-	*	Restituisce:
-	*		- Nulla
-	*/
-void initSusiOverI2C(uint8_t I2cAddr, Rcn600* SUSI);
-	/*
 	*	endSusiOverI2C() disabilita il bus I2C
 	*	Input:
 	*		- Nulla
