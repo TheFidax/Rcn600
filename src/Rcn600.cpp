@@ -294,7 +294,6 @@ void Rcn600::ISR_SUSI(void) {
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 
 	if (_CLK_pin != ONLY_DECODER) {
-
 		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin->pinModeFast(OUTPUT);
@@ -304,7 +303,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 		digitalWrite(_DATA_pin, LOW);
 #endif
 
-		delay(1);
+		delayMicroseconds(1500);
 
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin->pinModeFast(INPUT);
@@ -347,6 +346,9 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 		return false;
 	}
 	return false;
+}
+
+void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -992,7 +994,6 @@ void Rcn600::process(void) {
 						Data_ACK();
 					}
 				}
-				processNextMessage = 1;
 				break;
 			}
 			case 123: {
@@ -1066,7 +1067,6 @@ void Rcn600::process(void) {
 					}
 					}
 				}
-				processNextMessage = 1;
 				break;
 			}
 			case 127: {
@@ -1115,7 +1115,6 @@ void Rcn600::process(void) {
 						}
 					}
 				}
-				processNextMessage = 1;
 				break;
 			}
 			default: {}
