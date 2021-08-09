@@ -32,6 +32,7 @@
 #define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
 
 #define SUSI_BUFFER_LENGTH			5
+#define FREE_MESSAGE_SLOT this
 
 typedef struct message {
 	uint8_t Byte[2];
