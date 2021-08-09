@@ -36,7 +36,6 @@
 
 typedef struct message {
 	uint8_t Byte[3];
-	//uint8_t cvArgument;
 
 	struct message* nextMessage;
 } Rcn600Message;
