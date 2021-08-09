@@ -1,6 +1,7 @@
 #include "SusiOverI2c.h"
 
 /* Variabili Globali 'private' */
+Rcn600* Susi;
 uint8_t *i2cDeviceAddresses = NULL;
 uint8_t nDevices = 0;
 
