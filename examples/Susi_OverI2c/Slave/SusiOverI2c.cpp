@@ -45,7 +45,7 @@ void receiveEvent_SusiOverI2C(int bytes) {
         Rcn600Message *m = (Rcn600Message*)&Buffer;
     
         if(Susi != NULL) {
-            Susi->addManualMessage(m->Byte[0], m->Byte[1],  m->cvArgument);
+            Susi->addManualMessage(m->Byte[0], m->Byte[1],  m->Byte[2]);
         }
     }
     else {
