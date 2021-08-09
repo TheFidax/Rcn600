@@ -1,16 +1,12 @@
 #include "SusiOverI2c.h"
 
 /* Variabili Globali 'private' */
-Rcn600* Susi;
 uint8_t *i2cDeviceAddresses = NULL;
 uint8_t nDevices = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void initSusiOverI2C(uint8_t I2cAddr) {
-    Wire.onReceive(receiveEvent_SusiOverI2C);
-    Wire.onRequest(requestEvent_SusiOverI2C);
-
     Wire.begin(I2cAddr);
     Wire.setClock(400000);
 
