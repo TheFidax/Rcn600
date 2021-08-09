@@ -233,14 +233,24 @@ void Rcn600::ISR_SUSI(void) {
 		if (millis() - _lastByte_time > SYNC_TIME) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
 			_bitCounter = 0;							// dopo il SYNC leggero' il primo bit
 			_lastByte_time = millis();					// imposto questo istante come ultimo Byte letto
-						
-			_messageSlot->Byte[0] = readData();			// Sto leggendo il primo bit del messaggio ( readData() restituisce 0 o 1 )
+					
+			// Sto leggendo il primo bit del messaggio 
+#ifdef DIGITAL_PIN_FAST
+			_messageSlot->Byte[0] = _DATA_pin->digitalReadFast();
+#else
+			_messageSlot->Byte[0] = digitalRead(_DATA_pin);
+#endif		
 
 			_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
 			_lastbit_time = micros();					// memorizzo l'istante in cui e' stato letto il bit
 		}
 		else if (((micros() - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
-			bitWrite(_messageSlot->Byte[_bitCounter/8], (_bitCounter % 8), readData());			// salvo il nuovo bit letto come Byte normale
+			// salvo il nuovo bit letto
+#ifdef DIGITAL_PIN_FAST
+			bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), _DATA_pin->digitalReadFast());
+#else
+			bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), digitalRead(_DATA_pin));
+#endif
 
 			++_bitCounter;												
 			_lastbit_time = micros();									
