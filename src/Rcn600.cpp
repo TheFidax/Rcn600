@@ -265,15 +265,9 @@ void Rcn600::ISR_SUSI(void) {
 						break;
 					}
 					case 24: {	// Letto un messaggio per la manipolazione CVs -> Messaggio Completo!
-						Rcn600Message* original = _BufferPointer;	// Salvo la posizione indicata attualmente
-
-						_BufferPointer = _messageSlot;				// Imposto il puntatore al messaggio appena acquisito
-
-						process();									// Processo il messaggio acquisito
-
-						_messageSlot->nextMessage = FREE_MESSAGE_SLOT;			// Libero lo Slot per scriverci dentro un nuovo messaggio
-
-						_BufferPointer = original;					// Ripristino la coda di messaggi acquisiti
+						processCVsMessage(_messageSlot);
+						
+						_messageSlot->nextMessage = FREE_MESSAGE_SLOT;
 
 						_bitCounter = 0;
 						break; 
@@ -349,6 +343,186 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 }
 
 void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
+	switch (CvMessage->Byte[0]) {
+		/* MESSAGGI MANIPOLAZIONE CVs */
+
+		case 119: {
+			/*	"CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
+			*
+			*	DCC-Befehl Byte Prüfen im Service- und Betriebsmodus
+			*	V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
+			*	D = Vergleichswert zum Prüfen. Wenn D dem gespeicherten CV-Wert
+			*	entspricht, antwortet der Slave mit einem Acknowledge.
+			*	Dieser und die beiden folgenden Befehle sind die in Abschnitt 4 genannten
+			*	3 Byte Pakete entsprechend [RCN-214]
+			*
+			*	Controllo Byte di comando DCC in modalita' di servizio e di funzionamento
+			*	V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
+			*	D = valore di confronto per il controllo. Se D corrisponde al valore CV memorizzato
+			*	lo Slave risponde con un riconoscimento.
+			*	Questo e i due comandi seguenti sono quelli menzionati nella sezione 4
+			*	Pacchetti da 3 byte secondo [RCN-214]
+			*/
+
+
+			uint16_t CV_Number;
+			uint8_t CV_Value;
+
+			CV_Number = 897 + (CvMessage->Byte[1] - 128);
+
+			if (isCVvalid(CV_Number)) {
+
+				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
+				if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
+					if (CV_Number == 897) {
+						CV_Value = _slaveAddress;
+					}
+					else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
+						CV_Value = MANUFACTER_ID;
+					}
+					else { //identificano la versione software
+						CV_Value = SUSI_VER;
+					}
+				}
+				else {
+					if (notifySusiCVRead) { //altre CV disponibili per il modulo
+						CV_Value = notifySusiCVRead(CV_Number);
+					}
+					else {
+						CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
+					}
+				}
+
+				/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
+				if (CV_Value == CvMessage->Byte[2]) {
+					Data_ACK();
+				}
+			}
+			break;
+		}
+		case 123: {
+			/* "CV-Manipulation Bit manipulieren" : 0111-1011 (0x7B = 123) | 1 V6 V5 V4 - V3 V2 V1 V0 | 1 1 1 K - D B2 B1 B0
+			*
+			* DCC-Befehl Bit Manipulieren im Service- und Betriebsmodus
+			* V = CV-Nummer 897 ... 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
+			* K = 0: Bit Prüfen. Wenn D mit dem Bitzustand an der Bitstelle B der CV übereinstimmt,
+			* wird mit einem Acknowledge geantwortet.
+			* K = 1: Bit Schreiben. D wird in Bitstelle B der CV geschrieben.
+			* Der Slave bestätigt das Schreiben mit einem Acknowledge.
+			*
+			* Manipolazione dei bit di comando DCC in modalita' di servizio e operativa
+			* V = numero CV 897 ... 1024 (valore 0 = CV 897, valore 127 = CV 1024)
+			* K = 0: bit di controllo. Se D corrisponde allo stato del bit nella posizione del bit B del CV,
+			* viene dato un riconoscimento.
+			* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
+			* Lo slave conferma la scrittura con un riconoscimento.
+			*/
+
+			uint16_t CV_Number;
+
+			CV_Number = 897 + (CvMessage->Byte[1] - 128);
+
+			if (isCVvalid(CV_Number)) {
+				static uint8_t CV_Value, operation, bitValue, bitPosition;
+
+				operation = bitRead(CvMessage->Byte[2], 4);																									// leggo quale operazione sui bit e' richiesta
+				bitValue = bitRead(CvMessage->Byte[2], 3);																									// leggo il valore del bit da confrontare/scrivere
+				bitPosition = ((bitRead(CvMessage->Byte[2], 0) * 1) + (bitRead(CvMessage->Byte[2], 1) * 2) + (bitRead(CvMessage->Byte[2], 2) * 4));			// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
+
+				if (CV_Number == 897) {
+					CV_Value = _slaveAddress;
+				}
+				else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {		//identificano il produttore dello Slave
+					CV_Value = MANUFACTER_ID;
+				}
+				else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
+					CV_Value = SUSI_VER;
+				}
+				else {
+					if (notifySusiCVRead) {
+						CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
+					}
+					else {
+						CV_Value = 255;															//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
+					}
+				}
+
+				//in base all'operazione richiesta eseguiro' un'azione
+				switch (operation) {
+				case 0: {	//confronto dei bit
+					if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
+						Data_ACK();
+					}
+					break;
+				}
+				case 1: {	//scrittura del bit
+					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
+						if (notifySusiCVWrite) {
+							bitWrite(CV_Value, bitPosition, bitRead(CvMessage->Byte[2], 3));						//scrivo il nuovo valore del bit
+							if (notifySusiCVWrite((897 + (CvMessage->Byte[1] - 128)), CV_Value) == CV_Value) {		//memorizzo il nuovo valore della CV
+								Data_ACK();
+							}
+						}
+						/* nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+						else { }
+						*/
+					}
+					break;
+				}
+				}
+			}
+			break;
+		}
+		case 127: {
+			/* "CV-Manipulation Byte schreiben" : 0111-1111 (0x7F = 127) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
+			*
+			* DCC-Befehl Byte Schreiben im Service- und Betriebsmodus
+			* V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
+			* D = Wert zum Schreiben in die CV. Der Slave bestätigt das Schreiben mit
+			* einem Acknowledge.
+			*
+			* Scrittura byte di comando DCC in modalita' di servizio e operativa
+			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
+			* D = valore per la scrittura nel CV. Lo Slave conferma la scrittura con un riconoscimento.
+			*/
+
+			uint16_t CV_Number;
+
+			CV_Number = 897 + (CvMessage->Byte[1] - 128);
+
+			if (isCVvalid(CV_Number)) {
+				/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
+
+				if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
+					if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (CvMessage->Byte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
+						if (notifyCVResetFactoryDefault) {
+							notifyCVResetFactoryDefault();
+
+							Data_ACK();
+						}
+					}
+					else {	//scrittura CVs
+						if (notifySusiCVWrite) {
+							if (notifySusiCVWrite(CV_Number, CvMessage->Byte[2]) == CvMessage->Byte[2]) {
+								Data_ACK();
+							}
+						}
+						/*
+						else { nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla }
+						*/
+					}
+				}
+
+				if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
+					if (notifySusiCVRead) {
+						_slaveAddress = notifySusiCVRead(CV_Number);
+					}
+				}
+			}
+			break;
+		}
+		default: {}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -935,185 +1109,6 @@ void Rcn600::process(void) {
 
 				if (notifySusiControllModule) {
 					notifySusiControllModule(_BufferPointer->Byte[1]);
-				}
-				break;
-			}
-
-
-					/* METODI MANIPOLAZIONE CVs */
-
-			case 119: {
-				/*	"CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
-				*
-				*	DCC-Befehl Byte Prüfen im Service- und Betriebsmodus
-				*	V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
-				*	D = Vergleichswert zum Prüfen. Wenn D dem gespeicherten CV-Wert
-				*	entspricht, antwortet der Slave mit einem Acknowledge.
-				*	Dieser und die beiden folgenden Befehle sind die in Abschnitt 4 genannten
-				*	3 Byte Pakete entsprechend [RCN-214]
-				*
-				*	Controllo Byte di comando DCC in modalita' di servizio e di funzionamento
-				*	V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
-				*	D = valore di confronto per il controllo. Se D corrisponde al valore CV memorizzato
-				*	lo Slave risponde con un riconoscimento.
-				*	Questo e i due comandi seguenti sono quelli menzionati nella sezione 4
-				*	Pacchetti da 3 byte secondo [RCN-214]
-				*/
-
-
-				uint16_t CV_Number;
-				uint8_t CV_Value;
-
-				CV_Number = 897 + (_BufferPointer->Byte[1] - 128);
-
-				if (isCVvalid(CV_Number)) {
-
-					/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
-					if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
-						if (CV_Number == 897) {
-							CV_Value = _slaveAddress;
-						}
-						else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
-							CV_Value = MANUFACTER_ID;
-						}
-						else { //identificano la versione software
-							CV_Value = SUSI_VER;
-						}
-					}
-					else {
-						if (notifySusiCVRead) { //altre CV disponibili per il modulo
-							CV_Value = notifySusiCVRead(CV_Number);
-						}
-						else {
-							CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
-						}
-					}
-
-					/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
-					if (CV_Value == _BufferPointer->Byte[2]) {
-						Data_ACK();
-					}
-				}
-				break;
-			}
-			case 123: {
-				/* "CV-Manipulation Bit manipulieren" : 0111-1011 (0x7B = 123) | 1 V6 V5 V4 - V3 V2 V1 V0 | 1 1 1 K - D B2 B1 B0
-				*
-				* DCC-Befehl Bit Manipulieren im Service- und Betriebsmodus
-				* V = CV-Nummer 897 ... 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
-				* K = 0: Bit Prüfen. Wenn D mit dem Bitzustand an der Bitstelle B der CV übereinstimmt,
-				* wird mit einem Acknowledge geantwortet.
-				* K = 1: Bit Schreiben. D wird in Bitstelle B der CV geschrieben.
-				* Der Slave bestätigt das Schreiben mit einem Acknowledge.
-				*
-				* Manipolazione dei bit di comando DCC in modalita' di servizio e operativa
-				* V = numero CV 897 ... 1024 (valore 0 = CV 897, valore 127 = CV 1024)
-				* K = 0: bit di controllo. Se D corrisponde allo stato del bit nella posizione del bit B del CV,
-				* viene dato un riconoscimento.
-				* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
-				* Lo slave conferma la scrittura con un riconoscimento.
-				*/
-
-				uint16_t CV_Number;
-
-				CV_Number = 897 + (_BufferPointer->Byte[1] - 128);
-
-				if (isCVvalid(CV_Number)) {
-					static uint8_t CV_Value, operation, bitValue, bitPosition;
-
-					operation = bitRead(_BufferPointer->Byte[2], 4);																									// leggo quale operazione sui bit e' richiesta
-					bitValue = bitRead(_BufferPointer->Byte[2], 3);																										// leggo il valore del bit da confrontare/scrivere
-					bitPosition = ((bitRead(_BufferPointer->Byte[2], 0) * 1) + (bitRead(_BufferPointer->Byte[2], 1) * 2) + (bitRead(_BufferPointer->Byte[2], 2) * 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
-
-					if (CV_Number == 897) {
-						CV_Value = _slaveAddress;
-					}
-					else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {		//identificano il produttore dello Slave
-						CV_Value = MANUFACTER_ID;
-					}
-					else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
-						CV_Value = SUSI_VER;
-					}
-					else {
-						if (notifySusiCVRead) {
-							CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
-						}
-						else {
-							CV_Value = 255;															//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
-						}
-					}
-
-					//in base all'operazione richiesta eseguiro' un'azione
-					switch (operation) {
-					case 0: {	//confronto dei bit
-						if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
-							Data_ACK();
-						}
-						break;
-					}
-					case 1: {	//scrittura del bit
-						if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
-							if (notifySusiCVWrite) {
-								bitWrite(CV_Value, bitPosition, bitRead(_BufferPointer->Byte[2], 3));	//scrivo il nuovo valore del bit
-								if (notifySusiCVWrite((897 + (_BufferPointer->Byte[1] - 128)), CV_Value) == CV_Value) {	//memorizzo il nuovo valore della CV
-									Data_ACK();
-								}
-							}
-							/* nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
-							else { }
-							*/
-						}
-						break;
-					}
-					}
-				}
-				break;
-			}
-			case 127: {
-				/* "CV-Manipulation Byte schreiben" : 0111-1111 (0x7F = 127) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
-				*
-				* DCC-Befehl Byte Schreiben im Service- und Betriebsmodus
-				* V = CV-Nummer 897 .. 1024 (Wert 0 = CV 897, Wert 127 = CV 1024)
-				* D = Wert zum Schreiben in die CV. Der Slave bestätigt das Schreiben mit
-				* einem Acknowledge.
-				*
-				* Scrittura byte di comando DCC in modalita' di servizio e operativa
-				* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
-				* D = valore per la scrittura nel CV. Lo Slave conferma la scrittura con un riconoscimento.
-				*/
-
-				uint16_t CV_Number;
-
-				CV_Number = 897 + (_BufferPointer->Byte[1] - 128);
-
-				if (isCVvalid(CV_Number)) {
-					/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
-
-					if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
-						if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (_BufferPointer->Byte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
-							if (notifyCVResetFactoryDefault) {
-								notifyCVResetFactoryDefault();
-
-								Data_ACK();
-							}
-						}
-						else {	//scrittura CVs
-							if (notifySusiCVWrite) {
-								if (notifySusiCVWrite(CV_Number, _BufferPointer->Byte[2]) == _BufferPointer->Byte[2]) {
-									Data_ACK();
-								}
-							}
-							/*
-							else { nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla }
-							*/
-						}
-					}
-
-					if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
-						if (notifySusiCVRead) {
-							_slaveAddress = notifySusiCVRead(CV_Number);
-						}
-					}
 				}
 				break;
 			}
