@@ -171,11 +171,19 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) {
 	/* Permette di aggiungere manualmente un Messaggio Rcn600 in cosa di Process */
 
-	Rcn600Message* _messageSlot = NULL;	// indica in quale slot salvare il messaggio
+	/* Controllo se e' un messaggio per la manipolazione delle CVs */
+	if (firstByte == 119 || firstByte == 123 || firstByte == 127) {
+		Rcn600Message message;
+		message.Byte[0] = firstByte;
+		message.Byte[1] = secondByte;
+		message.Byte[2] = CvManipulating;
 
-	_messageSlot = searchFreeMessage();
+		processCVsMessage(&message);
+	}
+	else {
+		Rcn600Message* _messageSlot = searchFreeMessage();
 
-	if (_messageSlot != NULL) {
+		if (_messageSlot != NULL) {
 			_messageSlot->nextMessage = NULL;
 			_messageSlot->Byte[0] = firstByte;
 			_messageSlot->Byte[1] = secondByte;
@@ -195,9 +203,10 @@ int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t C
 			}
 
 			return 0;
-	}
-	else {
-		return -1;
+		}
+		else {
+			return -1;
+		}
 	}
 }
 
@@ -1110,20 +1119,6 @@ void Rcn600::process(void) {
 					if (notifySusiControllModule) {
 						notifySusiControllModule(_BufferPointer->Byte[1]);
 					}
-					break;
-				}
-
-					/* Messaggi Manipolazione CVs (implementati anche qui in caso di uso della libreria SOLO come Decoder -> GUARDARE METODO: processCVsMessage */
-				case 119: {
-					processCVsMessage(_BufferPointer);
-					break;
-				}
-				case 123: {
-					processCVsMessage(_BufferPointer);
-					break;
-				}
-				case 127: {
-					processCVsMessage(_BufferPointer);
 					break;
 				}
 				default: {}
