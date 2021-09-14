@@ -30,13 +30,21 @@ void sendDebugMessage(uint32_t n) {
 Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
 	_CLK_pin = CLK_pin_i;
 
-	if (_CLK_pin != ONLY_DECODER) {
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin = new digitalPinFast(DATA_pin_i);
 #else
 		_DATA_pin = DATA_pin_i;
 #endif // DIGITAL_PIN_FAST	
-	}
+
+#ifdef DEBUG_RCN600
+	Wire.end();
+	Wire.begin(1);
+	Wire.setClock(400000);
+#endif // DEBUG_RCN600
+}
+
+Rcn600::Rcn600(void) {
+	_CLK_pin = ONLY_DECODER;
 
 #ifdef DEBUG_RCN600
 	Wire.end();
@@ -69,9 +77,9 @@ void Rcn600::initClass(void) {
 	sendDebugMessage((char*)"Rcn600 initClass (Start)\n");
 #endif // DEBUG_RCN600
 
-	if (_CLK_pin != ONLY_DECODER) {
-		pointerToRcn600 = this;
+	pointerToRcn600 = this;
 
+	if (_CLK_pin != ONLY_DECODER) {
 		/* Inizializzo i pin come Input */
 		pinMode(_CLK_pin, INPUT);
 
@@ -201,13 +209,13 @@ int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t C
 				_messageSlot->nextMessage = FREE_MESSAGE_SLOT;			// Libero lo Slot per scriverci dentro un nuovo messaggio
 				_BufferPointer = original;					// Ripristino la coda di messaggi acquisiti
 			}
-
-			return 0;
 		}
 		else {
 			return -1;
 		}
 	}
+
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

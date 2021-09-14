@@ -21,7 +21,8 @@
 
 # Rcn600 SUSI
 Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.<br/>
-Libreria testata su Arduino UNO.
+Libreria testata su Arduino UNO, Arduino NANO (ATmega328P) e ATmega128 (MegaCore).</br>
+La libreria permette *anche* di Decodificare i messaggi SUSI **acquisiti da dispositivo terzo**, in questo caso NON E' NECESSARIO collegare il microcontrollore al Bus SUSI.</br>
 
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI, *se non specificato*, SONO A 5 VOLT !** 
 
@@ -48,6 +49,14 @@ Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
 ```
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.<br/>
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).
+
+**OPPURE**
+
+```c
+Rcn600();
+```
+Dichiarazione delle libreria per la **sola decodifica** dei messaggi SUSI.</br>
+Guardare la cartella Esempi per maggiori informazioni.</br>
 
 ------------
 
