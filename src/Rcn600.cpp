@@ -54,15 +54,17 @@ Rcn600::Rcn600(void) {
 }
 
 Rcn600::~Rcn600(void) {
-	detachInterrupt(digitalPinToInterrupt(_CLK_pin));
+	if (_CLK_pin != ONLY_DECODER) {
+		detachInterrupt(digitalPinToInterrupt(_CLK_pin));
 
-	pinMode(_CLK_pin, INPUT);
+		pinMode(_CLK_pin, INPUT);
 
 #ifdef DIGITAL_PIN_FAST
-	delete _DATA_pin;
+		delete _DATA_pin;
 #else
-	pinMode(_DATA_pin, INPUT);
+		pinMode(_DATA_pin, INPUT);
 #endif
+	}
 
 #ifdef DEBUG_RCN600
 	Wire.end();
