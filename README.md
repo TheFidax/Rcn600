@@ -22,7 +22,7 @@
 # Rcn600 SUSI
 Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.<br/>
 Libreria testata su Arduino UNO, Arduino NANO (ATmega328P) e ATmega128 (MegaCore).</br></br>
-La libreria permette **anche** di Decodificare i messaggi SUSI **acquisiti da dispositivo terzo**, in questo caso *NON E' NECESSARIO* collegare il microcontrollore al Bus SUSI.</br>
+La libreria permette **anche** di Decodificare i messaggi SUSI **acquisiti da dispositivo terzo**, in questo caso *NON E' NECESSARIO* collegare il microcontrollore al Bus SUSI, maggiori dettagli sotto [Gestione Manuale Messaggi](#Gestione-Manuale-Messaggi)</br>
 
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI, *se non specificato*, SONO A 5 VOLT !** 
 
@@ -53,10 +53,10 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 **OPPURE**
 
 ```c
-Rcn600();
+Rcn600;
 ```
 Dichiarazione delle libreria per la **sola decodifica** dei messaggi SUSI *acquisiti da dispositivo terzo.*</br>
-Guardare la cartella Esempi per maggiori informazioni.</br>
+Maggiori dettagli sotto [Gestione Manuale Messaggi](#Gestione-Manuale-Messaggi)</br>
 
 ------------
 
@@ -338,8 +338,9 @@ E' possibile utilizzare questa libreria per *decodificare* pacchetti dati Rcn600
 Per questa ragione e' possibile *esportare* messaggi grezzi non decodificati da inviare a un altro dispositivo (mediante sistema scelto dall'utente) il quale a sua volta si occupera' di decodificare il messaggio *inserito manualmente* nella coda di decodifica.</br>
 
 Durante questo utilizzo la dichiarazione dell'oggetto **deve essere fatta** nel seguente modo:
+
 ```c
-Rcn600(ONLY_DECODER, 0);
+Rcn600;
 ```
 
 ------------
