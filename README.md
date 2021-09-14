@@ -55,7 +55,7 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 ```c
 Rcn600();
 ```
-Dichiarazione delle libreria per la **sola decodifica** dei messaggi SUSI.</br>
+Dichiarazione delle libreria per la **sola decodifica** dei messaggi SUSI *acquisiti da dispositivo terzo.*</br>
 Guardare la cartella Esempi per maggiori informazioni.</br>
 
 ------------
