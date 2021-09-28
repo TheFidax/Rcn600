@@ -27,13 +27,13 @@ void sendDebugMessage(uint32_t n) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Rcn600::Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i) {
-	_CLK_pin = CLK_pin_i;
+Rcn600::Rcn600(uint8_t CLK_pin, uint8_t DATA_pin) {
+	_CLK_pin = CLK_pin;
 
 #ifdef DIGITAL_PIN_FAST
-		_DATA_pin = new digitalPinFast(DATA_pin_i);
+		_DATA_pin = new digitalPinFast(DATA_pin);
 #else
-		_DATA_pin = DATA_pin_i;
+		_DATA_pin = DATA_pin;
 #endif // DIGITAL_PIN_FAST	
 
 #ifdef DEBUG_RCN600
