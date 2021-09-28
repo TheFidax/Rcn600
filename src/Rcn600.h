@@ -63,7 +63,7 @@ class Rcn600 {
 		void processCVsMessage(Rcn600Message* CvMessage);	// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
 
 	public:					/* Metodi Pubblici */
-		Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);		// Creazione dell'oggetto Rcn600 con pin di Interrupt e pin Data
+		Rcn600(uint8_t CLK_pin, uint8_t DATA_pin);			// Creazione dell'oggetto Rcn600 con pin di Interrupt e pin Data
 		Rcn600(void);										// Creazione Oggetto SENZA PIN (decodifica solo i messaggi senza che li acquisisca) -> addManualMessage()
 		~Rcn600(void);										// Distruzionde dell'oggetto Rcn600
 		void init(void);									// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
