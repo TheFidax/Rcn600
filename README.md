@@ -1,12 +1,8 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheFidax/Rcn600)
 ![GitHub Release Date](https://img.shields.io/github/release-date/TheFidax/Rcn600?color=blue&label=last%20release)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/TheFidax/Rcn600/latest?color=orange)
-![Hits](https://hitcounter.pythonanywhere.com/count/tag.svg?url=https%3A%2F%2Fgithub.com%2FTheFidax%2FRcn600)
-[![GitHub issues](https://img.shields.io/github/issues/TheFidax/Rcn600)](https://github.com/TheFidax/Rcn600/issues)
-[![Fork](https://img.shields.io/github/forks/TheFidax/Rcn600)](#)
-[![Stars](https://img.shields.io/github/stars/TheFidax/Rcn600)](#)
+[![arduino-library-badge](https://www.ardu-badge.com/badge/Rcn600?)](https://www.ardu-badge.com/Rcn600)
 [![License](https://img.shields.io/github/license/TheFidax/Rcn600)](#)
-[![Total Downloads](https://img.shields.io/github/downloads/TheFidax/Rcn600/total)](#)
 
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
