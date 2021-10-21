@@ -172,6 +172,7 @@ void Rcn600::ISR_SUSI(void) {
 	static uint32_t _lastbit_time = ( micros() - MIN_LEVEL_CLOCK_TIME );	// tempo a cui e' stato letto l'ultimo bit
 	static uint8_t	_bitCounter = 0;										// indica quale bit si deve leggere
 	static Rcn600Message* _messageSlot = NULL;								// indica in quale slot sta venendo salvato il messaggio in ricezione
+	uint32_t actualMicros = micros();										// indica i microsecondi dell'attuale ISR
 
 	if (_bitCounter == 0) {
 		_messageSlot = searchFreeMessage();
@@ -192,31 +193,33 @@ void Rcn600::ISR_SUSI(void) {
 		_messageSlot->Byte[0] = READ_DATA_PIN;
 
 		_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
-		_lastbit_time = micros();					// memorizzo l'istante in cui e' stato letto il bit
+		_lastbit_time = actualMicros;				// memorizzo l'istante in cui e' stato letto il bit
 	}
-	else if (((micros() - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+	else if (((actualMicros - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((actualMicros - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 		// salvo il nuovo bit letto
 		bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), READ_DATA_PIN);
 
 		++_bitCounter;
-		_lastbit_time = micros();
+		_lastbit_time = actualMicros;
 
 		/* Controllo se ho letto un Byte (8 bit): il resto di _bitCounter / 8 deve essere 0 */
 		if ((_bitCounter % 8) == 0) {
-			/* Se ho letto un Byte, memorizzo il momento in cui la lettura è avvenuta e resetto il contatore dei bit */
-			_lastByte_time = millis();
 
 			// Se sono qui _bitCounter e' uguale a 8 , 16 o 24
 			switch (_bitCounter) {
+				case 8: {
+					_lastByte_time = millis(); // Memorizzo l'istante in cui ho letto il primo Byte
+					break;
+				}
 				case 16: {	// Letti 2 Byte, devo controllare se sono sufficienti o se ne servono 3 (Manipolazione CVs)
 					if ((_messageSlot->Byte[0] != 119) && (_messageSlot->Byte[0] != 123) && (_messageSlot->Byte[0] != 127)) {
 						setNextMessage(_messageSlot);
 
 						_bitCounter = 0;
 					}
-					/*
-					else { Messaggio manipolazione CVs, devo acquisire il Terzo Byte }
-					*/
+					else { //Messaggio manipolazione CVs, devo acquisire il Terzo Byte 
+						_lastByte_time = millis();	// Memorizzo il momento in cui ho letto il secondo Byte del messaggio
+					}					
 					break;
 				}
 				case 24: {	// Letto un messaggio per la manipolazione CVs -> Messaggio Completo!
@@ -227,8 +230,7 @@ void Rcn600::ISR_SUSI(void) {
 					_bitCounter = 0;
 					break;
 				}
-				default:	// _bitCounter == 8
-					break;
+				default: {}
 			}
 		}
 	}
@@ -350,11 +352,8 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 				* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
 				* Lo slave conferma la scrittura con un riconoscimento.
 				*/
-
-				uint8_t operation, bitValue, bitPosition;
-				operation = (CvMessage->Byte[2] & 16);		// leggo quale operazione sui bit e' richiesta
-				bitValue = (CvMessage->Byte[2] & 8);		// leggo il valore del bit da confrontare/scrivere
-				bitPosition = ((CvMessage->Byte[2] & 1) + (CvMessage->Byte[2] & 2) + (CvMessage->Byte[2] & 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
+				uint8_t	bitValue	=	(CvMessage->Byte[2] & 0b00001000);	// leggo il valore del bit da confrontare/scrivere
+				uint8_t	bitPosition =	(CvMessage->Byte[2] & 0b00000111);	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
 				if (CV_Number == 897) {
 					CV_Value = _slaveAddress;
@@ -367,16 +366,17 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 				}
 
 				//in base all'operazione richiesta eseguiro' un'azione
-				if (operation == 0) {	// Confronto dei bit
+				if (CvMessage->Byte[2] & 0b00010000) {	// 0 = Confronto dei bit
 					if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
 						Data_ACK();
 					}
 				}
-				else {					// Scrittura di un bit
+				else {									// 1 = Scrittura di un bit
 					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
 						if (notifySusiCVWrite) {
 							bitWrite(CV_Value, bitPosition, bitRead(CvMessage->Byte[2], 3));						//scrivo il nuovo valore del bit
-							if (notifySusiCVWrite((897 + (CvMessage->Byte[1] - 128)), CV_Value) == CV_Value) {		//memorizzo il nuovo valore della CV
+
+							if (notifySusiCVWrite((897 + (CvMessage->Byte[1] & 0b01111111)), CV_Value) == CV_Value) {		//memorizzo il nuovo valore della CV
 								Data_ACK();
 							}
 						}
