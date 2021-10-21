@@ -45,7 +45,7 @@
 #define MAX_ADDRESS_VALUE			3
 
 #define	SYNC_TIME					9		//tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_LEVEL_CLOCK_TIME		20		//minima durata di un livello di Clock
+#define MIN_CLOCK_TIME				20		//minima durata di un Clock: 10 + 10 uS
 #define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
 
 #define SUSI_BUFFER_LENGTH			5		//lunghezza buffer dove sono contenuti i messaggi
