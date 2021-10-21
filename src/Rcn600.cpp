@@ -169,7 +169,7 @@ int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t C
 
 void Rcn600::ISR_SUSI(void) {
 	static uint32_t _lastByte_time = millis();								// tempo a cui e' stato letto l'ultimo Byte
-	static uint32_t _lastbit_time = ( micros() - MIN_LEVEL_CLOCK_TIME );	// tempo a cui e' stato letto l'ultimo bit
+	static uint32_t _lastbit_time = ( micros() - MIN_CLOCK_TIME);			// tempo a cui e' stato letto l'ultimo bit
 	static uint8_t	_bitCounter = 0;										// indica quale bit si deve leggere
 	static Rcn600Message* _messageSlot = NULL;								// indica in quale slot sta venendo salvato il messaggio in ricezione
 	uint32_t actualMicros = micros();										// indica i microsecondi dell'attuale ISR
@@ -195,7 +195,7 @@ void Rcn600::ISR_SUSI(void) {
 		_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
 		_lastbit_time = actualMicros;				// memorizzo l'istante in cui e' stato letto il bit
 	}
-	else if (((actualMicros - _lastbit_time) > MIN_LEVEL_CLOCK_TIME) && ((actualMicros - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+	else if (((actualMicros - _lastbit_time) > MIN_CLOCK_TIME) && ((actualMicros - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 		// salvo il nuovo bit letto
 		bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), READ_DATA_PIN);
 
