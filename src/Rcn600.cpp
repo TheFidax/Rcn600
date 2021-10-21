@@ -337,9 +337,19 @@ bool Rcn600::isCVvalid(uint16_t CV) {
 }
 
 void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
-	switch (CvMessage->Byte[0]) {
-		/* MESSAGGI MANIPOLAZIONE CVs */
+	uint16_t CV_Number = 897 + (CvMessage->Byte[1] & 0b0111111);
+	static uint8_t CV_Value;
 
+	if (!isCVvalid(CV_Number)) {	// Se la CV non e' per questo Slave ignoro
+		return;
+	}
+
+	if (notifySusiRawMessage) {
+		notifySusiRawMessage(CvMessage->Byte[0], CvMessage->Byte[1], CvMessage->Byte[2]);
+	}
+
+	/* MESSAGGI MANIPOLAZIONE CVs */
+	switch (CvMessage->Byte[0]) {
 		case 119: {
 			/*	"CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
 			*
@@ -357,49 +367,38 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 			*	Questo e i due comandi seguenti sono quelli menzionati nella sezione 4
 			*	Pacchetti da 3 byte secondo [RCN-214]
 			*/
-			uint16_t CV_Number;
-			uint8_t CV_Value;
 
-			CV_Number = 897 + (CvMessage->Byte[1] - 128);
+			/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
+			if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
+				if (CV_Number == 897) {
+					CV_Value = _slaveAddress;
+				}
+				else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
+					CV_Value = MANUFACTER_ID;
+				}
+				else { //identificano la versione software
+					CV_Value = SUSI_VER;
+				}
+			}
+			else {
+				if (notifySusiCVRead) { //altre CV disponibili per il modulo
+					static uint16_t cvNumber = 0;
 
-			if (isCVvalid(CV_Number)) {
-
-				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
-				if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
-					if (CV_Number == 897) {
-						CV_Value = _slaveAddress;
-					}
-					else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
-						CV_Value = MANUFACTER_ID;
-					}
-					else { //identificano la versione software
-						CV_Value = SUSI_VER;
+					if (CV_Number != cvNumber) {
+						cvNumber = CV_Number;
+						CV_Value = notifySusiCVRead(cvNumber);
 					}
 				}
 				else {
-					if (notifySusiCVRead) { //altre CV disponibili per il modulo
-						static uint16_t cvNumber = CV_Number;
-						static uint8_t cvValue = notifySusiCVRead(cvNumber);
-
-						if (CV_Number == cvNumber) {
-							CV_Value = cvValue;
-						}
-						else {
-							cvNumber = CV_Number;
-							cvValue = notifySusiCVRead(cvNumber);
-							CV_Value = cvValue;
-						}
-					}
-					else {
-						CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
-					}
-				}
-
-				/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
-				if (CV_Value == CvMessage->Byte[2]) {
-					Data_ACK();
+					CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
 				}
 			}
+
+			/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
+			if (CV_Value == CvMessage->Byte[2]) {
+				Data_ACK();
+			}
+
 			break;
 		}
 		case 123: {
@@ -419,67 +418,57 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 			* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
 			* Lo slave conferma la scrittura con un riconoscimento.
 			*/
-			uint16_t CV_Number;
 
-			CV_Number = 897 + (CvMessage->Byte[1] - 128);
+			uint8_t operation, bitValue, bitPosition;
+			operation = (CvMessage->Byte[2] & 16);		// leggo quale operazione sui bit e' richiesta
+			bitValue =	(CvMessage->Byte[2] & 8);		// leggo il valore del bit da confrontare/scrivere
+			bitPosition = ( (CvMessage->Byte[2] & 1) + (CvMessage->Byte[2] & 2) + (CvMessage->Byte[2] & 4));	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
-			if (isCVvalid(CV_Number)) {
-				static uint8_t CV_Value, operation, bitValue, bitPosition;
+			if (CV_Number == 897) {
+				CV_Value = _slaveAddress;
+			}
+			else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {		//identificano il produttore dello Slave
+				CV_Value = MANUFACTER_ID;
+			}
+			else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
+				CV_Value = SUSI_VER;
+			}
+			else {
+				if (notifySusiCVRead) {														// Leggo il valore della CV sulla quale manipolare i bit
+					static uint16_t cvNumber = CV_Number;
+					static uint8_t cvValue = notifySusiCVRead(cvNumber);
 
-				operation = bitRead(CvMessage->Byte[2], 4);																									// leggo quale operazione sui bit e' richiesta
-				bitValue = bitRead(CvMessage->Byte[2], 3);																									// leggo il valore del bit da confrontare/scrivere
-				bitPosition = ((bitRead(CvMessage->Byte[2], 0) * 1) + (bitRead(CvMessage->Byte[2], 1) * 2) + (bitRead(CvMessage->Byte[2], 2) * 4));			// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
-
-				if (CV_Number == 897) {
-					CV_Value = _slaveAddress;
-				}
-				else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {		//identificano il produttore dello Slave
-					CV_Value = MANUFACTER_ID;
-				}
-				else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
-					CV_Value = SUSI_VER;
-				}
-				else {
-					if (notifySusiCVRead) {														// Leggo il valore della CV sulla quale manipolare i bit
-						static uint16_t cvNumber = CV_Number;
-						static uint8_t cvValue = notifySusiCVRead(cvNumber);
-
-						if (CV_Number == cvNumber) {
-							CV_Value = cvValue;
-						}
-						else {
-							cvNumber = CV_Number;
-							cvValue = notifySusiCVRead(cvNumber);
-							CV_Value = cvValue;
-						}
+					if (CV_Number == cvNumber) {
+						CV_Value = cvValue;
 					}
 					else {
-						CV_Value = 255;															//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
+						cvNumber = CV_Number;
+						cvValue = notifySusiCVRead(cvNumber);
+						CV_Value = cvValue;
 					}
 				}
+				else {
+					CV_Value = 255;															//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
+				}
+			}
 
-				//in base all'operazione richiesta eseguiro' un'azione
-				switch (operation) {
-				case 0: {	//confronto dei bit
-					if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
-						Data_ACK();
-					}
-					break;
+			//in base all'operazione richiesta eseguiro' un'azione
+			if (operation == 0) {	// Confronto dei bit
+				if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
+					Data_ACK();
 				}
-				case 1: {	//scrittura del bit
-					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
-						if (notifySusiCVWrite) {
-							bitWrite(CV_Value, bitPosition, bitRead(CvMessage->Byte[2], 3));						//scrivo il nuovo valore del bit
-							if (notifySusiCVWrite((897 + (CvMessage->Byte[1] - 128)), CV_Value) == CV_Value) {		//memorizzo il nuovo valore della CV
-								Data_ACK();
-							}
+			}
+			else {					// Scrittura di un bit
+				if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
+					if (notifySusiCVWrite) {
+						bitWrite(CV_Value, bitPosition, bitRead(CvMessage->Byte[2], 3));						//scrivo il nuovo valore del bit
+						if (notifySusiCVWrite((897 + (CvMessage->Byte[1] - 128)), CV_Value) == CV_Value) {		//memorizzo il nuovo valore della CV
+							Data_ACK();
 						}
-						/* nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
-						else { }
-						*/
 					}
-					break;
-				}
+					/* nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+					else { }
+					*/
 				}
 			}
 			break;
@@ -496,39 +485,34 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
 			* D = valore per la scrittura nel CV. Lo Slave conferma la scrittura con un riconoscimento.
 			*/
-			uint16_t CV_Number;
+			/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
-			CV_Number = 897 + (CvMessage->Byte[1] - 128);
+			if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
+				if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (CvMessage->Byte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
+					if (notifyCVResetFactoryDefault) {
+						notifyCVResetFactoryDefault();
 
-			if (isCVvalid(CV_Number)) {
-				/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
-
-				if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
-					if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (CvMessage->Byte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
-						if (notifyCVResetFactoryDefault) {
-							notifyCVResetFactoryDefault();
-
+						Data_ACK();
+					}
+				}
+				else {	//scrittura CVs
+					if (notifySusiCVWrite) {
+						if (notifySusiCVWrite(CV_Number, CvMessage->Byte[2]) == CvMessage->Byte[2]) {
 							Data_ACK();
 						}
 					}
-					else {	//scrittura CVs
-						if (notifySusiCVWrite) {
-							if (notifySusiCVWrite(CV_Number, CvMessage->Byte[2]) == CvMessage->Byte[2]) {
-								Data_ACK();
-							}
-						}
-						/*
-						else { nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla }
-						*/
-					}
-				}
-
-				if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
-					if (notifySusiCVRead) {
-						_slaveAddress = notifySusiCVRead(CV_Number);
-					}
+					/*
+					else { nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla }
+					*/
 				}
 			}
+
+			if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
+				if (notifySusiCVRead) {
+					_slaveAddress = notifySusiCVRead(CV_Number);
+				}
+			}
+			
 			break;
 		}
 		default: {}
