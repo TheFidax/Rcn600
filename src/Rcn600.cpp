@@ -1,3 +1,5 @@
+/* LIB_VERSION: 1.4.5 */
+
 #include "Rcn600.h"
 
 Rcn600* pointerToRcn600; // declare a pointer to testLib class

@@ -1,6 +1,8 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
+/* LIB_VERSION: 1.4.5 */
+
 //#define DEBUG_RCN600	// Permette di abilitare il debug tramite stream
 
 #include "Arduino.h"

@@ -135,7 +135,5 @@ void setup() {
 }
 
 void loop() {
-    while (1) {
-        SUSI.process();
-    }
+    SUSI.process();
 }

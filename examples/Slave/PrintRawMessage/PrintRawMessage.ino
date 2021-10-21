@@ -25,17 +25,15 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
     return EEPROM.read(CV);
 }
 
-void setup() {
+void setup() {    
     Serial.begin(115200); // Avvio la comunicazione Seriale
-
     while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
-    Serial.println("PrintRawMessages:");
+    
+    Serial.println("SUSI Print Raw Messages:");
 
-    SUSI.init();			// Avvio la libreria
+    SUSI.init();      // Avvio la libreria
 }
 
 void loop() {
-    while (1) {
-        SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
-    }
+    SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
 }

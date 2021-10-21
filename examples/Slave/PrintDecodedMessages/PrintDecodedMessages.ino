@@ -435,17 +435,14 @@ void notifyCVResetFactoryDefault(void) {
 #endif
 
 void setup() {
-    Serial.begin(115200);   // Avvio la comunicazione Seriale
+	Serial.begin(115200);   // Avvio la comunicazione Seriale
+	while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
 
-    while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
+	Serial.println("SUSI Print Decoded Messages:"); //Informo l'utente che e' pronto a leggere i Byte
 
-    SUSI.init();            // Avvio la libreria
-
-    Serial.println("SUSI PrintMessage:"); //Informo l'utente che e' pronto a leggere i Byte
+	SUSI.init();            // Avvio la libreria
 }
 
 void loop() {
-    while (1) {
-        SUSI.process();     // Elaboro più volte possibile i dati acquisiti
-    }
+    SUSI.process();     // Elaboro più volte possibile i dati acquisiti
 }

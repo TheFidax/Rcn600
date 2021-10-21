@@ -37,7 +37,5 @@ void setup() {
 }
 
 void loop() {
-    while (1) {
-        SUSI.process();     // Elaboro piu' volte possibile i dati acquisiti
-    }
+    SUSI.process();     // Elaboro piu' volte possibile i dati acquisiti
 }
