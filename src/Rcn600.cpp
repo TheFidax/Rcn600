@@ -344,8 +344,8 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 		return;
 	} 
 	else {
-		if (notifySusiCVRead) {
-			CV_Value = notifySusiCVRead(cvNumber);
+		if (notifySusiCVRead) {		// Se e' presente il sistema di memorizzazione CV, leggo il valore della CV memorizzata
+			CV_Value = notifySusiCVRead(CV_Number);
 		}
 		else {
 			CV_Value = 255;
