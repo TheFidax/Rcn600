@@ -63,11 +63,7 @@ Rcn600::~Rcn600(void) {
 		}
 
 		/* Gestione Pin DATA */
-#ifdef DIGITAL_PIN_FAST
-		delete _DATA_pin;
-#else
-		pinMode(_DATA_pin, INPUT);
-#endif
+		DATA_PIN_DELETE;
 	}
 
 #ifdef DEBUG_RCN600
