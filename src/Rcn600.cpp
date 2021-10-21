@@ -94,11 +94,7 @@ void Rcn600::initClass(void) {
 		}
 
 		/* Pin DATA */
-#ifdef DIGITAL_PIN_FAST
-		_DATA_pin->pinModeFast(INPUT);
-#else
-		pinMode(_DATA_pin, INPUT);
-#endif
+		DATA_PIN_INPUT;
 	}
 
 	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {	// Imposto gli slot del Buffer come liberi
@@ -300,22 +296,14 @@ void Rcn600::ISR_SUSI(void) {
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	if (_CLK_pin != ONLY_DECODER) {
 		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-#ifdef DIGITAL_PIN_FAST
-		_DATA_pin->pinModeFast(OUTPUT);
-		_DATA_pin->digitalWriteFast(LOW);
-#else
-		pinMode(_DATA_pin, OUTPUT);
-		digitalWrite(_DATA_pin, LOW);
-#endif
+		DATA_PIN_OUTPUT;
+		DATA_PIN_LOW;
 
 		delay(1);
 
 		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-#ifdef DIGITAL_PIN_FAST
-		_DATA_pin->pinModeFast(INPUT);
-#else
-		pinMode(_DATA_pin, INPUT);
-#endif
+		DATA_PIN_HIGH;
+		DATA_PIN_INPUT;
 	}
 	else {
 		if (ackManualMessage) {
