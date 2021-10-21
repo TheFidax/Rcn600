@@ -18,8 +18,8 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
 }
 
 void setup() {
-	if ((EEPROM.read(897) != 1) || (EEPROM.read(897) != 2) || (EEPROM.read(897) != 3)) {	//controllo che la CV contenente l'indirizzo del Modulo sia nei valori consentiti
-		EEPROM.update(897, 1);
+	if ( ( EEPROM.read(897) < 1 ) || ( EEPROM.read(897) > 3 ) ) {	//controllo che la CV contenente l'indirizzo del Modulo sia nei valori consentiti
+		EEPROM.update(897, DEFAULT_SLAVE_NUMBER);
 	}
 
 	SUSI.init();      // Avvio la libreria
