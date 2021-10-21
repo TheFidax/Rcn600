@@ -29,11 +29,13 @@ void setup() {
     Serial.begin(115200); // Avvio la comunicazione Seriale
 
     while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
-    Serial.println("notifySusiRawMessage():");
+    Serial.println("PrintRawMessages:");
 
     SUSI.init();			// Avvio la libreria
 }
 
 void loop() {
-    SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
+    while (1) {
+        SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
+    }
 }
