@@ -237,13 +237,11 @@ void Rcn600::ISR_SUSI(void) {
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	if (_CLK_pin != ONLY_DECODER) {
 		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-		DATA_PIN_OUTPUT;
 		DATA_PIN_LOW;
 
 		delay(1);
 
 		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-		DATA_PIN_HIGH;
 		DATA_PIN_INPUT;
 	}
 	else {
