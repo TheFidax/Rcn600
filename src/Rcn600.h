@@ -23,14 +23,14 @@
 	#define		DATA_PIN_INPUT		_DATA_pin->pinModeFast(INPUT);
 	#define		DATA_PIN_OUTPUT		_DATA_pin->pinModeFast(OUTPUT);
 	#define		DATA_PIN_HIGH		_DATA_pin->digitalWriteFast(HIGH);
-	#define		DATA_PIN_LOW		_DATA_pin->digitalWriteFast(LOW);
+	#define		DATA_PIN_LOW		DATA_PIN_OUTPUT;	_DATA_pin->digitalWriteFast(LOW);
 	#define		DATA_PIN_DELETE		delete _DATA_pin
 #else
 	#define		READ_DATA_PIN		digitalRead(_DATA_pin)
 	#define		DATA_PIN_INPUT		pinMode(_DATA_pin, INPUT);
 	#define		DATA_PIN_OUTPUT		pinMode(_DATA_pin, OUTPUT);
 	#define		DATA_PIN_HIGH		digitalWrite(_DATA_pin, HIGH);
-	#define		DATA_PIN_LOW		digitalWrite(_DATA_pin, LOW);
+	#define		DATA_PIN_LOW		DATA_PIN_OUTPUT;	digitalWrite(_DATA_pin, LOW);
 	#define		DATA_PIN_DELETE		DATA_PIN_INPUT
 #endif
 
