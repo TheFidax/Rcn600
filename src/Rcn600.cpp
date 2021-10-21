@@ -5,26 +5,8 @@
 Rcn600* pointerToRcn600; // declare a pointer to testLib class
 
 static void Rcn600InterruptHandler(void) { // define global handler
-		pointerToRcn600->ISR_SUSI(); // calls class member handler
+	pointerToRcn600->ISR_SUSI(); // calls class member handler
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#ifdef DEBUG_RCN600
-void sendDebugMessage(char* message) {
-	Wire.beginTransmission(0);
-	Wire.write(message);
-	Wire.endTransmission();
-}
-
-void sendDebugMessage(uint32_t n) {
-	char buf[11];
-	sprintf(buf, "%lu", n);
-	sendDebugMessage(buf);
-}
-
-#endif // DEBUG_RCN600
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,22 +19,10 @@ Rcn600::Rcn600(uint8_t CLK_pin, uint8_t DATA_pin) {
 #else
 		_DATA_pin = DATA_pin;
 #endif // DIGITAL_PIN_FAST	
-
-#ifdef DEBUG_RCN600
-	Wire.end();
-	Wire.begin(1);
-	Wire.setClock(400000);
-#endif // DEBUG_RCN600
 }
 
 Rcn600::Rcn600(void) {
 	_CLK_pin = ONLY_DECODER;
-
-#ifdef DEBUG_RCN600
-	Wire.end();
-	Wire.begin(1);
-	Wire.setClock(400000);
-#endif // DEBUG_RCN600
 }
 
 Rcn600::~Rcn600(void) {
@@ -65,19 +35,12 @@ Rcn600::~Rcn600(void) {
 		/* Gestione Pin DATA */
 		DATA_PIN_DELETE;
 	}
-
-#ifdef DEBUG_RCN600
-	Wire.end();
-#endif // DEBUG_RCN600
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::initClass(void) {
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 initClass (Start)\n");
-#endif // DEBUG_RCN600
 
 	pointerToRcn600 = this;
 
@@ -98,16 +61,9 @@ void Rcn600::initClass(void) {
 	}
 
 	_BufferPointer = NULL;								// Imposto il puntatore per indicare l'assenza di messaggi da decodificare
-
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 initClass (End)\n");
-#endif // DEBUG_RCN600
 }
 
 void Rcn600::init(void) {
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 init(void) (Start)\n");
-#endif // DEBUG_RCN600
 	if (notifySusiCVRead) {			/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
 		_slaveAddress = notifySusiCVRead(897);
 
@@ -121,16 +77,9 @@ void Rcn600::init(void) {
 	}
 	
 	initClass();
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 init(void) (End)\n");
-#endif // DEBUG_RCN600
 }
 
 void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 init(uint8_t) (Start)\n");
-#endif // DEBUG_RCN600
-
 	_slaveAddress = SlaveAddress;
 
 	if (_slaveAddress > MAX_ADDRESS_VALUE) {	/* In caso di indirizzo passato non conforme alla normativa SUSI imposto il valore di Default 1 */
@@ -138,10 +87,6 @@ void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo sce
 	}
 
 	initClass();
-
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 init(uint8_t) (End)\n");
-#endif // DEBUG_RCN600
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,7 +240,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 		DATA_PIN_OUTPUT;
 		DATA_PIN_LOW;
 
-		delay(2);
+		delay(1);
 
 		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
 		DATA_PIN_HIGH;
@@ -506,10 +451,6 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 }
 
 void Rcn600::process(void) {
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 process(void) (Start)\n");
-#endif // DEBUG_RCN600
-
 	uint8_t processNextMessage = 1;	// Indica se devo processare piu' messaggi
 
 	while (processNextMessage == 1) {
@@ -1087,10 +1028,6 @@ void Rcn600::process(void) {
 			_BufferPointer = p;
 		}
 	}
-
-#ifdef DEBUG_RCN600
-	sendDebugMessage((char*)"Rcn600 process(void) (End)\n");
-#endif // DEBUG_RCN600
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
