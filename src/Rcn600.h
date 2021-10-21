@@ -8,9 +8,6 @@
 #include "Arduino.h"
 #include <stdint.h>
 #include <stdbool.h>
-#ifdef DEBUG_RCN600
-	#include <Wire.h>
-#endif
 
 #ifdef __AVR__	// Se la piattaforma e' AVR posso usare la libreria digitalPinFast; e' escludibile per risparmiare RAM
 	#define	DIGITAL_PIN_FAST
