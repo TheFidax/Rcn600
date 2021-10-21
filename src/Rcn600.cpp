@@ -57,10 +57,12 @@ Rcn600::Rcn600(void) {
 
 Rcn600::~Rcn600(void) {
 	if (_CLK_pin != ONLY_DECODER) {
-		detachInterrupt(digitalPinToInterrupt(_CLK_pin));
+		if (_CLK_pin != EXTERNAL_CLOCK) {	// Gestisco il Pin Clock solo se esso e' Gestito dalla Libreria
+			detachInterrupt(digitalPinToInterrupt(_CLK_pin));
+			pinMode(_CLK_pin, INPUT);
+		}
 
-		pinMode(_CLK_pin, INPUT);
-
+		/* Gestione Pin DATA */
 #ifdef DIGITAL_PIN_FAST
 		delete _DATA_pin;
 #else
@@ -84,16 +86,19 @@ void Rcn600::initClass(void) {
 	pointerToRcn600 = this;
 
 	if (_CLK_pin != ONLY_DECODER) {
-		/* Inizializzo i pin come Input */
-		pinMode(_CLK_pin, INPUT);
+		if (_CLK_pin != EXTERNAL_CLOCK) {
+			/* Gestisco l'Interrup  per il pin di Clock */
+			pinMode(_CLK_pin, INPUT);
 
+			attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+		}
+
+		/* Pin DATA */
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin->pinModeFast(INPUT);
 #else
 		pinMode(_DATA_pin, INPUT);
 #endif
-
-		attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
 	}
 
 	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {	// Imposto gli slot del Buffer come liberi

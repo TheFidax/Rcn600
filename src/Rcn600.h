@@ -22,6 +22,7 @@
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
 
+#define	EXTERNAL_CLOCK				254
 #define	ONLY_DECODER				255		//indica che la libreria funzionera' solamente come Decoder di messaggi SUSI e non si occupera' di acquisirli
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
