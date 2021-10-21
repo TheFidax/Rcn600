@@ -312,7 +312,6 @@ void Rcn600::ISR_SUSI(void) {
 }
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
-
 	if (_CLK_pin != ONLY_DECODER) {
 		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 #ifdef DIGITAL_PIN_FAST
@@ -325,13 +324,12 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 
 		delay(1);
 
+		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin->pinModeFast(INPUT);
 #else
 		pinMode(_DATA_pin, INPUT);
 #endif
-		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-
 	}
 	else {
 		if (ackManualMessage) {
@@ -389,8 +387,6 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 			*	Questo e i due comandi seguenti sono quelli menzionati nella sezione 4
 			*	Pacchetti da 3 byte secondo [RCN-214]
 			*/
-
-
 			uint16_t CV_Number;
 			uint8_t CV_Value;
 
@@ -412,7 +408,17 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 				}
 				else {
 					if (notifySusiCVRead) { //altre CV disponibili per il modulo
-						CV_Value = notifySusiCVRead(CV_Number);
+						static uint16_t cvNumber = CV_Number;
+						static uint8_t cvValue = notifySusiCVRead(cvNumber);
+
+						if (CV_Number == cvNumber) {
+							CV_Value = cvValue;
+						}
+						else {
+							cvNumber = CV_Number;
+							cvValue = notifySusiCVRead(cvNumber);
+							CV_Value = cvValue;
+						}
 					}
 					else {
 						CV_Value = 255;		//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
@@ -443,7 +449,6 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 			* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
 			* Lo slave conferma la scrittura con un riconoscimento.
 			*/
-
 			uint16_t CV_Number;
 
 			CV_Number = 897 + (CvMessage->Byte[1] - 128);
@@ -465,8 +470,18 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 					CV_Value = SUSI_VER;
 				}
 				else {
-					if (notifySusiCVRead) {
-						CV_Value = notifySusiCVRead(CV_Number);									// Leggo il valore della CV sulla quale manipolare i bit
+					if (notifySusiCVRead) {														// Leggo il valore della CV sulla quale manipolare i bit
+						static uint16_t cvNumber = CV_Number;
+						static uint8_t cvValue = notifySusiCVRead(cvNumber);
+
+						if (CV_Number == cvNumber) {
+							CV_Value = cvValue;
+						}
+						else {
+							cvNumber = CV_Number;
+							cvValue = notifySusiCVRead(cvNumber);
+							CV_Value = cvValue;
+						}
 					}
 					else {
 						CV_Value = 255;															//Se non e' implementato un sistema di memorizzazione CV utilizzo il valore simbolico di 255
@@ -511,7 +526,6 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 			* V = numero CV 897 .. 1024 (valore 0 = CV 897, valore 127 = CV 1024)
 			* D = valore per la scrittura nel CV. Lo Slave conferma la scrittura con un riconoscimento.
 			*/
-
 			uint16_t CV_Number;
 
 			CV_Number = 897 + (CvMessage->Byte[1] - 128);
