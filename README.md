@@ -8,7 +8,7 @@
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Obbligatori](#Metodi-Obbligatori)
 * [Funzioni CallBack](#Funzioni-CallBack)
-* [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
+* [Manipolazione CVs](#Manipolazione-CVs)
 * [Distruzione Classe](#distruzione-classe)
 * [Tipi di Dati](#Tipi-di-Dati)
 * [Gestione Manuale Messaggi](#Gestione-Manuale-Messaggi)
@@ -222,8 +222,8 @@ void notifySusiControllModule(uint8_t ModuleControll);
 
 ------------
 
-# Metodi Manipolazione CVs
-I seguenti metodi sono **facoltativi** (definiti come 'extern' alla libreria), ma permettono alla libreria di dialogare con il Decoder Master in caso di *Lettura/Scrittura CVs*</br>
+# Manipolazione CVs
+Le seguenti funzioni sono **facoltative** (definite come 'extern' alla libreria), ma permettono alla libreria di dialogare con il Decoder Master in caso di *Lettura/Scrittura CVs*</br>
 La libreria **gestisce l'ACK** che permette al decoder di conoscere l'esito dell'operazione richiesta.
 
 ------------
@@ -251,7 +251,7 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value);
 
 ------------
 
-RESET CVs, viene utilizzato lo *stesso metodo* della Libreria [NmraDcc](https://github.com/mrrwa/NmraDcc):</br>
+RESET CVs, viene utilizzato la *stessa funzione* della Libreria [NmraDcc](https://github.com/mrrwa/NmraDcc):</br>
 ```c
 void notifyCVResetFactoryDefault(void);
 ```
@@ -269,12 +269,12 @@ E' possibile distruggere la Classe se non piu' necessaria.
 ~Rcn600(void);	
 ```
 
-Le risorse verranno deallocate i pin verranno messi nello stato di **INPUT** per evitare danni accidentali.
+Le risorse verranno deallocate, i pin verranno messi nello stato di **INPUT** per evitare danni accidentali.
  
 ------------
 
 # Tipi di Dati
-I seguenti tipi di dati vengono utilizzati dai metodi della libreria.
+I seguenti tipi di dati vengono utilizzati dai metodi/funzioni della libreria.
 
 ------------
 
