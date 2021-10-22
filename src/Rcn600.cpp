@@ -183,11 +183,13 @@ void Rcn600::ISR_SUSI(void) {
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
+	DATA_PIN_OUTPUT;
 	DATA_PIN_LOW;
 
-	delay(1);
+	delay(2);
 
 	//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
+	DATA_PIN_HIGH;
 	DATA_PIN_INPUT;
 }
 
@@ -227,6 +229,8 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 		return;
 	} 
 	else {
+		Data_ACK();
+
 		if (notifySusiCVRead) {		// Se e' presente il sistema di memorizzazione CV, leggo il valore della CV memorizzata
 			CV_Value = notifySusiCVRead(CV_Number);
 		}
