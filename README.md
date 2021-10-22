@@ -7,7 +7,7 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [Metodi Obbligatori](#Metodi-Obbligatori)
-* [Metodi CallBack](#Metodi-CallBack)
+* [Funzioni CallBack](#Funzioni-CallBack)
 * [Metodi Manipolazione CVs](#Metodi-Manipolazione-CVs)
 * [Distruzione Classe](#distruzione-classe)
 * [Tipi di Dati](#Tipi-di-Dati)
@@ -78,7 +78,7 @@ void process(void);
 
 ------------
 
-# Metodi CallBack
+# Funzioni CallBack
 I seguenti metodi CallBack sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
 
 ------------
