@@ -1,3 +1,5 @@
+**README PER 1.5.0 IN LAVORAZIONE**
+
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheFidax/Rcn600)
 ![GitHub Release Date](https://img.shields.io/github/release-date/TheFidax/Rcn600?color=blue&label=last%20release)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/TheFidax/Rcn600/latest?color=orange)
@@ -26,7 +28,6 @@ Clock ---> 470Ω ---> Pin Interrupt<br/>
 
 Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
 
-
 **Video Presentazione del Progetto:**</br>
 
 [![Video Presentazione](https://img.youtube.com/vi/VzgkDouOvCY/0.jpg)](http://www.youtube.com/watch?v=VzgkDouOvCY)
@@ -39,7 +40,7 @@ I seguenti metodi sono **obbligatori** per il corretto funzionamento della libre
 ------------
 
 ```c
-Rcn600(uint8_t CLK_pin_i, uint8_t DATA_pin_i);
+Rcn600(CLK_pin, DATA_pin);
 ```
 Dichiarazione delle libreria nella quale inserire i pin a cui e' collegato il Bus SUSI.<br/>
 Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).
@@ -47,7 +48,7 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 **OPPURE**
 
 ```c
-Rcn600;
+Rcn600(EXTERNAL_CLOCK, DATA_pin);
 ```
 Dichiarazione delle libreria per la **sola decodifica** dei messaggi SUSI *acquisiti da dispositivo terzo.*</br>
 Maggiori dettagli sotto [Gestione Manuale Messaggi](#Gestione-Manuale-Messaggi)</br>
