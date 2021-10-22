@@ -15,10 +15,7 @@ SUSI_AN_GROUP	LITERAL1
 
 //////////////////////// Rcn600
 init	KEYWORD2
-addManualMessage	KEYWORD2
 process	KEYWORD2
-
-ackManualMessage	KEYWORD2
 
 notifySusiRawMessage	KEYWORD2
 notifySusiFunc	KEYWORD2

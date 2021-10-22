@@ -1,7 +1,7 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-/* LIB_VERSION: 1.4.5 */
+/* LIB_VERSION: 1.5.0 */
 
 //#define DEBUG_RCN600	// Permette di abilitare il debug tramite stream
 
@@ -36,8 +36,7 @@
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
 
-#define	EXTERNAL_CLOCK				254		//indica che il Clock e' acquisito tramite sistema esterno alla libreria
-#define	ONLY_DECODER				255		//indica che la libreria funzionera' solamente come Decoder di messaggi SUSI e non si occupera' di acquisirli
+#define	EXTERNAL_CLOCK				255		//indica che il Clock e' acquisito tramite sistema Esterno alla libreria
 
 #define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
 #define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
@@ -81,12 +80,9 @@ class Rcn600 {
 
 	public:					/* Metodi Pubblici */
 		Rcn600(uint8_t CLK_pin, uint8_t DATA_pin);			// Creazione dell'oggetto Rcn600 con pin di Interrupt e pin Data
-		Rcn600(void);										// Creazione Oggetto SENZA PIN (decodifica solo i messaggi senza che li acquisisca) -> addManualMessage()
 		~Rcn600(void);										// Distruzionde dell'oggetto Rcn600
 		void init(void);									// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
 		void init(uint8_t SlaveAddress);					// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
-
-		int8_t addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);	// Permette di aggiungere Manualmente un messaggio alla coda da processare
 
 		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
 		void ISR_SUSI(void);							// Metodo che gestisce 'acquisizione dati tramite Interrupt
@@ -250,17 +246,6 @@ extern "C" {
 	*    None
 	*/
 	extern void notifyCVResetFactoryDefault(void) __attribute__((weak));
-
-	/* ACK PER MESSAGGI ACQUISITI DA DIVERSO DISPOSITIVO */
-	/*
-	*	ackManualMessage() viene invocato quando: e' necessario un ACK post modifiche di una CVs.
-	*	Quando la libreria Processa Solamente i messaggi senza acquisirli, e' lasciato all'utente la modalita' con cui comunicare al dispositivo master l'ACK.
-	*	Input:
-	*		- Nulla
-	*	Restituisce:
-	*		- Null
-	*/
-	extern void ackManualMessage(void) __attribute__((weak));
 #if defined (__cplusplus)
 }
 #endif

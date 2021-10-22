@@ -11,14 +11,12 @@
 * [Manipolazione CVs](#Manipolazione-CVs)
 * [Distruzione Classe](#distruzione-classe)
 * [Tipi di Dati](#Tipi-di-Dati)
-* [Gestione Manuale Messaggi](#Gestione-Manuale-Messaggi)
 
 ------------
 
 # Rcn600 SUSI
 Questa libreria permette di utilizzare una scheda Arduino (o un microcontrollore tramite Arduino IDE) come Slave per l'interfaccia SUSI.<br/>
 Libreria testata su Arduino UNO, Arduino NANO (ATmega328P) e ATmega128 (MegaCore).</br></br>
-La libreria permette **anche** di Decodificare i messaggi SUSI **acquisiti da dispositivo terzo**, in questo caso *NON E' NECESSARIO* collegare il microcontrollore al Bus SUSI, maggiori dettagli sotto [Gestione Manuale Messaggi](#Gestione-Manuale-Messaggi)</br>
 
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI, *se non specificato*, SONO A 5 VOLT !** 
 
@@ -326,54 +324,5 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasme
 - SUSI_AN_FN_40_47 : Funzioni Analogiche dalla 40 alla 47
 - SUSI_AN_FN_48_55 : Funzioni Analogiche dalla 48 alla 55
 - SUSI_AN_FN_56_63 : Funzioni Analogiche dalla 56 alla 63
-
-------------
-
-# Gestione Manuale Messaggi
-E' possibile utilizzare questa libreria per *decodificare* pacchetti dati Rcn600 Susi anche su dispositivi non collegati al Bus.</br>
-Per questa ragione e' possibile *esportare* messaggi grezzi non decodificati da inviare a un altro dispositivo (mediante sistema scelto dall'utente) il quale a sua volta si occupera' di decodificare il messaggio *inserito manualmente* nella coda di decodifica.</br>
-
-Durante questo utilizzo la dichiarazione dell'oggetto **deve essere fatta** nel seguente modo:
-
-```c
-Rcn600;
-```
-
-------------
-
-```c
-void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);
-```
-*notifySusiRawMessage()* viene invocato ogni volta (metodo Callback) che è presente un messaggio grezzo da decodificare
-- Input:
-  - il primo Byte del messaggio
-  - il Secondo Byte del messaggio
-  - il Byte che determina l'azione da eseguire su una CV
-- Restituisce:
-  - Nulla
-
-------------
-
-```c
-int8_t addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating);
-```
-*addManualMessage()* Permette di inserire manualmente un messaggio in coda di decodifica
-- Input:
-  - il primo Byte del messaggio
-  - il Secondo Byte del messaggio
-  - il Byte che determina l'azione da eseguire su una CV
-- Restituisce:
-  - 0 se l'inserimento e' riuscito, -1 altrimenti
-
-------------
-
-```c
-void ackManualMessage(void);
-```
-*ackManualMessage()* viene invocato ogni volta (metodo Callback) che e' necessario comunicare al dispositivo connesso al Bus Susi (quello che acquisisce i messaggi) un ACK
-- Input:
-  - nulla
-- Restituisce:
-  - nulla
 
 ------------

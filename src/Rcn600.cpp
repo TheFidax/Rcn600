@@ -1,4 +1,4 @@
-/* LIB_VERSION: 1.4.5 */
+/* LIB_VERSION: 1.5.0 */
 
 #include "Rcn600.h"
 
@@ -15,26 +15,20 @@ Rcn600::Rcn600(uint8_t CLK_pin, uint8_t DATA_pin) {
 	_CLK_pin = CLK_pin;
 
 #ifdef DIGITAL_PIN_FAST
-		_DATA_pin = new digitalPinFast(DATA_pin);
+	_DATA_pin = new digitalPinFast(DATA_pin);
 #else
-		_DATA_pin = DATA_pin;
+	_DATA_pin = DATA_pin;
 #endif // DIGITAL_PIN_FAST	
 }
 
-Rcn600::Rcn600(void) {
-	_CLK_pin = ONLY_DECODER;
-}
-
 Rcn600::~Rcn600(void) {
-	if (_CLK_pin != ONLY_DECODER) {
-		if (_CLK_pin != EXTERNAL_CLOCK) {	// Gestisco il Pin Clock solo se esso e' Gestito dalla Libreria
-			detachInterrupt(digitalPinToInterrupt(_CLK_pin));
-			pinMode(_CLK_pin, INPUT);
-		}
-
-		/* Gestione Pin DATA */
-		DATA_PIN_DELETE;
+	if (_CLK_pin != EXTERNAL_CLOCK) {	// Gestisco il Pin Clock solo se esso e' Gestito dalla Libreria
+		detachInterrupt(digitalPinToInterrupt(_CLK_pin));
+		pinMode(_CLK_pin, INPUT);
 	}
+
+	/* Gestione Pin DATA */
+	DATA_PIN_DELETE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,17 +38,14 @@ void Rcn600::initClass(void) {
 
 	pointerToRcn600 = this;
 
-	if (_CLK_pin != ONLY_DECODER) {
-		if (_CLK_pin != EXTERNAL_CLOCK) {
-			/* Gestisco l'Interrup  per il pin di Clock */
-			pinMode(_CLK_pin, INPUT);
-
-			attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
-		}
-
-		/* Pin DATA */
-		DATA_PIN_INPUT;
+	if (_CLK_pin != EXTERNAL_CLOCK) {	// Controllo se e' presente il numero di un pin
+		/* Gestisco l'Interrupt  per il pin di Clock */
+		pinMode(_CLK_pin, INPUT);
+		attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
 	}
+
+	/* Pin DATA */
+	DATA_PIN_INPUT;
 
 	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {	// Imposto gli slot del Buffer come liberi
 		_Buffer[i].nextMessage = FREE_MESSAGE_SLOT;
@@ -116,52 +107,6 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 	else {				// Ancora nessun messaggio pronto per la decodifica
 		_BufferPointer = nextMessage;
 	}
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-int8_t Rcn600::addManualMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) {
-	/* Permette di aggiungere manualmente un Messaggio Rcn600 in cosa di Process */
-
-	/* Controllo se e' un messaggio per la manipolazione delle CVs */
-	if (firstByte == 119 || firstByte == 123 || firstByte == 127) {
-		Rcn600Message message;
-		message.Byte[0] = firstByte;
-		message.Byte[1] = secondByte;
-		message.Byte[2] = CvManipulating;
-
-		processCVsMessage(&message);
-	}
-	else {
-		Rcn600Message* _messageSlot = searchFreeMessage();
-
-		if (_messageSlot != NULL) {
-			_messageSlot->nextMessage = NULL;
-			_messageSlot->Byte[0] = firstByte;
-			_messageSlot->Byte[1] = secondByte;
-			_messageSlot->Byte[2] = CvManipulating;
-
-			if ((_messageSlot->Byte[0] != 119) && (_messageSlot->Byte[0] != 123) && (_messageSlot->Byte[0] != 127)) {
-				setNextMessage(_messageSlot);
-			}
-			else {
-				Rcn600Message* original = _BufferPointer;	// Salvo la posizione indicata attualmente
-				_BufferPointer = _messageSlot;				// Imposto il puntatore al messaggio appena acquisito
-
-				process();									// Processo il messaggio acquisito
-
-				_messageSlot->nextMessage = FREE_MESSAGE_SLOT;			// Libero lo Slot per scriverci dentro un nuovo messaggio
-				_BufferPointer = original;					// Ripristino la coda di messaggi acquisiti
-			}
-		}
-		else {
-			return -1;
-		}
-	}
-
-	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,20 +182,13 @@ void Rcn600::ISR_SUSI(void) {
 }
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
-	if (_CLK_pin != ONLY_DECODER) {
-		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-		DATA_PIN_LOW;
+	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
+	DATA_PIN_LOW;
 
-		delay(1);
+	delay(1);
 
-		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-		DATA_PIN_INPUT;
-	}
-	else {
-		if (ackManualMessage) {
-			ackManualMessage();
-		}
-	}
+	//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
+	DATA_PIN_INPUT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
