@@ -204,7 +204,7 @@ void notifySusiTriggerPulse(uint8_t state) {
 // Decommentare la #define sotto per stampare il consumo di corrente del motore
 #define NOTIFY_SUSI_MOTOR_CURRENT
 #ifdef  NOTIFY_SUSI_MOTOR_CURRENT
-void notifySusiMotorCurrent(int current) {
+void notifySusiMotorCurrent(int8_t current) {
     Serial.print("notifySusiCurrentAbsorption: ");
     Serial.println(current, DEC);
 };
@@ -237,7 +237,7 @@ void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir) {
 // Decommentare la #define sotto per stampare il Carico del motore
 #define NOTIFY_SUSI_MOTOR_LOAD
 #ifdef  NOTIFY_SUSI_MOTOR_LOAD
-void notifySusiMotorLoad(int load) {
+void notifySusiMotorLoad(int8_t load) {
     Serial.print("notifySusiMotorLoad: ");
     Serial.println(load, DEC);
 };

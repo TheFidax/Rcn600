@@ -131,7 +131,7 @@ notifySusiTriggerPulse() viene invocato quando: si riceve dal Master il comando 
 ------------
 
 ```c
-void notifySusiMotorCurrent(int current);
+void notifySusiMotorCurrent(int8_t current);
 ```
 *notifySusiMotorCurrent()* viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
 - Input:
@@ -166,7 +166,7 @@ void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir);
 ------------
 
 ```c
-void notifySusiMotorLoad(int load);
+void notifySusiMotorLoad(int8_t load);
 ```
 *notifySusiAnalogFunction()* viene invocato quando: si riceve dal Master i dati sul carico del Motore
 - Input:

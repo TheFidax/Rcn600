@@ -147,7 +147,7 @@ extern "C" {
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiMotorCurrent(int current) __attribute__((weak));
+	extern	void notifySusiMotorCurrent(int8_t current) __attribute__((weak));
 	/*
 	*	notifySusiRequestSpeed() viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
 	*	Input:
@@ -173,7 +173,7 @@ extern "C" {
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiMotorLoad(int load) __attribute__((weak));
+	extern	void notifySusiMotorLoad(int8_t load) __attribute__((weak));
 	/*
 	*	notifySusiAnalogFunction() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni analogiche
 	*	Input:
