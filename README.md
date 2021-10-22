@@ -79,7 +79,7 @@ void process(void);
 ------------
 
 # Funzioni CallBack
-I seguenti metodi CallBack sono **facoltativi** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
+Le seguenti funzioni CallBack sono **facoltative** (definiti come 'extern' alla libreria), e permettono all'utente di definire il comportamento da adottare in caso di un particolare comando.</br>
 
 ------------
 
