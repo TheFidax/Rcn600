@@ -393,7 +393,7 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 void Rcn600::process(void) {
 	uint8_t processNextMessage = 1;	// Indica se devo processare piu' messaggi
 
-	while (processNextMessage == 1) {
+	while (processNextMessage) {
 		processNextMessage = 0;
 
 		if (_BufferPointer != NULL) {		//controllo che sia stati ricevuti dei messaggi
