@@ -117,7 +117,8 @@ void Rcn600::ISR_SUSI(void) {
 	static uint32_t _lastbit_time = ( micros() - MIN_CLOCK_TIME);			// tempo a cui e' stato letto l'ultimo bit
 	static uint8_t	_bitCounter = 0;										// indica quale bit si deve leggere
 	static Rcn600Message* _messageSlot = NULL;								// indica in quale slot sta venendo salvato il messaggio in ricezione
-	uint32_t actualMicros = micros();										// indica i microsecondi dell'attuale ISR
+	uint32_t actualMicros = micros();
+uint32_t actualMillis = millis();										// indica i microsecondi dell'attuale ISR
 
 	if (_bitCounter == 0) {
 		_messageSlot = searchFreeMessage();
@@ -130,9 +131,9 @@ void Rcn600::ISR_SUSI(void) {
 		}
 	}
 
-	if (millis() - _lastByte_time > SYNC_TIME) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
+	if ( ( (actualMillis - _lastByte_time) < MAX_MESSAGES_DELAY) && ( (actualMillis - _lastByte_time) > SYNC_TIME) ) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
 		_bitCounter = 0;							// dopo il SYNC leggero' il primo bit
-		_lastByte_time = millis();					// imposto questo istante come ultimo Byte letto
+		_lastByte_time = actualMillis;					// imposto questo istante come ultimo Byte letto
 
 		// Sto leggendo il primo bit del messaggio 
 		_messageSlot->Byte[0] = READ_DATA_PIN;
@@ -153,7 +154,7 @@ void Rcn600::ISR_SUSI(void) {
 			// Se sono qui _bitCounter e' uguale a 8 , 16 o 24
 			switch (_bitCounter) {
 				case 8: {
-					_lastByte_time = millis(); // Memorizzo l'istante in cui ho letto il primo Byte
+					_lastByte_time = actualMillis; // Memorizzo l'istante in cui ho letto il primo Byte
 					break;
 				}
 				case 16: {	// Letti 2 Byte, devo controllare se sono sufficienti o se ne servono 3 (Manipolazione CVs)
@@ -163,7 +164,7 @@ void Rcn600::ISR_SUSI(void) {
 						_bitCounter = 0;
 					}
 					else { //Messaggio manipolazione CVs, devo acquisire il Terzo Byte 
-						_lastByte_time = millis();	// Memorizzo il momento in cui ho letto il secondo Byte del messaggio
+						_lastByte_time = actualMillis;	// Memorizzo il momento in cui ho letto il secondo Byte del messaggio
 					}					
 					break;
 				}
