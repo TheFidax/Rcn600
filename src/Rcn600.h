@@ -41,10 +41,10 @@
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 #define MAX_ADDRESS_VALUE			3
 
-#define MAX_MESSAGES_DELAY 7 //tempo Massimo che può trascorrere da due Byte di un messaggio
-#define	SYNC_TIME					9		//tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME				20		//minima durata di un Clock: 10 + 10 uS
-#define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
+#define MAX_MESSAGES_DELAY 6 //(7-1) tempo Massimo che può trascorrere da due Byte di un messaggio
+#define	SYNC_TIME					10		//(9+1) tempo necessario a sincronizzare Master e Slave: 9ms
+#define MIN_CLOCK_TIME				19		//(20-1)minima durata di un Clock: 10 + 10 uS
+#define MAX_CLOCK_TIME				501		//(500+1)massima durata di un Clock : livello alto + livello basso
 
 #define SUSI_BUFFER_LENGTH			5		//lunghezza buffer dove sono contenuti i messaggi
 #define FREE_MESSAGE_SLOT			(Rcn600Message*) this	//valore simbolico per contrassegnare gli slot del buffer come liberi
