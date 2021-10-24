@@ -41,6 +41,7 @@
 #define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
 #define MAX_ADDRESS_VALUE			3
 
+#define MAX_MESSAGES_DELAY 7 //tempo Massimo che può trascorrere da due Byte di un messaggio
 #define	SYNC_TIME					9		//tempo necessario a sincronizzare Master e Slave: 9ms
 #define MIN_CLOCK_TIME				20		//minima durata di un Clock: 10 + 10 uS
 #define MAX_CLOCK_TIME				500		//massima durata di un Clock : livello alto + livello basso
