@@ -114,11 +114,11 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 
 void Rcn600::ISR_SUSI(void) {
 	static uint32_t _lastByte_time = millis();								// tempo a cui e' stato letto l'ultimo Byte
-	static uint32_t _lastbit_time = ( micros() - MIN_CLOCK_TIME);			// tempo a cui e' stato letto l'ultimo bit
+	static uint32_t _lastbit_time = (micros() - MIN_CLOCK_TIME);			// tempo a cui e' stato letto l'ultimo bit
 	static uint8_t	_bitCounter = 0;										// indica quale bit si deve leggere
 	static Rcn600Message* _messageSlot = NULL;								// indica in quale slot sta venendo salvato il messaggio in ricezione
 	uint32_t actualMicros = micros();
-uint32_t actualMillis = millis();										// indica i microsecondi dell'attuale ISR
+	uint32_t actualMillis = millis();										// indica i microsecondi dell'attuale ISR
 
 	if (_bitCounter == 0) {
 		_messageSlot = searchFreeMessage();
@@ -131,7 +131,7 @@ uint32_t actualMillis = millis();										// indica i microsecondi dell'attuale
 		}
 	}
 
-	if ( ( (actualMillis - _lastByte_time) < (MAX_MESSAGES_DELAY)) && ( (actualMillis - _lastByte_time) > (SYNC_TIME)) ) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
+	if (((actualMillis - _lastByte_time) < (MAX_MESSAGES_DELAY)) && ((actualMillis - _lastByte_time) > (SYNC_TIME))) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
 		_bitCounter = 0;							// dopo il SYNC leggero' il primo bit
 		_lastByte_time = actualMillis;					// imposto questo istante come ultimo Byte letto
 
@@ -141,7 +141,7 @@ uint32_t actualMillis = millis();										// indica i microsecondi dell'attuale
 		_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
 		_lastbit_time = actualMicros;				// memorizzo l'istante in cui e' stato letto il bit
 	}
-	else if (((actualMicros - _lastbit_time) > (MIN_CLOCK_TIME) ) && ((actualMicros - _lastbit_time) < (MAX_CLOCK_TIME))) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+	else if (((actualMicros - _lastbit_time) > (MIN_CLOCK_TIME)) && ((actualMicros - _lastbit_time) < (MAX_CLOCK_TIME))) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 		// salvo il nuovo bit letto
 		bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), READ_DATA_PIN);
 
@@ -165,7 +165,7 @@ uint32_t actualMillis = millis();										// indica i microsecondi dell'attuale
 					}
 					else { //Messaggio manipolazione CVs, devo acquisire il Terzo Byte 
 						_lastByte_time = actualMillis;	// Memorizzo il momento in cui ho letto il secondo Byte del messaggio
-					}					
+					}
 					break;
 				}
 				case 24: {	// Letto un messaggio per la manipolazione CVs -> Messaggio Completo!
@@ -187,7 +187,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	DATA_PIN_OUTPUT;
 	DATA_PIN_LOW;
 
-	delay(2);
+	delay(1);
 
 	//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
 	DATA_PIN_HIGH;
@@ -230,8 +230,6 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 		return;
 	} 
 	else {
-		Data_ACK();
-
 		if (notifySusiCVRead) {		// Se e' presente il sistema di memorizzazione CV, leggo il valore della CV memorizzata
 			CV_Value = notifySusiCVRead(CV_Number);
 		}
