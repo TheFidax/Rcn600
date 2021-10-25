@@ -447,7 +447,7 @@ void notifyCVResetFactoryDefault(void) {
 #endif
 
 void setup() {
-	Serial.begin(115200);   // Avvio la comunicazione Seriale
+	Serial.begin(500000);   // Avvio la comunicazione Seriale
 	while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
 
 	Serial.println("SUSI Print Decoded Messages:"); //Informo l'utente che e' pronto a leggere i Byte

@@ -34,19 +34,19 @@
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
 
-#define	EXTERNAL_CLOCK				255		//indica che il Clock e' acquisito tramite sistema Esterno alla libreria
+#define	EXTERNAL_CLOCK				255		// indica che il Clock e' acquisito tramite sistema Esterno alla libreria
 
-#define	MANUFACTER_ID				13		//identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
-#define	SUSI_VER					10		//identifica la versione del protocollo SUSI: 1.0
-#define DEFAULT_SLAVE_NUMBER		1		//identifica l'indirizzo dello Slave SUSI: default 1
+#define	MANUFACTER_ID				13		// identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
+#define	SUSI_VER					10		// identifica la versione del protocollo SUSI: 1.0
+#define DEFAULT_SLAVE_NUMBER		1		// identifica l'indirizzo dello Slave SUSI: default 1
 #define MAX_ADDRESS_VALUE			3
 
-#define MAX_MESSAGES_DELAY 8 //(7+1) tempo Massimo che può trascorrere da due Byte di un messaggio
-#define	SYNC_TIME					8		//(9-1) tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME				19		//(20-1)minima durata di un Clock: 10 + 10 uS
-#define MAX_CLOCK_TIME				501		//(500+1)massima durata di un Clock : livello alto + livello basso
+#define MAX_MESSAGES_DELAY			8		// (7+1) tempo Massimo che può trascorrere da due Byte di un messaggio
+#define	SYNC_TIME					8		// (9-1) tempo necessario a sincronizzare Master e Slave: 9ms
+#define MIN_CLOCK_TIME				19		// (20-1)minima durata di un Clock: 10 + 10 uS
+#define MAX_CLOCK_TIME				501		// (500+1)massima durata di un Clock : livello alto + livello basso
 
-#define SUSI_BUFFER_LENGTH			5		//lunghezza buffer dove sono contenuti i messaggi
+#define SUSI_BUFFER_LENGTH			5		// lunghezza buffer dove sono contenuti i messaggi
 #define FREE_MESSAGE_SLOT			(Rcn600Message*) this	//valore simbolico per contrassegnare gli slot del buffer come liberi
 
 typedef struct message {

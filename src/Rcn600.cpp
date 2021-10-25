@@ -113,67 +113,140 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::ISR_SUSI(void) {
-	static uint32_t _lastByte_time = millis();								// tempo a cui e' stato letto l'ultimo Byte
-	static uint32_t _lastbit_time = (micros() - MIN_CLOCK_TIME);			// tempo a cui e' stato letto l'ultimo bit
-	static uint8_t	_bitCounter = 0;										// indica quale bit si deve leggere
-	static Rcn600Message* _messageSlot = NULL;								// indica in quale slot sta venendo salvato il messaggio in ricezione
+	// Variabili 'statiche' per i confronti e/o immagazzinare informazioni
+	static uint32_t lastByte_time = millis();								// tempo a cui e' stato letto l'ultimo Byte
+	static uint32_t lastbit_time = (micros() - MIN_CLOCK_TIME);				// tempo a cui e' stato letto l'ultimo bit
+	static uint8_t	bitCounter = 0;											// indica quale bit si deve leggere
+	static Rcn600Message* messageSlot = NULL;								// indica in quale slot sta venendo salvato il messaggio in ricezione
+
+	// Variaibli 'dinamiche' allocate ad ogni iterazione
+	uint32_t microsActualISR = micros();									// indica a che 'microsecondi' sta avvenendo l'attuale ISR
+	uint32_t millisActualISR = millis();									// indica a che 'millisecondi' sta avvenendo l'attuale ISR
+	uint32_t millisDelayFromLastByte = (millisActualISR - lastByte_time);
+	uint32_t microsDelayFromLastBit = (microsActualISR - lastbit_time);
+
+	if (messageSlot == NULL) {												// Se NON E' disponibile uno slot dove salvare i dati acquisiti
+		messageSlot = searchFreeMessage();									// ne cerco uno libero
+		
+		if (messageSlot == NULL) {											// Nessuno slot disponibile
+			return;															// Non acquisisco nulla ed esco dall'ISR
+		}
+		else {																// Slot libero trovato, posso acquisire un messaggio
+			messageSlot->nextMessage = NULL;								// Imposto lo Slot come 'in utilizzo'
+		}														
+	}
+
+	if (millisDelayFromLastByte > SYNC_TIME) {								// Controllo se e' avvenuta la 'sincronizzazione': eseguo un reset dei contatori per acquisisire un messaggio da 0
+		bitCounter = 0;														// dopo il SYNC leggero' il primo bit
+		lastByte_time = millisActualISR;									// imposto questo istante come ultimo Byte letto
+ 
+		messageSlot->Byte[0] = READ_DATA_PIN;								// Sto leggendo il primo bit del messaggio
+
+		bitCounter = 1;														// Ho letto il bit 0, il prossimo da leggere e' il bit 1
+		lastbit_time = microsActualISR;										// memorizzo l'istante in cui e' stato letto il bit
+	}
+	else if (millisDelayFromLastByte < MAX_MESSAGES_DELAY) {				// Dall'ultimo Byte sono passato meno di 7ms -> Timing 'millis' valido
+		if ((microsDelayFromLastBit > MIN_CLOCK_TIME) && (microsDelayFromLastBit < MAX_CLOCK_TIME)) {		//controllo se il timing 'micros' e' corretto
+			bitWrite(messageSlot->Byte[bitCounter / 8], (bitCounter % 8), READ_DATA_PIN);					// Salvo il bit letto nello slot libero
+			++bitCounter;													// Incremento il contatore dei bit letti
+			lastbit_time = microsActualISR;									// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
+
+			if ((bitCounter % 8) == 0) {
+				if (bitCounter == 8) {										// Ho letto un Byte completo
+					lastByte_time = millisActualISR;						// Memorizzo in che 'millis' e' stata completata la lettura del Byte
+				}
+				else if (bitCounter == 16) {								// Ho letto 2 Byte completi, lunghezza dei comandi 'normali' (NO CV)
+					if (!((messageSlot->Byte[0] == 119) || (messageSlot->Byte[0] == 123) || (messageSlot->Byte[0] == 127))) {		// Controllo che il comando NON sia per le CV
+						setNextMessage(messageSlot);						// Se e' un messaggio normale lo inserisco nella coda di quelli da decodificare
+
+						bitCounter = 0;										// Azzero il contatore dei bit per leggere un nuovo messaggio
+						messageSlot = NULL;									// Imposto il puntatore a NULL, al prossimo ISR cerchera' un nuovo Slot dove salvare il messaggio ricevuto
+					}
+					//else {}												// Comando per manipolare le CVs, NON faccio niente
+					lastByte_time = millisActualISR;						// Memorizzo in che 'millis' e' stata completata la lettura del secondo Byte
+				}
+				else if (bitCounter == 24) {								// Ho letto 3 Byte -> Comando manipolazione CVs
+					Serial.println(messageSlot->Byte[0]);
+					//processCVsMessage(messageSlot);							// Processo IMMEDIATAMENTE il messaggio ricevuto
+
+					messageSlot->nextMessage = FREE_MESSAGE_SLOT;			// Libero lo Slot per poterlo usare in futuro
+
+					bitCounter = 0;											// Azzero il contatore dei bit per leggere un nuovo messaggio
+					messageSlot = NULL;										// Imposto il puntatore a NULL, al prossimo ISR cerchera' un nuovo Slot dove salvare il messaggio ricevuto
+
+					lastByte_time = millisActualISR;						// Memorizzo in che 'millis' e' stata completata la lettura del Terzo Byte
+				}
+			}
+		}
+	}
+}
+/**/
+/*
+void Rcn600::ISR_SUSI(void) {
+	static uint32_t lastByte_time = millis();								// tempo a cui e' stato letto l'ultimo Byte
+	static uint32_t lastbit_time = (micros() - MIN_CLOCK_TIME);			// tempo a cui e' stato letto l'ultimo bit
+	static uint8_t	bitCounter = 0;										// indica quale bit si deve leggere
+	static Rcn600Message* messageSlot = NULL;								// indica in quale slot sta venendo salvato il messaggio in ricezione
 	uint32_t actualMicros = micros();
 	uint32_t actualMillis = millis();										// indica i microsecondi dell'attuale ISR
 
-	if (_bitCounter == 0) {
-		_messageSlot = searchFreeMessage();
+	if (bitCounter == 0) {
+		messageSlot = searchFreeMessage();
 
-		if (_messageSlot != NULL) {
-			_messageSlot->nextMessage = NULL;
+		if (messageSlot != NULL) {
+			messageSlot->nextMessage = NULL;
 		}
 		else {	// Nessuno slot libero dove salvare il messaggio
 			return;
 		}
 	}
 
-	if (((actualMillis - _lastByte_time) < (MAX_MESSAGES_DELAY)) && ((actualMillis - _lastByte_time) > (SYNC_TIME))) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
-		_bitCounter = 0;							// dopo il SYNC leggero' il primo bit
-		_lastByte_time = actualMillis;					// imposto questo istante come ultimo Byte letto
+	if ((actualMillis - lastByte_time) > SYNC_TIME) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
+		bitCounter = 0;							// dopo il SYNC leggero' il primo bit
+		lastByte_time = actualMillis;					// imposto questo istante come ultimo Byte letto
 
 		// Sto leggendo il primo bit del messaggio 
-		_messageSlot->Byte[0] = READ_DATA_PIN;
+		messageSlot->Byte[0] = READ_DATA_PIN;
 
-		_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
-		_lastbit_time = actualMicros;				// memorizzo l'istante in cui e' stato letto il bit
+		bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
+		lastbit_time = actualMicros;				// memorizzo l'istante in cui e' stato letto il bit
 	}
-	else if (((actualMicros - _lastbit_time) > (MIN_CLOCK_TIME)) && ((actualMicros - _lastbit_time) < (MAX_CLOCK_TIME))) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+	else if ((actualMillis - lastByte_time) > MAX_MESSAGES_DELAY) {
+		return;
+	}
+	else if (((actualMicros - lastbit_time) > MIN_CLOCK_TIME) && ((actualMicros - lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
 		// salvo il nuovo bit letto
 		bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), READ_DATA_PIN);
 
 		++_bitCounter;
-		_lastbit_time = actualMicros;
+		lastbit_time = actualMicros;
 
-		/* Controllo se ho letto un Byte (8 bit): il resto di _bitCounter / 8 deve essere 0 */
-		if ((_bitCounter % 8) == 0) {
+		// Controllo se ho letto un Byte (8 bit): il resto di _bitCounter / 8 deve essere 0
+		if ((bitCounter % 8) == 0) {
 
 			// Se sono qui _bitCounter e' uguale a 8 , 16 o 24
-			switch (_bitCounter) {
+			switch (bitCounter) {
 				case 8: {
-					_lastByte_time = actualMillis; // Memorizzo l'istante in cui ho letto il primo Byte
+					lastByte_time = actualMillis; // Memorizzo l'istante in cui ho letto il primo Byte
 					break;
 				}
 				case 16: {	// Letti 2 Byte, devo controllare se sono sufficienti o se ne servono 3 (Manipolazione CVs)
-					if ((_messageSlot->Byte[0] != 119) && (_messageSlot->Byte[0] != 123) && (_messageSlot->Byte[0] != 127)) {
-						setNextMessage(_messageSlot);
+					if ((messageSlot->Byte[0] != 119) && (messageSlot->Byte[0] != 123) && (messageSlot->Byte[0] != 127)) {
+						setNextMessage(messageSlot);
 
-						_bitCounter = 0;
+						bitCounter = 0;
 					}
 					else { //Messaggio manipolazione CVs, devo acquisire il Terzo Byte 
-						_lastByte_time = actualMillis;	// Memorizzo il momento in cui ho letto il secondo Byte del messaggio
+						lastByte_time = actualMillis;	// Memorizzo il momento in cui ho letto il secondo Byte del messaggio
 					}
 					break;
 				}
 				case 24: {	// Letto un messaggio per la manipolazione CVs -> Messaggio Completo!
-					processCVsMessage(_messageSlot);
+					processCVsMessage(messageSlot);
+					Serial.println(messageSlot->Byte[0]);
+					messageSlot->nextMessage = FREE_MESSAGE_SLOT;
 
-					_messageSlot->nextMessage = FREE_MESSAGE_SLOT;
-
-					_bitCounter = 0;
+					bitCounter = 0;
 					break;
 				}
 				default: {}
@@ -181,6 +254,7 @@ void Rcn600::ISR_SUSI(void) {
 		}
 	}
 }
+/**/
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */

@@ -26,12 +26,12 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
 }
 
 void setup() {    
-    Serial.begin(115200); // Avvio la comunicazione Seriale
-    while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
+	Serial.begin(500000);   // Avvio la comunicazione Seriale
+    	while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
     
-    Serial.println("SUSI Print Raw Messages:");
+    	Serial.println("SUSI Print Raw Messages:");
 
-    SUSI.init();      // Avvio la libreria
+    	SUSI.init();      // Avvio la libreria
 }
 
 void loop() {

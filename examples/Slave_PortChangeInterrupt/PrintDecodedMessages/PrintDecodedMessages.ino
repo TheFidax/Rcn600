@@ -435,15 +435,15 @@ void notifyCVResetFactoryDefault(void) {
 #endif
 
 void setup() {
-	Serial.begin(115200);   // Avvio la comunicazione Seriale
+	Serial.begin(500000);   // Avvio la comunicazione Seriale
 	while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
 
 	Serial.println("SUSI Print Decoded Messages Port Change Interrupt:"); //Informo l'utente che e' pronto a leggere i Byte
 
-    // Imposto il pin 7 come pin per il clock
-    pinMode(7, INPUT);          // 7 == PD7
-    PCICR   |= 0b00000100;      // Abilito i "Port Change Interrupt" sulla porta D
-    PCMSK2  |= 0b10000000;      // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
+    	// Imposto il pin 7 come pin per il clock
+    	pinMode(7, INPUT);          // 7 == PD7
+    	PCICR   |= 0b00000100;      // Abilito i "Port Change Interrupt" sulla porta D
+    	PCMSK2  |= 0b10000000;      // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
 
 	SUSI.init();            // Avvio la libreria
 }
