@@ -167,7 +167,7 @@ void Rcn600::ISR_SUSI(void) {
 				}
 				else if (bitCounter == 24) {								// Ho letto 3 Byte -> Comando manipolazione CVs
 					Serial.println(messageSlot->Byte[0]);
-					//processCVsMessage(messageSlot);							// Processo IMMEDIATAMENTE il messaggio ricevuto
+					processCVsMessage(messageSlot);							// Processo IMMEDIATAMENTE il messaggio ricevuto
 
 					messageSlot->nextMessage = FREE_MESSAGE_SLOT;			// Libero lo Slot per poterlo usare in futuro
 
