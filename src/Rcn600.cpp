@@ -189,9 +189,90 @@ void Rcn600::ISR_SUSI(void) {
 
 #else	// ISR v1.44 
 
+void Rcn600::ISR_SUSI(void) {
+	static uint32_t _lastByte_time = 0;			// tempo a cui e' stato letto l'ultimo Byte
+	static uint32_t _lastbit_time = 0;			// tempo a cui e' stato letto l'ultimo bit
+	static uint8_t	_bitCounter = 0;			// indica quale bit si deve leggere
+	static Rcn600Message* _messageSlot = NULL;	// indica in quale slot sta venendo salvato il messaggio in ricezione
 
+	if (_bitCounter == 0) {
+		_messageSlot = searchFreeMessage();
+
+		if (_messageSlot != NULL) {
+			_messageSlot->nextMessage = NULL;
+		}
+	}
+
+	//controllo che l'ultimo messaggio ricevuto sia stato processato: in caso positivo procedo con la lettura di uno nuvo
+
+	if (_messageSlot != NULL) {
+		if (millis() - _lastByte_time > SYNC_TIME) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
+			_bitCounter = 0;							// dopo il SYNC leggero' il primo bit
+			_lastByte_time = millis();					// imposto questo istante come ultimo Byte letto
+
+			// Sto leggendo il primo bit del messaggio 
+#ifdef DIGITAL_PIN_FAST
+			_messageSlot->Byte[0] = _DATA_pin->digitalReadFast();
+#else
+			_messageSlot->Byte[0] = digitalRead(_DATA_pin);
+#endif		
+
+			_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
+			_lastbit_time = micros();					// memorizzo l'istante in cui e' stato letto il bit
+		}
+		else if (((micros() - _lastbit_time) > MIN_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
+			// salvo il nuovo bit letto
+#ifdef DIGITAL_PIN_FAST
+			bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), _DATA_pin->digitalReadFast());
+#else
+			bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), digitalRead(_DATA_pin));
+#endif
+
+			++_bitCounter;
+			_lastbit_time = micros();
+
+			/* Controllo se ho letto un Byte (8 bit) */
+			if (_bitCounter == 8 || _bitCounter == 16 || _bitCounter == 24) {
+				/* Se ho letto un Byte, memorizzo il momento in cui la lettura è avvenuta e resetto il contatore dei bit */
+				_lastByte_time = millis();
+
+				// Se sono qui _bitCounter e' uguale a 8 , 16 o 24
+				switch (_bitCounter) {
+				case 16: {	// Letti 2 Byte, devo controllare se sono sufficienti o se ne servono 3 (Manipolazione CVs)
+					if ((_messageSlot->Byte[0] != 119) && (_messageSlot->Byte[0] != 123) && (_messageSlot->Byte[0] != 127)) {
+						setNextMessage(_messageSlot);
+
+						_bitCounter = 0;
+					}
+					/*
+					else { Messaggio manipolazione CVs, devo acquisire il Terzo Byte }
+					*/
+					break;
+				}
+				case 24: {	// Letto un messaggio per la manipolazione CVs -> Messaggio Completo!
+					processCVsMessage(_messageSlot);
+
+					_messageSlot->nextMessage = FREE_MESSAGE_SLOT;
+
+					_bitCounter = 0;
+					break;
+				}
+				default:	// _bitCounter == 8
+					break;
+				}
+			}
+		}
+	}
+	/*
+	else {
+		Nessuno slot libero per salvare il messaggio...
+	}
+	*/
+}
 
 #endif
+
+#ifdef EXPERIMENTAL_ISR	// ISR v1.5
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
@@ -204,6 +285,39 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	DATA_PIN_HIGH;
 	DATA_PIN_INPUT;
 }
+
+#else
+
+void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
+
+	if (_CLK_pin != ONLY_DECODER) {
+		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
+#ifdef DIGITAL_PIN_FAST
+		_DATA_pin->pinModeFast(OUTPUT);
+		_DATA_pin->digitalWriteFast(LOW);
+#else
+		pinMode(_DATA_pin, OUTPUT);
+		digitalWrite(_DATA_pin, LOW);
+#endif
+
+		delay(1);
+
+#ifdef DIGITAL_PIN_FAST
+		_DATA_pin->pinModeFast(INPUT);
+#else
+		pinMode(_DATA_pin, INPUT);
+#endif
+		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
+
+	}/*
+	else {
+		if (ackManualMessage) {
+			ackManualMessage();
+		}
+	}*/
+}
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
