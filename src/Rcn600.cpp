@@ -290,7 +290,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 
-	if (_CLK_pin != ONLY_DECODER) {
+	//if (_CLK_pin != ONLY_DECODER) {
 		/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 #ifdef DIGITAL_PIN_FAST
 		_DATA_pin->pinModeFast(OUTPUT);
@@ -309,7 +309,7 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 #endif
 		//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
 
-	}/*
+	//}/*
 	else {
 		if (ackManualMessage) {
 			ackManualMessage();
