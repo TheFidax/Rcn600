@@ -2,13 +2,14 @@
 #define RCN_600_h
 
 /* LIB_VERSION: 1.5.0 */
-//#define V1_5_FEATURES
 
 #include "Arduino.h"
 #include <stdint.h>
 #include <stdbool.h>
 
 #ifdef __AVR__	// Se la piattaforma e' AVR posso usare la libreria digitalPinFast; e' escludibile per risparmiare RAM
+	#include <util/delay.h>
+
 	#define	DIGITAL_PIN_FAST
 #endif // __AVR__
 
@@ -42,10 +43,10 @@
 #define DEFAULT_SLAVE_NUMBER		1		// identifica l'indirizzo dello Slave SUSI: default 1
 #define MAX_ADDRESS_VALUE			3
 
-#define MAX_MESSAGES_DELAY			8		// (7+1) tempo Massimo che può trascorrere da due Byte di un messaggio
-#define	SYNC_TIME					8		// (9-1) tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME				19		// (20-1)minima durata di un Clock: 10 + 10 uS
-#define MAX_CLOCK_TIME				501		// (500+1)massima durata di un Clock : livello alto + livello basso
+#define MAX_MESSAGES_DELAY			7		// tempo Massimo che può trascorrere da due Byte di un messaggio
+#define	SYNC_TIME					9		// tempo necessario a sincronizzare Master e Slave: 9ms
+#define MIN_CLOCK_TIME				20		// minima durata di un Clock: 10 + 10 uS
+#define MAX_CLOCK_TIME				500		// massima durata di un Clock : livello alto + livello basso
 
 #define SUSI_BUFFER_LENGTH			5		// lunghezza buffer dove sono contenuti i messaggi
 #define FREE_MESSAGE_SLOT			(Rcn600Message*) this	//valore simbolico per contrassegnare gli slot del buffer come liberi
@@ -75,8 +76,8 @@ class Rcn600 {
 		Rcn600Message* searchFreeMessage(void);				// Cerca nel Buffer uno slot dove salvare il messaggio in ricezione
 		void setNextMessage(Rcn600Message* nextMessage);	// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
 		void Data_ACK(void);								// funzione per esguire l'ACK della linea DATA quando necessario
-		bool isCVvalid(uint16_t CV);						// ritorna True se il numero della CV passato e' valido per questo modulo Slave
-		void processCVsMessage(Rcn600Message* CvMessage);	// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
+		uint8_t isCVvalid(uint16_t CV);						// ritorna True se il numero della CV passato e' valido per questo modulo Slave
+		void processCVsMessage(Rcn600Message CvMessage);	// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
 
 	public:					/* Metodi Pubblici */
 		Rcn600(uint8_t CLK_pin, uint8_t DATA_pin);			// Creazione dell'oggetto Rcn600 con pin di Interrupt e pin Data

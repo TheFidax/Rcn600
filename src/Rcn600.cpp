@@ -118,159 +118,85 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef V1_5_FEATURES	// ISR v1.5
-
 void Rcn600::ISR_SUSI(void) {
 	// Variabili 'statiche' per i confronti e/o immagazzinare informazioni
-	static uint32_t lastByte_time = millis();								// tempo a cui e' stato letto l'ultimo Byte
-	static uint32_t lastbit_time = (micros() - MIN_CLOCK_TIME);				// tempo a cui e' stato letto l'ultimo bit
-	static uint8_t	bitCounter = 0;											// indica quale bit si deve leggere
-	static Rcn600Message* messageSlot;										// indica in quale slot sta venendo salvato il messaggio in ricezione
+	static uint32_t lastByte_time = millis();													// tempo a cui e' stato letto l'ultimo Byte
+	static uint32_t lastbit_time = (micros() - MIN_CLOCK_TIME);									// tempo a cui e' stato letto l'ultimo bit
+	static uint8_t	bitCounter = 0;																// indica quale bit si deve leggere
+	static Rcn600Message* messageSlot;															// indica in quale slot sta venendo salvato il messaggio in ricezione
 
 	// Variaibli 'dinamiche' allocate ad ogni iterazione
-	uint32_t microsActualISR = micros();									// indica a che 'microsecondi' sta avvenendo l'attuale ISR
-	uint32_t millisActualISR = millis();									// indica a che 'millisecondi' sta avvenendo l'attuale ISR
-	uint32_t millisDelayFromLastByte = (millisActualISR - lastByte_time);
-	uint32_t microsDelayFromLastBit = (microsActualISR - lastbit_time);
+	uint32_t microsActualISR = micros();														// indica a che 'microsecondi' sta avvenendo l'attuale ISR
+	uint32_t millisActualISR = millis();														// indica a che 'millisecondi' sta avvenendo l'attuale ISR
+	uint8_t	millisDelayFromLastByte = (millisActualISR - lastByte_time);
+	uint16_t microsDelayFromLastBit = (microsActualISR - lastbit_time);
 
-	if (bitCounter == 0) {													// Se NON E' disponibile uno slot dove salvare i dati acquisiti
-		messageSlot = searchFreeMessage();									// ne cerco uno libero
+	if (bitCounter == 0) {																		// Se NON E' disponibile uno slot dove salvare i dati acquisiti
+		messageSlot = searchFreeMessage();														// ne cerco uno libero
 		
-		if (messageSlot == NULL) {											// Nessuno slot disponibile
-			return;															// Non acquisisco nulla ed esco dall'ISR
-		}
-		else {																// Slot libero trovato, posso acquisire un messaggio
-			messageSlot->nextMessage = NULL;								// Imposto lo Slot come 'in utilizzo'
-		}														
+		if (messageSlot == NULL) {	return;	}													// Nessuno slot disponibile -> Non acquisisco nulla
+		else {																					// Slot libero trovato -> Acquisisco il primo bit
+			messageSlot->nextMessage = NULL;													// Slot libero trovato -> Imposto lo Slot come 'in utilizzo'
+			if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}											// Passati MENO di 20uS -> Errore
+			else if (microsDelayFromLastBit > MAX_CLOCK_TIME) {}									// Passati PIU' di 500uS -> Errore
+			else {																					// Timing Corretto
+				messageSlot->Byte[0] = READ_DATA_PIN;												// Salvo il bit nella posizione 0
+				++bitCounter;																		// Incremento il contatore dei bit letti
+				lastbit_time = microsActualISR;														// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
+			}
+		}																			
 	}
+	if (millisDelayFromLastByte < MAX_MESSAGES_DELAY) {											// Dall'ultimo Byte sono passato meno di 7ms -> Timing 'millis' valido
+		if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}											// Passati MENO di 20uS -> Errore
+		else if(microsDelayFromLastBit > MAX_CLOCK_TIME) {}										// Passati PIU' di 500uS -> Errore
+		else {																					// Timing Corretto
+			bitWrite(messageSlot->Byte[bitCounter / 8], (bitCounter % 8), READ_DATA_PIN);		// Salvo il bit letto nello slot libero
+			++bitCounter;																		// Incremento il contatore dei bit letti
+			lastbit_time = microsActualISR;														// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
 
-	if (millisDelayFromLastByte > SYNC_TIME) {								// Controllo se e' avvenuta la 'sincronizzazione': eseguo un reset dei contatori per acquisisire un messaggio da 0
-		bitCounter = 0;														// dopo il SYNC leggero' il primo bit
-		lastByte_time = millisActualISR;									// imposto questo istante come ultimo Byte letto
+			if ((bitCounter % 8) == 0) {														// Controllo se sono stati letti 8 o multipli di 8 bit
+				if (bitCounter == 16) {															// Ho letto 2 Byte completi, lunghezza dei comandi 'normali' (NO CV)
+					if (messageSlot->Byte[0] < 118) {											// Controllo che il comando NON sia per le CV -> i comandi CV sono maggiori di 118 (119, 123, 127)
+						setNextMessage(messageSlot);											// Se e' un messaggio normale lo inserisco nella coda di quelli da decodificare
+
+						bitCounter = 0;															// Azzero il contatore dei bit per leggere un nuovo messaggio
+					}
+					//else {}																	// Comando per manipolare le CVs, NON faccio niente
+				}
+				else if (bitCounter == 24) {													// Ho letto 3 Byte -> Comando manipolazione CVs
+					processCVsMessage(*messageSlot);											// Processo IMMEDIATAMENTE il messaggio ricevuto
+
+					messageSlot->nextMessage = FREE_MESSAGE_SLOT;								// Libero lo Slot per poterlo usare in futuro
+
+					bitCounter = 0;																// Azzero il contatore dei bit per leggere un nuovo messaggio
+				}
+
+				lastByte_time = millisActualISR;												// Memorizzo in che 'millis' e' stata completata la lettura del Byte
+			}
+		}
+	}
+	else if (millisDelayFromLastByte > SYNC_TIME) {												// Sono passati piu' di 7ms -> Controllo se e' avvenuta la 'sincronizzazione': eseguo un reset dei contatori per acquisisire un messaggio da 0
+		bitCounter = 0;																			// dopo il SYNC leggero' il primo bit
+		lastByte_time = millisActualISR;														// imposto questo istante come ultimo Byte letto
  
-		messageSlot->Byte[0] = READ_DATA_PIN;								// Sto leggendo il primo bit del messaggio
+		messageSlot->Byte[0] = READ_DATA_PIN;													// Sto leggendo il primo bit del messaggio
 
-		bitCounter = 1;														// Ho letto il bit 0, il prossimo da leggere e' il bit 1
-		lastbit_time = microsActualISR;										// memorizzo l'istante in cui e' stato letto il bit
+		++bitCounter;																			// Ho letto il bit 0, il prossimo da leggere e' il bit 1
+		lastbit_time = microsActualISR;															// memorizzo l'istante in cui e' stato letto il bit
 	}
-	else if (millisDelayFromLastByte < MAX_MESSAGES_DELAY) {				// Dall'ultimo Byte sono passato meno di 7ms -> Timing 'millis' valido
-		if ((microsDelayFromLastBit > MIN_CLOCK_TIME) && (microsDelayFromLastBit < MAX_CLOCK_TIME)) {		//controllo se il timing 'micros' e' corretto
-			bitWrite(messageSlot->Byte[bitCounter / 8], (bitCounter % 8), READ_DATA_PIN);					// Salvo il bit letto nello slot libero
-			++bitCounter;													// Incremento il contatore dei bit letti
-			lastbit_time = microsActualISR;									// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
-
-			if ((bitCounter % 8) == 0) {									// Controllo se sono stati letti 8 o multipli di 8 bit
-				if (bitCounter == 8) {										// Ho letto un Byte completo
-					lastByte_time = millisActualISR;						// Memorizzo in che 'millis' e' stata completata la lettura del Byte
-				}
-				else if (bitCounter == 16) {								// Ho letto 2 Byte completi, lunghezza dei comandi 'normali' (NO CV)
-					if (!((messageSlot->Byte[0] == 119) || (messageSlot->Byte[0] == 123) || (messageSlot->Byte[0] == 127))) {		// Controllo che il comando NON sia per le CV
-						setNextMessage(messageSlot);						// Se e' un messaggio normale lo inserisco nella coda di quelli da decodificare
-
-						bitCounter = 0;										// Azzero il contatore dei bit per leggere un nuovo messaggio
-					}
-					//else {}												// Comando per manipolare le CVs, NON faccio niente
-					lastByte_time = millisActualISR;						// Memorizzo in che 'millis' e' stata completata la lettura del secondo Byte
-				}
-				else if (bitCounter == 24) {								// Ho letto 3 Byte -> Comando manipolazione CVs
-					Serial.println(messageSlot->Byte[0]);
-					processCVsMessage(messageSlot);							// Processo IMMEDIATAMENTE il messaggio ricevuto
-
-					messageSlot->nextMessage = FREE_MESSAGE_SLOT;			// Libero lo Slot per poterlo usare in futuro
-
-					bitCounter = 0;											// Azzero il contatore dei bit per leggere un nuovo messaggio
-
-					lastByte_time = millisActualISR;						// Memorizzo in che 'millis' e' stata completata la lettura del Terzo Byte
-				}
-			}
-		}
-	}
+	// else {}																					// trascorsi PIU' di 7ms ma MENO di 9ms -> Errore
 }
-
-#else	// ISR v1.44 
-
-void Rcn600::ISR_SUSI(void) {
-	static uint32_t _lastByte_time = 0;			// tempo a cui e' stato letto l'ultimo Byte
-	static uint32_t _lastbit_time = 0;			// tempo a cui e' stato letto l'ultimo bit
-	static uint8_t	_bitCounter = 0;			// indica quale bit si deve leggere
-	static Rcn600Message* _messageSlot = NULL;	// indica in quale slot sta venendo salvato il messaggio in ricezione
-
-	if (_bitCounter == 0) {
-		_messageSlot = searchFreeMessage();
-
-		if (_messageSlot != NULL) {
-			_messageSlot->nextMessage = NULL;
-		}
-	}
-
-	//controllo che l'ultimo messaggio ricevuto sia stato processato: in caso positivo procedo con la lettura di uno nuvo
-
-	if (_messageSlot != NULL) {
-		if (millis() - _lastByte_time > SYNC_TIME) {	// se sono passati piu' di 9ms dall'ultimo Byte ricevuto, devo resettare la lettura dei dati
-			_bitCounter = 0;							// dopo il SYNC leggero' il primo bit
-			_lastByte_time = millis();					// imposto questo istante come ultimo Byte letto
-
-			// Sto leggendo il primo bit del messaggio 
-			_messageSlot->Byte[0] = READ_DATA_PIN;	
-
-			_bitCounter = 1;							// Ho letto il bit0, il prossimo da leggere e' il bit 1
-			_lastbit_time = micros();					// memorizzo l'istante in cui e' stato letto il bit
-		}
-		else if (((micros() - _lastbit_time) > MIN_CLOCK_TIME) && ((micros() - _lastbit_time) < MAX_CLOCK_TIME)) { //se non sono passati ancora 9ms, devo controllare che la durata del bit sia valida: dall'ultimo bit letto devono essere passati almeno 10us e meno di 500us
-			// salvo il nuovo bit letto
-
-			bitWrite(_messageSlot->Byte[_bitCounter / 8], (_bitCounter % 8), READ_DATA_PIN);
-
-			++_bitCounter;
-			_lastbit_time = micros();
-
-			/* Controllo se ho letto un Byte (8 bit) */
-			if (_bitCounter == 8 || _bitCounter == 16 || _bitCounter == 24) {
-				/* Se ho letto un Byte, memorizzo il momento in cui la lettura è avvenuta e resetto il contatore dei bit */
-				_lastByte_time = millis();
-
-				// Se sono qui _bitCounter e' uguale a 8 , 16 o 24
-				switch (_bitCounter) {
-				case 16: {	// Letti 2 Byte, devo controllare se sono sufficienti o se ne servono 3 (Manipolazione CVs)
-					if ((_messageSlot->Byte[0] != 119) && (_messageSlot->Byte[0] != 123) && (_messageSlot->Byte[0] != 127)) {
-						setNextMessage(_messageSlot);
-
-						_bitCounter = 0;
-					}
-					/*
-					else { Messaggio manipolazione CVs, devo acquisire il Terzo Byte }
-					*/
-					break;
-				}
-				case 24: {	// Letto un messaggio per la manipolazione CVs -> Messaggio Completo!
-					processCVsMessage(_messageSlot);
-
-					_messageSlot->nextMessage = FREE_MESSAGE_SLOT;
-
-					_bitCounter = 0;
-					break;
-				}
-				default:	// _bitCounter == 8
-					break;
-				}
-			}
-		}
-	}
-	/*
-	else {
-		Nessuno slot libero per salvare il messaggio...
-	}
-	*/
-}
-
-#endif
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
 	DATA_PIN_OUTPUT;
 	DATA_PIN_LOW;
-
-	delay(1);
+	
+#ifdef __AVR__
+	_delay_us(1500);
+#else
+	delayMicroseconds(1500);
+#endif
 
 	//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
 	DATA_PIN_HIGH;
@@ -280,47 +206,57 @@ void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Rcn600::isCVvalid(uint16_t CV) {
+uint8_t Rcn600::isCVvalid(uint16_t CV) {
 	/* Questa funzione permette di determinare se il numero della CV e' valida per questo modulo SUSI
 	* Slave 1: 900 - 939
 	* Slave 2: 940 - 979
 	* Slave 3: 980 - 1019
 	* Per tutti: 1020 - 1024 */
 
+	uint8_t valid;
+
 	if ((_slaveAddress == 1) && ((CV >= 900) && (CV <= 939))) {
-		return true;
+		valid = 1;
 	}
 	else if ((_slaveAddress == 2) && ((CV >= 940) && (CV <= 979))) {
-		return true;
+		valid = 1;
 	}
 	else if ((_slaveAddress == 3) && ((CV >= 980) && (CV <= 1019))) {
-		return true;
+		valid = 1;
 	}
-	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {	//CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
-		return true;
+	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {											// CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
+		valid = 1;
 	}
 	else {
-		return false;
+		valid = 0;
 	}
-	return false;
+	return valid;
 }
 
-void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
-	uint16_t CV_Number = 897 + (CvMessage->Byte[1] & 0b0111111);
+void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
+	uint16_t CV_Number = 897 + (CvMessage.Byte[1] & 0b0111111);
 	uint8_t CV_Value;
-	
-	if (!isCVvalid(CV_Number)) {	// Se la CV non e' per questo Slave ignoro
-		return;
-	} 
-	else {
-		if (notifySusiCVRead) {		// Se e' presente il sistema di memorizzazione CV, leggo il valore della CV memorizzata
-			CV_Value = notifySusiCVRead(CV_Number);
-		}
-		else {
-			CV_Value = 255;
-		}
 
-		switch (CvMessage->Byte[0]) {
+	switch (CV_Number) {																			// Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione
+		case 897:	CV_Value = _slaveAddress;	break;
+		case 900:	CV_Value = MANUFACTER_ID;	break;
+		case 901:	CV_Value = SUSI_VER;		break;
+		case 940:	CV_Value = MANUFACTER_ID;	break;
+		case 941:	CV_Value = SUSI_VER;		break;
+		case 980:	CV_Value = MANUFACTER_ID;	break;
+		case 981:	CV_Value = SUSI_VER;		break;
+		default: {
+			if (notifySusiCVRead) {																	// Se e' presente il sistema di memorizzazione CV, leggo il valore della CV memorizzata
+				CV_Value = notifySusiCVRead(CV_Number);
+			}
+			else {
+				CV_Value = 255;
+			}
+		}
+	}
+	
+	if (isCVvalid(CV_Number)) {	// Se la CV non e' per questo Slave ignoro
+		switch (CvMessage.Byte[0]) {
 			case 119: {
 				/*	"CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
 				*
@@ -339,22 +275,9 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 				*	Pacchetti da 3 byte secondo [RCN-214]
 				*/
 
-				/* Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione */
-				if ((CV_Number == 897) || (CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981)) {
-					if (CV_Number == 897) {
-						CV_Value = _slaveAddress;
-					}
-					else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {	//identificano il produttore dello Slave
-						CV_Value = MANUFACTER_ID;
-					}
-					else { //identificano la versione software
-						CV_Value = SUSI_VER;
-					}
-				}
-
 				/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
-				if (CV_Value == CvMessage->Byte[2]) {
-					Data_ACK();
+				if (CV_Value == CvMessage.Byte[2]) {												// Controllo il valore ipotizzato dal master
+					Data_ACK();																		// se il valore corrisponde, eseguo un ACK
 				}
 
 				break;
@@ -376,37 +299,33 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 				* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
 				* Lo slave conferma la scrittura con un riconoscimento.
 				*/
-				uint8_t	bitValue	=	(CvMessage->Byte[2] & 0b00001000);	// leggo il valore del bit da confrontare/scrivere
-				uint8_t	bitPosition =	(CvMessage->Byte[2] & 0b00000111);	// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
-
-				if (CV_Number == 897) {
-					CV_Value = _slaveAddress;
-				}
-				else if ((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) {		//identificano il produttore dello Slave
-					CV_Value = MANUFACTER_ID;
-				}
-				else if ((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981)) {		//identificano la versione software
-					CV_Value = SUSI_VER;
-				}
+				uint8_t	bitValue	=	(CvMessage.Byte[2] & 0b00001000);							// leggo il valore del bit da confrontare/scrivere
+				uint8_t	bitPosition =	(CvMessage.Byte[2] & 0b00000111);							// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
 				//in base all'operazione richiesta eseguiro' un'azione
-				if (CvMessage->Byte[2] & 0b00010000) {	// 0 = Confronto dei bit
-					if (bitRead(CV_Value, bitPosition) == bitValue) {	//confronto il bit richiesto con quello memorizzato 
-						Data_ACK();
+				if (CvMessage.Byte[2] & 0b00010000) {												// se 1 scrivo
+					switch (CV_Number) {															// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
+						case 900:	return;
+						case 901:	return;
+						case 940:	return;
+						case 941:	return;
+						case 980:	return;
+						case 981:	return;
+						default: {																	// CV scrivibile
+							if (notifySusiCVWrite) {
+								bitWrite(CV_Value, bitPosition, bitRead(CvMessage.Byte[2], 3));		// scrivo il nuovo valore del bit
+
+								if (notifySusiCVWrite(CV_Number, CV_Value) == CV_Value) {			// memorizzo il nuovo valore della CV
+									Data_ACK();														// Eseguo un ACK come conferma dell'avvenuta operazione
+								}
+							}
+							// else {}																// nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+						}
 					}
 				}
-				else {									// 1 = Scrittura di un bit
-					if (!((CV_Number == 900) || (CV_Number == 901) || (CV_Number == 940) || (CV_Number == 941) || (CV_Number == 980) || (CV_Number == 981))) {
-						if (notifySusiCVWrite) {
-							bitWrite(CV_Value, bitPosition, bitRead(CvMessage->Byte[2], 3));						//scrivo il nuovo valore del bit
-
-							if (notifySusiCVWrite((897 + (CvMessage->Byte[1] & 0b01111111)), CV_Value) == CV_Value) {		//memorizzo il nuovo valore della CV
-								Data_ACK();
-							}
-						}
-						/* nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
-						else { }
-						*/
+				else {																				// se 0 leggo
+					if (bitRead(CV_Value, bitPosition) == bitValue) {								//	confronto il bit richiesto con quello memorizzato 
+						Data_ACK();																	// se corrisponde eseguo un ACK
 					}
 				}
 				break;
@@ -425,27 +344,31 @@ void Rcn600::processCVsMessage(Rcn600Message* CvMessage) {
 				*/
 				/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
-				if (!((CV_Number == 901) || (CV_Number == 941) || (CV_Number == 981))) {
-					if (((CV_Number == 900) || (CV_Number == 940) || (CV_Number == 980)) && (CvMessage->Byte[2] == 8)) {	//si vuole eseguire un Reset delle CVs
-						if (notifyCVResetFactoryDefault) {
-							notifyCVResetFactoryDefault();
+				switch (CV_Number) {																// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
+					case 901:	return;
+					case 941:	return;
+					case 981:	return;
+					case 900:	{}																	// controllo se si sta tentato di eseguire il reset delle CVs
+					case 940:	{}
+					case 980: {
+						if (notifyCVResetFactoryDefault) {											// Se e' presente il sistema di reset delle CVs
+							notifyCVResetFactoryDefault();											// Eseguo il reset
 
-							Data_ACK();
+							Data_ACK();																// Riporto un ACK come conferma operazione
 						}
+						break;
 					}
-					else {	//scrittura CVs
-						if (notifySusiCVWrite) {
-							if (notifySusiCVWrite(CV_Number, CvMessage->Byte[2]) == CvMessage->Byte[2]) {
-								Data_ACK();
+					default: {																		// CV scrivibile
+						if (notifySusiCVWrite) {													// Se e' presente il sistema memorizzazione CVs la scrivo
+							if (notifySusiCVWrite(CV_Number, CvMessage.Byte[2]) == CvMessage.Byte[2]) {
+								Data_ACK();															// Ad operazione eseguita confermo con un ACK
 							}
 						}
-						/*
-						else { nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla }
-						*/
+						//else {}																	//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
 					}
 				}
 
-				if (CV_Number == 897) {		/* Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato */
+				if (CV_Number == 897) {																// Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato
 					if (notifySusiCVRead) {
 						_slaveAddress = notifySusiCVRead(CV_Number);
 					}
