@@ -118,7 +118,7 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef EXPERIMENTAL_ISR	// ISR v1.5
+#ifdef V1_5_FEATURES	// ISR v1.5
 
 void Rcn600::ISR_SUSI(void) {
 	// Variabili 'statiche' per i confronti e/o immagazzinare informazioni
@@ -272,7 +272,7 @@ void Rcn600::ISR_SUSI(void) {
 
 #endif
 
-#ifdef EXPERIMENTAL_ISR	// ISR v1.5
+#ifdef V1_5_FEATURES	// ISR v1.5
 
 void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
 	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
