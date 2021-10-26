@@ -2,6 +2,7 @@
 #define RCN_600_h
 
 /* LIB_VERSION: 1.5.0 */
+//#define V1_5_FEATURES
 
 #include "Arduino.h"
 #include <stdint.h>
