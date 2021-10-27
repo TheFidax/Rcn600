@@ -330,9 +330,9 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 					}
 				}
 
-				if (CV_Number == 897) {																// Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato
+				if (CV_Number == ADDRESS_CV) {														// Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato
 					if (notifySusiCVRead) {
-						_slaveAddress = notifySusiCVRead(CV_Number);
+						_slaveAddress = notifySusiCVRead(ADDRESS_CV);
 					}
 				}
 
