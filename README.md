@@ -24,7 +24,7 @@ Libreria testata su Arduino UNO, Arduino NANO (ATmega328P) e ATmega128 (MegaCore
 
 Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI (Clock e Dati).<br/>
 Data  ---> 470Ω ---> Pin generico (anche di tipo analogico)<br/>
-Clock ---> 470Ω ---> Pin Interrupt<br/>
+Clock ---> 470Ω ---> Pin Interrupt (o PortChangeInterrupt)<br/>
 
 Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
 
