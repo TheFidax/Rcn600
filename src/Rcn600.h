@@ -25,7 +25,7 @@
 	#define		DATA_PIN_HIGH		_DATA_pin->digitalWriteFast(HIGH);
 	#define		DATA_PIN_LOW		_DATA_pin->digitalWriteFast(LOW);
 	#define		DATA_PIN_DELETE		delete _DATA_pin
-	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT
+	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT				// Macro per esguire l'ACK della linea DATA quando necessario
 #else
 	#define		READ_DATA_PIN		digitalRead(_DATA_pin)
 	#define		DATA_PIN_INPUT		pinMode(_DATA_pin, INPUT);
@@ -34,9 +34,9 @@
 	#define		DATA_PIN_LOW		digitalWrite(_DATA_pin, LOW);
 	#define		DATA_PIN_DELETE		DATA_PIN_INPUT
 #ifdef __AVR__
-	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT
+	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT				// Macro per esguire l'ACK della linea DATA quando necessario
 #else
-	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	delayMicroseconds(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT
+	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	delayMicroseconds(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT		// Macro per esguire l'ACK della linea DATA quando necessario
 #endif // __AVR__
 
 #endif
@@ -82,7 +82,6 @@ class Rcn600 {
 		void initClass(void);								// Inizializza a Input i pin a cui e' connesso il bus
 		Rcn600Message* searchFreeMessage(void);				// Cerca nel Buffer uno slot dove salvare il messaggio in ricezione
 		void setNextMessage(Rcn600Message* nextMessage);	// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
-		void Data_ACK(void);								// funzione per esguire l'ACK della linea DATA quando necessario
 		uint8_t isCVvalid(uint16_t CV);						// ritorna True se il numero della CV passato e' valido per questo modulo Slave
 		void processCVsMessage(Rcn600Message CvMessage);	// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
 
