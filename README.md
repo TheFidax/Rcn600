@@ -1,5 +1,3 @@
-**!!! README PER 1.5.0 IN LAVORAZIONE !!!**
-
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheFidax/Rcn600)
 ![GitHub Release Date](https://img.shields.io/github/release-date/TheFidax/Rcn600?color=blue&label=last%20release)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/TheFidax/Rcn600/latest?color=orange)
@@ -20,8 +18,7 @@ Libreria testata su Arduino UNO, Arduino NANO (ATmega328P) e ATmega128 (MegaCore
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI, *se non specificato*, SONO A 5 VOLT !** 
 
 Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI (Clock e Dati).<br/>
-Data  ---> 470Ω ---> Pin generico (anche di tipo analogico)<br/>
-Clock ---> 470Ω ---> Pin Interrupt (o PortChangeInterrupt)<br/>
+<img src="collegamenti.jpg" width="1280">
 
 Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
 
