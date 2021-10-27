@@ -9,6 +9,7 @@
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
 * [API Libreria](#API-Libreria)
+* [Esempi di Utilizzo](#Esempi-di-Utilizzo)
 
 ------------
 
@@ -31,7 +32,14 @@ Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/T
 ------------
 
 # API Libreria
-
 Le Api per la libreria sono nel file "[readme.md](https://github.com/TheFidax/Rcn600/blob/master/src/readme.md)" disponibile sotto la cartella 'src'.</br>
+
+------------
+
+# Esempi di Utilizzo
+Sotto la cartella "[examples](https://github.com/TheFidax/Rcn600/tree/master/examples)" sono disponibili esempi di utilizzo della libreria.</br>
+Sono divisi in base alla modalita' di acquisizione del segnale di Clock:</br>
+- [Clock Mediante *pin di tipo Interrupt*](https://github.com/TheFidax/Rcn600/tree/master/examples/Slave_Interrupt)
+- [Clock Mediante *PortChangeInterrupt*](https://github.com/TheFidax/Rcn600/tree/master/examples/Slave_PortChangeInterrupt)
 
 ------------
