@@ -187,22 +187,6 @@ void Rcn600::ISR_SUSI(void) {
 	// else {}																					// trascorsi PIU' di 7ms ma MENO di 9ms -> Errore
 }
 
-void Rcn600::Data_ACK(void) {	//impulso ACK sulla linea Data
-	/* La normativa prevede che come ACK la linea Data venga messa a livello logico LOW per almeno 1ms (max 2ms) */
-	DATA_PIN_OUTPUT;
-	DATA_PIN_LOW;
-	
-#ifdef __AVR__
-	_delay_us(1500);
-#else
-	delayMicroseconds(1500);
-#endif
-
-	//rimetto la linea a INPUT (alta impedenza), per leggere un nuovo bit */
-	DATA_PIN_HIGH;
-	DATA_PIN_INPUT;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -277,7 +261,7 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 
 				/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
 				if (CV_Value == CvMessage.Byte[2]) {												// Controllo il valore ipotizzato dal master
-					Data_ACK();																		// se il valore corrisponde, eseguo un ACK
+					DATA_ACK;																		// se il valore corrisponde, eseguo un ACK
 				}
 
 				break;
@@ -316,7 +300,7 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 								bitWrite(CV_Value, bitPosition, bitRead(CvMessage.Byte[2], 3));		// scrivo il nuovo valore del bit
 
 								if (notifySusiCVWrite(CV_Number, CV_Value) == CV_Value) {			// memorizzo il nuovo valore della CV
-									Data_ACK();														// Eseguo un ACK come conferma dell'avvenuta operazione
+									DATA_ACK;														// Eseguo un ACK come conferma dell'avvenuta operazione
 								}
 							}
 							// else {}																// nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
@@ -325,7 +309,7 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 				}
 				else {																				// se 0 leggo
 					if (bitRead(CV_Value, bitPosition) == bitValue) {								//	confronto il bit richiesto con quello memorizzato 
-						Data_ACK();																	// se corrisponde eseguo un ACK
+						DATA_ACK;																	// se corrisponde eseguo un ACK
 					}
 				}
 				break;
@@ -354,14 +338,14 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 						if (notifyCVResetFactoryDefault) {											// Se e' presente il sistema di reset delle CVs
 							notifyCVResetFactoryDefault();											// Eseguo il reset
 
-							Data_ACK();																// Riporto un ACK come conferma operazione
+							DATA_ACK;																// Riporto un ACK come conferma operazione
 						}
 						break;
 					}
 					default: {																		// CV scrivibile
 						if (notifySusiCVWrite) {													// Se e' presente il sistema memorizzazione CVs la scrivo
 							if (notifySusiCVWrite(CV_Number, CvMessage.Byte[2]) == CvMessage.Byte[2]) {
-								Data_ACK();															// Ad operazione eseguita confermo con un ACK
+								DATA_ACK;															// Ad operazione eseguita confermo con un ACK
 							}
 						}
 						//else {}																	//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
