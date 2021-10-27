@@ -3,9 +3,8 @@
 
 /* LIB_VERSION: 1.5.0 */
 
-#include "Arduino.h"
-#include <stdint.h>
-#include <stdbool.h>
+#include "Arduino.h"																													// Libreria per le funzioni tipiche dell'Arduino IDE
+#include <stdint.h>																														// Libreria per i tipi 'uintX_t'
 
 #ifdef __AVR__																															// Se la piattaforma e' AVR puo' essere usata la libreria digitalPinFast; e' escludibile per risparmiare SRAM
 	#include <util/delay.h>																												// Libreria per la gestione del Delay tramite libreria AVR
