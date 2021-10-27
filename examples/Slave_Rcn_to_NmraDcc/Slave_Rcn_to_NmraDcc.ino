@@ -1,13 +1,24 @@
-// Questo esempio mostra come interfacciare la libreria RCN600 alla libreria NmraDcc per sfruttarne i suoi metodi
+/*  Questo esempio mostra come interfacciare la libreria RCN600 
+*   alla libreria NmraDcc per sfruttarne le Funzioni.
+*
+*   L'esempio e' pensato per essere utilizzato sia con pin Interrupt che con PortChangeInterrpt
+*   abilitando il PortChangeInterrupt mediante define
+*/
+
+#define SUSI_PORT_CHANGE_INTERRUPT          // Utilizza il PortChangeInterrupt al posto di un Pin di tipo Interrupt
 
 #include <NmraDcc.h>
 #include <Rcn600.h>
 
 #define This_Decoder_Address 3
 
-Rcn600 SUSI(2, 3);  //Definisco i pin a cui e' collegato il Bus SUSI
+#ifdef SUSI_PORT_CHANGE_INTERRUPT
+    Rcn600 SUSI(EXTERNAL_CLOCK, 3);         // SUSI con pin Data e ISR esterno
+#else
+    Rcn600 SUSI(2, 3);                      // Definisco i pin a cui e' collegato il Bus SUSI
+#endif // SUSI_PORT_CHANGE_INTERRUPT
 
-/* Metodi Libreria NmraDcc */
+/* Funzioni Libreria NmraDcc */
 
 // Uncomment the #define below to print all Speed Packets
 #define NOTIFY_DCC_SPEED
@@ -128,11 +139,33 @@ void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) {
 
 
 void setup() {
-	Serial.begin(500000);   // Avvio la comunicazione Seriale
-    	Serial.println("Interfacciamento Libreria RCN600 a NmraDcc");
+    Serial.begin(500000);           // Avvio la comunicazione Seriale
+    while (!Serial) {}              // Attendo che la comunicazione seriale sia disponibile
 
-    	SUSI.init();
+    Serial.println("RCN600 to NmraDcc:");
+
+#ifdef SUSI_PORT_CHANGE_INTERRUPT
+    // Imposto il pin 7 come pin per il clock
+    pinMode(7, INPUT);         	    // 7 == PD7
+    PCICR |= 0b00000100;      	    // Abilito i "Port Change Interrupt" sulla porta D
+    PCMSK2 |= 0b10000000;      	    // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
+#endif
+
+    SUSI.init();
 }
+
+#ifdef SUSI_PORT_CHANGE_INTERRUPT
+ISR(PCINT2_vect) {              	// Port D, PCINT16 - PCIN23
+    /*
+    * Da normativa i dati fanno letti sul "fronte di discesa" del Clock
+    * Devo richiamre l'ISR della Libreria quando so che e' avvenuto il fronte di discesa
+    */
+    if (!(PIND & (1 << PIND7))) {
+        SUSI.ISR_SUSI();
+    }
+}
+#endif // SUSI_PORT_CHANGE_INTERRUPT
+
 
 void loop() {
     SUSI.process();

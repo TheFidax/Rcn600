@@ -33,23 +33,23 @@ void setup() {
     	Serial.println("PrintRawMessages with External Clock:");
 
 	// Imposto il pin 7 come pin per il clock
-    	pinMode(7, INPUT);          // 7 == PD7
-	PCICR   |= 0b00000100;      // Abilito i "Port Change Interrupt" sulla porta D
-    	PCMSK2  |= 0b10000000;      // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
+    	pinMode(7, INPUT);         	// 7 == PD7
+	PCICR   |= 0b00000100;      	// Abilito i "Port Change Interrupt" sulla porta D
+    	PCMSK2  |= 0b10000000;      	// Abilito, per la porta D, il pin 7 (PD7 == pin 7)
 
-    SUSI.init();			// Avvio la libreria
+	SUSI.init();			// Avvio la libreria
 }
 
 void loop() {
-    SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
+	SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
 }
 
-ISR(PCINT2_vect) {              // Port D, PCINT16 - PCIN23
-    /* 
-    * Da normativa i dati fanno letti sul "fronte di discesa" del Clock
-    * Devo richiamre l'ISR della Libreria quando so che e' avvenuto il fronte di discesa
-    */ 
-    if (!(PIND & (1 << PIND7))) {
-        SUSI.ISR_SUSI();
-    }
+ISR(PCINT2_vect) {              	// Port D, PCINT16 - PCIN23
+    	/* 
+    	* Da normativa i dati fanno letti sul "fronte di discesa" del Clock
+	* Devo richiamre l'ISR della Libreria quando so che e' avvenuto il fronte di discesa
+	*/ 
+	if (!(PIND & (1 << PIND7))) {
+        	SUSI.ISR_SUSI();
+	}
 }
