@@ -11,6 +11,11 @@
 
 ------------
 
+# Metodi Obbligatori
+I seguenti metodi sono **obbligatori** per il corretto funzionamento della libreria.
+
+------------
+
 ```c
 Rcn600(CLK_pin, DATA_pin);
 ```
