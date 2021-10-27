@@ -435,17 +435,21 @@ void notifyCVResetFactoryDefault(void) {
 #endif
 
 void setup() {
-	Serial.begin(500000);   // Avvio la comunicazione Seriale
-	while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
+    if (EEPROM.read(ADDRESS_CV) > MAX_ADDRESS_VALUE) {       // Controllo che la CV contenente l'indirizzo del Modulo sia nei valori consentiti
+        EEPROM.update(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);    // In caso negativo aggiorno il valore
+    }
 
-	Serial.println("SUSI Print Decoded Messages Port Change Interrupt:"); //Informo l'utente che e' pronto a leggere i Byte
+    Serial.begin(500000);   // Avvio la comunicazione Seriale
+    while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
 
-    	// Imposto il pin 7 come pin per il clock
-    	pinMode(7, INPUT);          // 7 == PD7
-    	PCICR   |= 0b00000100;      // Abilito i "Port Change Interrupt" sulla porta D
-    	PCMSK2  |= 0b10000000;      // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
+    Serial.println("SUSI Print Decoded Messages Port Change Interrupt:"); //Informo l'utente che e' pronto a leggere i Byte
 
-	SUSI.init();            // Avvio la libreria
+    // Imposto il pin 7 come pin per il clock
+    pinMode(7, INPUT);          // 7 == PD7
+    PCICR |= 0b00000100;      // Abilito i "Port Change Interrupt" sulla porta D
+    PCMSK2 |= 0b10000000;      // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
+
+    SUSI.init();            // Avvio la libreria
 }
 
 void loop() {

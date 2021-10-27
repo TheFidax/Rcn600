@@ -28,8 +28,8 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
 }
 
 void setup() {
-    if ((EEPROM.read(897) != 1) || (EEPROM.read(897) != 2) || (EEPROM.read(897) != 3)) {	//controllo che la CV contenente l'indirizzo del Modulo sia nei valori consentiti
-        EEPROM.update(897, 1);
+    if(EEPROM.read(ADDRESS_CV) > MAX_ADDRESS_VALUE) {       // Controllo che la CV contenente l'indirizzo del Modulo sia nei valori consentiti
+        EEPROM.update(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);    // In caso negativo aggiorno il valore
     }
 
     pinMode(LED_BUILTIN, OUTPUT);

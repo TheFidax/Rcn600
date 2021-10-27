@@ -25,15 +25,19 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
     return EEPROM.read(CV);
 }
 
-void setup() {    
-	Serial.begin(500000);   // Avvio la comunicazione Seriale
-    	while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
-    
-    	Serial.println("SUSI Print Raw Messages:");
+void setup() {
+    if (EEPROM.read(ADDRESS_CV) > MAX_ADDRESS_VALUE) {      // Controllo che la CV contenente l'indirizzo del Modulo sia nei valori consentiti
+        EEPROM.update(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);    // In caso negativo aggiorno il valore
+    }
 
-    	SUSI.init();      // Avvio la libreria
+    Serial.begin(500000);                                   // Avvio la comunicazione Seriale
+    while (!Serial) {}                                      // Attendo che la comunicazione seriale sia disponibile
+
+    Serial.println("SUSI Print Raw Messages:");
+
+    SUSI.init();                                            // Avvio la libreria
 }
 
 void loop() {
-    SUSI.process();			// Elaboro piu' volte possibile i dati acquisiti
+    SUSI.process();			                                // Elaboro piu' volte possibile i dati acquisiti
 }
