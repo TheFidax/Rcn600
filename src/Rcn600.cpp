@@ -183,7 +183,7 @@ void Rcn600::ISR_SUSI(void) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
-	uint16_t CV_Number = 897 + (CvMessage.Byte[1] & 0b0111111);
+	uint16_t CV_Number = 897 + (CvMessage.Byte[1] & 0b01111111);									// Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
 	uint8_t CV_Value, valid;
 
 	if ((_slaveAddress == 1) && ((CV_Number >= 900) && (CV_Number <= 939))) {
@@ -289,7 +289,7 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 					}
 				}
 				else {																				// se 0 leggo
-					if (bitRead(CV_Value, bitPosition) == bitValue) {								//	confronto il bit richiesto con quello memorizzato 
+					if (bitRead(CV_Value, bitPosition) == bitValue) {								// confronto il bit richiesto con quello memorizzato 
 						DATA_ACK;																	// se corrisponde eseguo un ACK
 					}
 				}
