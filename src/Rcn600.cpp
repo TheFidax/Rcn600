@@ -2,81 +2,77 @@
 
 #include "Rcn600.h"
 
-Rcn600* pointerToRcn600;									// Puntatore alle Classe Rcn600
+Rcn600* pointerToRcn600;																		// Puntatore alle Classe Rcn600
 
-static void Rcn600InterruptHandler(void) {					// Handle per l'ISR del Clock
-	pointerToRcn600->ISR_SUSI();							// Chiamata all'ISR della Classe
+static void Rcn600InterruptHandler(void) {														// Handle per l'ISR del Clock
+	pointerToRcn600->ISR_SUSI();																// Chiamata all'ISR della Classe
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600::Rcn600(uint8_t CLK_pin, uint8_t DATA_pin) {
-	_CLK_pin = CLK_pin;										// Memorizzo il numero del pin di Clock sia per gestire l'Interrupt oppure per verificare se il clock e' esterno
+	_CLK_pin = CLK_pin;																			// Memorizzo il numero del pin di Clock sia per gestire l'Interrupt oppure per verificare se il clock e' esterno
 
 #ifdef DIGITAL_PIN_FAST
-	_DATA_pin = new digitalPinFast(DATA_pin);				// Se e' attiva la libreria 'Fast' ne creo la Classe
+	_DATA_pin = new digitalPinFast(DATA_pin);													// Se e' attiva la libreria 'Fast' ne creo la Classe
 #else
-	_DATA_pin = DATA_pin;									// In caso contrario memorizzo il numero del pin per la gestione 'standard' dei pin digitali
+	_DATA_pin = DATA_pin;																		// In caso contrario memorizzo il numero del pin per la gestione 'standard' dei pin digitali
 #endif // DIGITAL_PIN_FAST	
 }
 
 Rcn600::~Rcn600(void) {
-	if (_CLK_pin != EXTERNAL_CLOCK) {						// Se il Pin Clock solo e' Gestito dalla Libreria
-		detachInterrupt(digitalPinToInterrupt(_CLK_pin));	// Disattivo la gestione dell'Interrupt
-		pinMode(_CLK_pin, INPUT);							// Imposto lo stato del pin come INPUT
+	if (_CLK_pin != EXTERNAL_CLOCK) {															// Se il Pin Clock solo e' Gestito dalla Libreria
+		detachInterrupt(digitalPinToInterrupt(_CLK_pin));										// Disattivo la gestione dell'Interrupt
+		pinMode(_CLK_pin, INPUT);																// Imposto lo stato del pin come INPUT
 	}
 
-	DATA_PIN_DELETE;										//	Metto il pin Data ad INPUT (e se occore elimino la Classe che lo gestiva)
+	DATA_PIN_DELETE;																			//	Metto il pin Data ad INPUT (e se occore elimino la Classe che lo gestiva)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::initClass(void) {
+	pointerToRcn600 = this;																		// Assegno al puntatore l'indirizzo della Seguente Classe
 
-	pointerToRcn600 = this;
-
-	if (_CLK_pin != EXTERNAL_CLOCK) {	// Controllo se e' presente il numero di un pin
-		/* Gestisco l'Interrupt  per il pin di Clock */
-		pinMode(_CLK_pin, INPUT);
-		attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);	//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+	if (_CLK_pin != EXTERNAL_CLOCK) {															// Controllo se e' presente il numero di un pin
+		pinMode(_CLK_pin, INPUT);																// il pin di Clock deve essere ad alta impedenza: INTERRUPT
+		attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);		//da normativa i dati fanno letti sul "fronte di discesa" del Clock
 	}
 
-	/* Pin DATA */
-	DATA_PIN_INPUT;
+	DATA_PIN_INPUT;																				// Pin Data ad alta impedenza: Interrupr
 
-	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {	// Imposto gli slot del Buffer come liberi
-		_Buffer[i].nextMessage = FREE_MESSAGE_SLOT;
+	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {											// Imposto gli slot del Buffer come liberi
+		_Buffer[i].nextMessage = FREE_MESSAGE_SLOT;												// Assegno al 'messaggio successivo' un indicatore simbolico
 	}
 
-	_BufferPointer = NULL;								// Imposto il puntatore per indicare l'assenza di messaggi da decodificare
+	_BufferPointer = NULL;																		// Imposto il puntatore per indicare l'assenza di messaggi da decodificare
 }
 
 void Rcn600::init(void) {
-	if (notifySusiCVRead) {			/* Se e' presente il sistema di memorizzazione CV, leggo da tale sistema il numero dello Slave*/
-		_slaveAddress = notifySusiCVRead(897);
+	if (notifySusiCVRead) {																		// Se e' presente il sistema di memorizzazione CV
+		_slaveAddress = notifySusiCVRead(ADDRESS_CV);											// Leggo il valore memorizzato nella CV dell'indirizzo
 
-		// Controllo che l'indirizzo sia compatibile, in caso negativo utilizzo quello di Default
-		if (_slaveAddress > MAX_ADDRESS_VALUE) {
-			_slaveAddress = DEFAULT_SLAVE_NUMBER;
+		if (_slaveAddress > MAX_ADDRESS_VALUE) {												// Se l'indirizzo e' maggiore di quelli consentiti
+			_slaveAddress = DEFAULT_SLAVE_NUMBER;												// Utilizzo l'indirizzo di Default: 1
 		}
-	}
-	else {
-		_slaveAddress = DEFAULT_SLAVE_NUMBER;
+	}	
+	else {																						// Se NON E' presente un sistema di memorizzazione CVs
+		_slaveAddress = DEFAULT_SLAVE_NUMBER;													// Utilizzo l'indirizzo di Default: 1
 	}
 	
-	initClass();
+	initClass();																				// Inizializzo la Classe ed i suoi componenti
 }
 
-void Rcn600::init(uint8_t SlaveAddress) {		/* Inizializzazione con indirizzo scelto dall'utente nel codice */
-	_slaveAddress = SlaveAddress;
+void Rcn600::init(uint8_t SlaveAddress) {														// Inizializzazione con indirizzo scelto dall'utente nel codice
+	_slaveAddress = SlaveAddress;																// Salvo l'indirizzo 
 
-	if (_slaveAddress > MAX_ADDRESS_VALUE) {	/* In caso di indirizzo passato non conforme alla normativa SUSI imposto il valore di Default 1 */
-		_slaveAddress = DEFAULT_SLAVE_NUMBER;
+	if (_slaveAddress > MAX_ADDRESS_VALUE) {													// Se l'indirizzo e' maggiore di quelli consentiti
+		_slaveAddress = DEFAULT_SLAVE_NUMBER;													// Utilizzo l'indirizzo di Default: 1
 	}
 
-	initClass();
+	initClass();																				// Inizializzo la Classe ed i suoi componenti
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,12 +126,12 @@ void Rcn600::ISR_SUSI(void) {
 		if (messageSlot == NULL) {	return;	}													// Nessuno slot disponibile -> Non acquisisco nulla
 		else {																					// Slot libero trovato -> Acquisisco il primo bit
 			messageSlot->nextMessage = NULL;													// Slot libero trovato -> Imposto lo Slot come 'in utilizzo'
-			if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}											// Passati MENO di 20uS -> Errore
-			else if (microsDelayFromLastBit > MAX_CLOCK_TIME) {}									// Passati PIU' di 500uS -> Errore
-			else {																					// Timing Corretto
-				messageSlot->Byte[0] = READ_DATA_PIN;												// Salvo il bit nella posizione 0
-				++bitCounter;																		// Incremento il contatore dei bit letti
-				lastbit_time = microsActualISR;														// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
+			if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}										// Passati MENO di 20uS -> Errore
+			else if (microsDelayFromLastBit > MAX_CLOCK_TIME) {}								// Passati PIU' di 500uS -> Errore
+			else {																				// Timing Corretto
+				messageSlot->Byte[0] = READ_DATA_PIN;											// Salvo il bit nella posizione 0
+				++bitCounter;																	// Incremento il contatore dei bit letti
+				lastbit_time = microsActualISR;													// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
 			}
 		}																			
 	}
