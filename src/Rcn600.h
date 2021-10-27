@@ -43,20 +43,27 @@
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
 
-#define	EXTERNAL_CLOCK				255		// indica che il Clock e' acquisito tramite sistema Esterno alla libreria
+#define	EXTERNAL_CLOCK				255								// indica che il Clock e' acquisito tramite sistema Esterno alla libreria
 
-#define	MANUFACTER_ID				13		// identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
-#define	SUSI_VER					10		// identifica la versione del protocollo SUSI: 1.0
-#define DEFAULT_SLAVE_NUMBER		1		// identifica l'indirizzo dello Slave SUSI: default 1
-#define MAX_ADDRESS_VALUE			3
+/* Gestione CVs */
+#define	ADDRESS_CV					897								// identifica la CV in cui e' contentuto l'indirizzo del Modulo Slave
+#define	FIRST_CV					ADDRESS_CV						// identifica la prima CV dei moduli SUSI -> da 897 a 1023
+#define	MANUFACTER_ID				13								// identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
+#define	SUSI_VER					10								// identifica la versione del protocollo SUSI: 1.0
 
-#define MAX_MESSAGES_DELAY			7		// tempo Massimo che può trascorrere da due Byte di un messaggio
-#define	SYNC_TIME					9		// tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME				20		// minima durata di un Clock: 10 + 10 uS
-#define MAX_CLOCK_TIME				500		// massima durata di un Clock : livello alto + livello basso
+/* Indirizzi Moduli Slave */
+#define DEFAULT_SLAVE_NUMBER		1								// identifica l'indirizzo dello Slave SUSI: default 1
+#define MAX_ADDRESS_VALUE			3								// Numero massimo di Moduli SUSI collegabili al Decoder: 3
 
-#define SUSI_BUFFER_LENGTH			5		// lunghezza buffer dove sono contenuti i messaggi
-#define FREE_MESSAGE_SLOT			(Rcn600Message*) this	//valore simbolico per contrassegnare gli slot del buffer come liberi
+/* Timing Protocollo */
+#define MAX_MESSAGES_DELAY			7								// tempo Massimo che può trascorrere da due Byte di un messaggio
+#define	SYNC_TIME					9								// tempo necessario a sincronizzare Master e Slave: 9ms
+#define MIN_CLOCK_TIME				20								// minima durata di un Clock: 10 + 10 uS
+#define MAX_CLOCK_TIME				500								// massima durata di un Clock : livello alto + livello basso
+
+/* Buffer Acquisizione */
+#define SUSI_BUFFER_LENGTH			5								// lunghezza buffer dove sono contenuti i messaggi
+#define FREE_MESSAGE_SLOT			(Rcn600Message*) this			//valore simbolico per contrassegnare gli slot del buffer come liberi
 
 typedef struct message {
 	uint8_t Byte[3];
@@ -66,32 +73,32 @@ typedef struct message {
 
 class Rcn600 {
 	private:
-		uint8_t	_slaveAddress;			// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
-		uint8_t	_CLK_pin;				// pin a cui e' collegata la linea "Clock";		DEVE ESSERE DI TIPO INTERRUPT
+		uint8_t	_slaveAddress;										// identifica il numero dello slave sul Bus SUSI (valori da 1 a 3)
+		uint8_t	_CLK_pin;											// pin a cui e' collegata la linea "Clock", se il clock e' gestito dalla libreria DEVE ESSERE DI TIPO INTERRUPT 
 
-		Rcn600Message _Buffer[SUSI_BUFFER_LENGTH];	// Buffer contenenti i comandi SUSI ricevuti
-		Rcn600Message* _BufferPointer;				// Puntatore per scorrere il Buffer
+		Rcn600Message _Buffer[SUSI_BUFFER_LENGTH];					// Buffer contenenti i comandi SUSI ricevuti
+		Rcn600Message* _BufferPointer;								// Puntatore per scorrere il Buffer
 
 #ifdef	DIGITAL_PIN_FAST
-		digitalPinFast *_DATA_pin;			// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
+		digitalPinFast *_DATA_pin;									// Oggetto che contiene i dati del pin a cui e' collegata la linea Data
 #else
-		uint8_t	_DATA_pin;				// pin a cui e' collegata la linea "Data";		Puo' essere un pin qualsiasi (Compresi gli analogici)
+		uint8_t	_DATA_pin;											// pin a cui e' collegata la linea "Data", puo' essere un pin qualsiasi (Compresi gli analogici)
 #endif
 
 	private:				/* Metodi Privati */
-		void initClass(void);								// Inizializza a Input i pin a cui e' connesso il bus
-		Rcn600Message* searchFreeMessage(void);				// Cerca nel Buffer uno slot dove salvare il messaggio in ricezione
-		void setNextMessage(Rcn600Message* nextMessage);	// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
-		void processCVsMessage(Rcn600Message CvMessage);	// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
+		void initClass(void);										// Inizializza a Input i pin a cui e' connesso il bus
+		Rcn600Message* searchFreeMessage(void);						// Cerca nel Buffer uno slot dove salvare il messaggio in ricezione
+		void setNextMessage(Rcn600Message* nextMessage);			// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
+		void processCVsMessage(Rcn600Message CvMessage);			// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
 
 	public:					/* Metodi Pubblici */
-		Rcn600(uint8_t CLK_pin, uint8_t DATA_pin);			// Creazione dell'oggetto Rcn600 con pin di Interrupt e pin Data
-		~Rcn600(void);										// Distruzionde dell'oggetto Rcn600
-		void init(void);									// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
-		void init(uint8_t SlaveAddress);					// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
+		Rcn600(uint8_t CLK_pin, uint8_t DATA_pin);					// Creazione dell'oggetto Rcn600 con pin di Interrupt e pin Data
+		~Rcn600(void);												// Distruzionde dell'oggetto Rcn600
+		void init(void);											// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
+		void init(uint8_t SlaveAddress);							// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
 
-		void process(void);								// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
-		void ISR_SUSI(void);							// Metodo che gestisce 'acquisizione dati tramite Interrupt
+		void process(void);											// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
+		void ISR_SUSI(void);										// Metodo che gestisce 'acquisizione dati tramite Interrupt
 };
 
 // Funzioni Esterne, implementabili a discrizione dell'utente
