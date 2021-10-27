@@ -41,6 +41,7 @@ Sotto la cartella "[examples](https://github.com/TheFidax/Rcn600/tree/master/exa
 Sono divisi in base alla modalita' di acquisizione del segnale di Clock:</br>
 - [Clock Mediante *pin di tipo Interrupt*](https://github.com/TheFidax/Rcn600/tree/master/examples/Slave_Interrupt)
 - [Clock Mediante *PortChangeInterrupt*](https://github.com/TheFidax/Rcn600/tree/master/examples/Slave_PortChangeInterrupt)
+
 E' disponibile un [esempio](https://github.com/TheFidax/Rcn600/tree/master/examples/Slave_Rcn600_to_NmraDcc) per *interfacciare la libreria Rcn600 alla libreria [NmraDcc](https://github.com/mrrwa/NmraDcc)
 
 ------------
