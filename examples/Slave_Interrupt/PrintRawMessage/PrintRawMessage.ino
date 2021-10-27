@@ -26,10 +26,6 @@ uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) {
 }
 
 void setup() {
-    if (EEPROM.read(ADDRESS_CV) > MAX_ADDRESS_VALUE) {      // Controllo che la CV contenente l'indirizzo del Modulo sia nei valori consentiti
-        EEPROM.update(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);    // In caso negativo aggiorno il valore
-    }
-
     Serial.begin(500000);                                   // Avvio la comunicazione Seriale
     while (!Serial) {}                                      // Attendo che la comunicazione seriale sia disponibile
 
