@@ -138,7 +138,7 @@ void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) {
 // Decommentare la #define sotto per stampare quando e' comandata una singola funzione
 #define NOTIFY_SUSI_BINARY_STATE
 #ifdef  NOTIFY_SUSI_BINARY_STATE
-void notifySusiBinaryState(uint16_t Command, uint8_t CommandState) {
+void notifySusiBinaryState(uint8_t Command, uint8_t CommandState) {
     Serial.print("notifySusiBinaryState: ");
     Serial.print(Command);
     Serial.print(" ; State: ");
