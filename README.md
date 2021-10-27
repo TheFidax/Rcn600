@@ -8,7 +8,7 @@
 
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
-* [API Libreria](https://github.com/TheFidax/Rcn600/tree/master/src)
+* [API Libreria](#API-Libreria)
 
 ------------
 
@@ -27,5 +27,10 @@ Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/T
 **Video Presentazione del Progetto:**</br>
 
 [![Video Presentazione](https://img.youtube.com/vi/VzgkDouOvCY/0.jpg)](http://www.youtube.com/watch?v=VzgkDouOvCY)
+
+------------
+
+#API Libreria
+Le Api per la libreria sono nel file "readme.md" disponibile sotto la cartella 'src' *oppure* [tramite il seguente Link Rapido](https://github.com/TheFidax/Rcn600/tree/master/src)
 
 ------------
