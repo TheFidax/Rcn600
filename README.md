@@ -38,7 +38,7 @@ Le Api per la libreria sono nel file "[readme.md](https://github.com/TheFidax/Rc
 
 # Esempi di Utilizzo
 Sotto la cartella "[examples](https://github.com/TheFidax/Rcn600/tree/master/examples)" sono disponibili esempi di utilizzo della libreria.</br>
-Sono divisi in base alla modalita' di acquisizione del segnale di Clock:</br>
+Sono suddivisi in base alla modalita' di acquisizione del segnale di Clock:</br>
 - [Clock Mediante *pin di tipo Interrupt*](https://github.com/TheFidax/Rcn600/tree/master/examples/Slave_Interrupt)
 - [Clock Mediante *PortChangeInterrupt*](https://github.com/TheFidax/Rcn600/tree/master/examples/Slave_PortChangeInterrupt)
 
