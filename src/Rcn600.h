@@ -25,6 +25,7 @@
 	#define		DATA_PIN_HIGH		_DATA_pin->digitalWriteFast(HIGH);
 	#define		DATA_PIN_LOW		_DATA_pin->digitalWriteFast(LOW);
 	#define		DATA_PIN_DELETE		delete _DATA_pin
+	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT
 #else
 	#define		READ_DATA_PIN		digitalRead(_DATA_pin)
 	#define		DATA_PIN_INPUT		pinMode(_DATA_pin, INPUT);
@@ -32,6 +33,12 @@
 	#define		DATA_PIN_HIGH		digitalWrite(_DATA_pin, HIGH);
 	#define		DATA_PIN_LOW		digitalWrite(_DATA_pin, LOW);
 	#define		DATA_PIN_DELETE		DATA_PIN_INPUT
+#ifdef __AVR__
+	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT
+#else
+	#define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	delayMicroseconds(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT
+#endif // __AVR__
+
 #endif
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
