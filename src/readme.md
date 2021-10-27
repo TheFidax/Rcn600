@@ -1,8 +1,5 @@
 # API Libreria
 
-------------
-
-# Indice
 * [Metodi Obbligatori](#Metodi-Obbligatori)
 * [Funzioni CallBack](#Funzioni-CallBack)
 * [Manipolazione CVs](#Manipolazione-CVs)
