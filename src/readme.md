@@ -27,7 +27,7 @@ Il pin CLK **deve essere** di tipo ***Interrupt***, il pin Data *puo'* essere di
 ```c
 Rcn600(EXTERNAL_CLOCK, DATA_pin);
 ```
-Dichiarazione delle libreria per l'acquisizione del Clock mediante *PortChangeInterrupt*</br>
+Dichiarazione delle libreria per l'acquisizione del Clock mediante **PortChangeInterrupt**</br>
 Il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).</br>
 
 ------------
