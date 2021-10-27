@@ -82,7 +82,6 @@ class Rcn600 {
 		void initClass(void);								// Inizializza a Input i pin a cui e' connesso il bus
 		Rcn600Message* searchFreeMessage(void);				// Cerca nel Buffer uno slot dove salvare il messaggio in ricezione
 		void setNextMessage(Rcn600Message* nextMessage);	// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
-		uint8_t isCVvalid(uint16_t CV);						// ritorna True se il numero della CV passato e' valido per questo modulo Slave
 		void processCVsMessage(Rcn600Message CvMessage);	// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
 
 	public:					/* Metodi Pubblici */
