@@ -13,7 +13,7 @@
 #endif // __AVR__
 
 #ifdef DIGITAL_PIN_FAST
-	#include <digitalPinFast.h>
+	#include <digitalPinFast.h>																											// Libreria per utilizzare i metodi 'Fast' sui pin Digital
 #endif
 
 // Comandi Rapidi sul Pin Data
