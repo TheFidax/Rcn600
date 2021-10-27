@@ -194,20 +194,20 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 	uint16_t CV_Number = 897 + (CvMessage.Byte[1] & 0b0111111);
 	uint8_t CV_Value, valid;
 
-	if ((_slaveAddress == 1) && ((CV >= 900) && (CV <= 939))) {
+	if ((_slaveAddress == 1) && ((CV_Number >= 900) && (CV_Number <= 939))) {
 		valid = 1;
 	}
-	else if ((_slaveAddress == 2) && ((CV >= 940) && (CV <= 979))) {
+	else if ((_slaveAddress == 2) && ((CV_Number >= 940) && (CV_Number <= 979))) {
 		valid = 1;
 	}
-	else if ((_slaveAddress == 3) && ((CV >= 980) && (CV <= 1019))) {
+	else if ((_slaveAddress == 3) && ((CV_Number >= 980) && (CV_Number <= 1019))) {
 		valid = 1;
 	}
-	else if (CV == 897 || (CV <= 1024 && CV >= 1020)) {												// CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
+	else if (CV_Number == 897 || (CV_Number <= 1024 && CV_Number >= 1020)) {						// CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
 		valid = 1;
 	}
 	else {
-		reurn;
+		return;
 	}
 
 	switch (CV_Number) {																			// Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione
