@@ -18,7 +18,7 @@ Libreria testata su Arduino UNO, Arduino NANO (ATmega328P) e ATmega128 (MegaCore
 **ATTENZIONE: Alcune schede Arduino funzionano a 3.3v, le interfacce SUSI, *se non specificato*, SONO A 5 VOLT !** 
 
 Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI (Clock e Dati).<br/>
-<img src="collegamenti.jpg" width="1280">
+<img src="https://github.com/TheFidax/Rcn600/blob/master/collegamenti.png" width="1280">
 
 Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
 
