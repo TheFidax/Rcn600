@@ -40,7 +40,8 @@ void init(uint8_t SlaveAddress);
 
 Il metodo **senza il parametro** utilizza, *se presente*, il metodo di lettura CVs per determinare l'indirizzo del modulo (*salvato nella CV 897*), se il metodo *e' assente* utilizza indirizzo **di default: 1**.
 
-Il metodo **con il parametro** *permette di specificare l'indirizzo del modulo*: **PUO' AVERE VALORE**: 1, 2, 3. In caso di valore diverso verra' utilizzato il valore **di default: 1**.
+Il metodo **con il parametro** *permette di specificare l'indirizzo del modulo*: **PUO' AVERE VALORE**: 1, 2, 3.</br>
+In caso di valore diverso verra' utilizzato il valore **di default: 1**.
 
 ------------
 
