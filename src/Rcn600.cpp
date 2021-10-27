@@ -183,20 +183,34 @@ void Rcn600::ISR_SUSI(void) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
-	uint16_t CV_Number = FIRST_CV + (CvMessage.Byte[1] & 0b01111111);								// Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
+	uint8_t CV_Offset = CvMessage.Byte[1] & 0b01111111;												// Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
 	uint8_t	CV_Value;																				// Tiene traccia del valore della CV
 
-	// Controllo se la CV richiesta e' per questo CV, in caso negativo non faccio nulla
-	//	Slave 1:	897 + 900 / 939		+ 1020 + 1021
-	//	Slave 2:	897 + 940 / 979		+ 1020 + 1021
-	//	Slave 3:	897 + 980 / 1019	+ 1020 + 1021
-	if ((_slaveAddress == 1) && ((CV_Number >= 900) && (CV_Number <= 939)))			{	/* OK */ }
-	else if ((_slaveAddress == 2) && ((CV_Number >= 940) && (CV_Number <= 979)))	{	/* OK */ }
-	else if ((_slaveAddress == 3) && ((CV_Number >= 980) && (CV_Number <= 1019)))	{	/* OK */ }
-	else if (CV_Number == 897 || (CV_Number <= 1024 && CV_Number >= 1020))			{	/* OK */ }
-	else { return; }
+	// Controllo se la CV richiesta e' per questo Slave, in caso negativo non faccio nulla (e ritorno)
+	//	Slave 1:	897 + 900 / 939		+ 1020 / 1024
+	//	Slave 2:	897 + 940 / 979		+ 1020 / 1024
+	//	Slave 3:	897 + 980 / 1019	+ 1020 / 1024
+	if ((CV_Offset > 2) && (CV_Offset < 43)) {														// Range 900(=897+3) / 939(=897 + 42) -> Solo Slave 1
+		if (_slaveAddress != 1) {																	// Controllo se l'indirizzo dello Slave e' diverso da 1
+			return;																					// In caso affermativo esco, questa CV non e' per questo slave
+		}
+	}
+	else if ((CV_Offset > 42) && (CV_Offset < 83)) {												// Range 940(=897+43) / 979(=897 + 82) -> Solo Slave 1
+		if (_slaveAddress != 2) {																	// Controllo se l'indirizzo dello Slave e' diverso da 2
+			return;																					// In caso affermativo esco, questa CV non e' per questo slave
+		}
+	}
+	else if ((CV_Offset > 82) && (CV_Offset < 123)) {												// Range 980(=897+83) / 1019(=897 + 122) -> Solo Slave 1
+		if (_slaveAddress != 3) {																	// Controllo se l'indirizzo dello Slave e' diverso da 3
+			return;																					// In caso affermativo esco, questa CV non e' per questo slave
+		}
+	}
+	else if ((CV_Offset == 2) || (CV_Offset == 3)) {												// CV riservate!
+		return;																						// Queste CV vanno ignorate
+	}
+	//else { /*		CV_Offset>= 124(= >= 1020)	||	CV_Offset == 0(=897)	*/	}					// gestite da tutti gli Slave
 
-	switch (CV_Number) {																			// Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione
+	switch (FIRST_CV + CV_Offset) {																	// Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione
 		case 897:	CV_Value = _slaveAddress;	break;
 		case 900:	CV_Value = MANUFACTER_ID;	break;
 		case 901:	CV_Value = SUSI_VER;		break;
@@ -206,7 +220,7 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 		case 981:	CV_Value = SUSI_VER;		break;
 		default: {
 			if (notifySusiCVRead) {																	// Se e' presente il sistema di memorizzazione CV, leggo il valore della CV memorizzata
-				CV_Value = notifySusiCVRead(CV_Number);
+				CV_Value = notifySusiCVRead(FIRST_CV + CV_Offset);
 			}
 			else {
 				CV_Value = 255;
@@ -234,8 +248,8 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 			*/
 
 			/* Confronto fra il valore memorizzato e quello ipotizzato dal master */
-			if (CV_Value == CvMessage.Byte[2]) {												// Controllo il valore ipotizzato dal master
-				DATA_ACK;																		// se il valore corrisponde, eseguo un ACK
+			if (CV_Value == CvMessage.Byte[2]) {													// Controllo il valore ipotizzato dal master
+				DATA_ACK;																			// se il valore corrisponde, eseguo un ACK
 			}
 
 			break;
@@ -257,33 +271,33 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 			* K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
 			* Lo slave conferma la scrittura con un riconoscimento.
 			*/
-			uint8_t	bitValue = (CvMessage.Byte[2] & 0b00001000);							// leggo il valore del bit da confrontare/scrivere
-			uint8_t	bitPosition = (CvMessage.Byte[2] & 0b00000111);							// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
+			uint8_t	bitValue = (CvMessage.Byte[2] & 0b00001000);									// leggo il valore del bit da confrontare/scrivere
+			uint8_t	bitPosition = (CvMessage.Byte[2] & 0b00000111);									// leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
 			//in base all'operazione richiesta eseguiro' un'azione
-			if (CvMessage.Byte[2] & 0b00010000) {												// se 1 scrivo
-				switch (CV_Number) {															// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
+			if (CvMessage.Byte[2] & 0b00010000) {													// se 1 scrivo
+				switch (FIRST_CV + CV_Offset) {														// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
 					case 900:	return;
 					case 901:	return;
 					case 940:	return;
 					case 941:	return;
 					case 980:	return;
 					case 981:	return;
-					default: {																	// CV scrivibile
+					default: {																		// CV scrivibile
 						if (notifySusiCVWrite) {
-							bitWrite(CV_Value, bitPosition, bitRead(CvMessage.Byte[2], 3));		// scrivo il nuovo valore del bit
+							bitWrite(CV_Value, bitPosition, bitRead(CvMessage.Byte[2], 3));			// scrivo il nuovo valore del bit
 
-							if (notifySusiCVWrite(CV_Number, CV_Value) == CV_Value) {			// memorizzo il nuovo valore della CV
-								DATA_ACK;														// Eseguo un ACK come conferma dell'avvenuta operazione
+							if (notifySusiCVWrite(FIRST_CV + CV_Offset, CV_Value) == CV_Value) {	// memorizzo il nuovo valore della CV
+								DATA_ACK;															// Eseguo un ACK come conferma dell'avvenuta operazione
 							}
 						}
-						// else {}																// nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+						// else {}																	// nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
 					}
 				}
 			}
-			else {																				// se 0 leggo
-				if (bitRead(CV_Value, bitPosition) == bitValue) {								// confronto il bit richiesto con quello memorizzato 
-					DATA_ACK;																	// se corrisponde eseguo un ACK
+			else {																					// se 0 leggo
+				if (bitRead(CV_Value, bitPosition) == bitValue) {									// confronto il bit richiesto con quello memorizzato 
+					DATA_ACK;																		// se corrisponde eseguo un ACK
 				}
 			}
 			break;
@@ -302,37 +316,37 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 			*/
 			/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
-			switch (CV_Number) {																// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
+			switch (FIRST_CV + CV_Offset) {															// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
 				case 901:	return;
 				case 941:	return;
 				case 981:	return;
-				case 900: {}																	// controllo se si sta tentato di eseguire il reset delle CVs
+				case 900: {}																		// controllo se si sta tentato di eseguire il reset delle CVs
 				case 940: {}
 				case 980: {
-					if (notifyCVResetFactoryDefault) {											// Se e' presente il sistema di reset delle CVs
-						notifyCVResetFactoryDefault();											// Eseguo il reset
+					if (notifyCVResetFactoryDefault) {												// Se e' presente il sistema di reset delle CVs
+						notifyCVResetFactoryDefault();												// Eseguo il reset
 
-						DATA_ACK;																// Riporto un ACK come conferma operazione
+						DATA_ACK;																	// Riporto un ACK come conferma operazione
 					}
 					break;
 				}
-				default: {																		// CV scrivibile
-					if (notifySusiCVWrite) {													// Se e' presente il sistema memorizzazione CVs la scrivo
-						if (notifySusiCVWrite(CV_Number, CvMessage.Byte[2]) == CvMessage.Byte[2]) {
-							DATA_ACK;															// Ad operazione eseguita confermo con un ACK
+				default: {																			// CV scrivibile
+					if (notifySusiCVWrite) {														// Se e' presente il sistema memorizzazione CVs la scrivo
+						if (notifySusiCVWrite(FIRST_CV + CV_Offset, CvMessage.Byte[2]) == CvMessage.Byte[2]) {
+							DATA_ACK;																// Ad operazione eseguita confermo con un ACK
 						}
 					}
-					//else {}																	//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
+					//else {}																		//nel caso in cui non e' implementato un sistema di memorizzazione CVs, non faccio nulla
 				}
 			}
 
-			if (CV_Number == ADDRESS_CV) {														// Se e' stato cambiato l'indirizzo dello Slave
-				if (CvMessage.Byte[2] > MAX_ADDRESS_VALUE) {									// Controllo se il nuovo valore e' consono
-					notifySusiCVWrite(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);						// Riporto il valore dell'indirizzo al valore di default
-					_slaveAddress = DEFAULT_SLAVE_NUMBER;										// Aggiorno il valore memorizzato dalla Libreria
+			if (CV_Offset == 0) {																	// Se e' stato cambiato l'indirizzo dello Slave
+				if (CvMessage.Byte[2] > MAX_ADDRESS_VALUE) {										// Controllo se il nuovo valore e' consono
+					notifySusiCVWrite(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);							// Riporto il valore dell'indirizzo al valore di default
+					_slaveAddress = DEFAULT_SLAVE_NUMBER;											// Aggiorno il valore memorizzato dalla Libreria
 				}
-				else {																			// Se il valore e' consono
-					_slaveAddress = CvMessage.Byte[2];											// Aggiorno il valore memorizzato dalla Libreria
+				else {																				// Se il valore e' consono
+					_slaveAddress = CvMessage.Byte[2];												// Aggiorno il valore memorizzato dalla Libreria
 				}
 			}
 			break;
