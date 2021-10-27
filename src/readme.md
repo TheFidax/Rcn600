@@ -70,7 +70,7 @@ void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ------------
 
 ```c
-void notifySusiBinaryState(uint16_t Command, uint8_t CommandState);
+void notifySusiBinaryState(uint8_t Command, uint8_t CommandState);
 ```
 *notifySusiBinaryState()* viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione:
 - Input:
