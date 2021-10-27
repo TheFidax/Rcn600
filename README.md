@@ -31,6 +31,7 @@ Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/T
 ------------
 
 # API Libreria
-Le Api per la libreria sono nel file "[readme.md](https://github.com/TheFidax/Rcn600/blob/master/src/readme.md)" disponibile sotto la cartella 'src' *oppure* [tramite il seguente Link Rapido](https://github.com/TheFidax/Rcn600/tree/master/src)
+
+Le Api per la libreria sono nel file "[readme.md](https://github.com/TheFidax/Rcn600/blob/master/src/readme.md)" disponibile sotto la cartella 'src'.</br>
 
 ------------
