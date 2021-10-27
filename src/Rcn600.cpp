@@ -190,14 +190,9 @@ void Rcn600::ISR_SUSI(void) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint8_t Rcn600::isCVvalid(uint16_t CV) {
-	/* Questa funzione permette di determinare se il numero della CV e' valida per questo modulo SUSI
-	* Slave 1: 900 - 939
-	* Slave 2: 940 - 979
-	* Slave 3: 980 - 1019
-	* Per tutti: 1020 - 1024 */
-
-	uint8_t valid;
+void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
+	uint16_t CV_Number = 897 + (CvMessage.Byte[1] & 0b0111111);
+	uint8_t CV_Value, valid;
 
 	if ((_slaveAddress == 1) && ((CV >= 900) && (CV <= 939))) {
 		valid = 1;
@@ -208,18 +203,12 @@ uint8_t Rcn600::isCVvalid(uint16_t CV) {
 	else if ((_slaveAddress == 3) && ((CV >= 980) && (CV <= 1019))) {
 		valid = 1;
 	}
-	else if ( CV == 897 || (CV <= 1024 && CV >= 1020)) {											// CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
+	else if (CV == 897 || (CV <= 1024 && CV >= 1020)) {												// CV valide per tutti i moduli; le CV 898 e 899 sono Riservate
 		valid = 1;
 	}
 	else {
-		valid = 0;
+		reurn;
 	}
-	return valid;
-}
-
-void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
-	uint16_t CV_Number = 897 + (CvMessage.Byte[1] & 0b0111111);
-	uint8_t CV_Value;
 
 	switch (CV_Number) {																			// Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione
 		case 897:	CV_Value = _slaveAddress;	break;
@@ -239,7 +228,7 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 		}
 	}
 	
-	if (isCVvalid(CV_Number)) {	// Se la CV non e' per questo Slave ignoro
+	if (valid) {																					// Se la CV non e' per questo Slave ignoro
 		switch (CvMessage.Byte[0]) {
 			case 119: {
 				/*	"CV-Manipulation Byte prüfen" : 0111-0111 (0x77 = 119) | 1 V6 V5 V4 - V3 V2 V1 V0 | D7 D6 D5 D4 - D3 D2 D1 D0
