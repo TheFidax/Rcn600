@@ -12,12 +12,12 @@ static void Rcn600InterruptHandler(void) {					// Handle per l'ISR del Clock
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600::Rcn600(uint8_t CLK_pin, uint8_t DATA_pin) {
-	_CLK_pin = CLK_pin;
+	_CLK_pin = CLK_pin;										// Memorizzo il numero del pin di Clock sia per gestire l'Interrupt oppure per verificare se il clock e' esterno
 
 #ifdef DIGITAL_PIN_FAST
-	_DATA_pin = new digitalPinFast(DATA_pin);
+	_DATA_pin = new digitalPinFast(DATA_pin);				// Se e' attiva la libreria 'Fast' ne creo la Classe
 #else
-	_DATA_pin = DATA_pin;
+	_DATA_pin = DATA_pin;									// In caso contrario memorizzo il numero del pin per la gestione 'standard' dei pin digitali
 #endif // DIGITAL_PIN_FAST	
 }
 
@@ -27,7 +27,6 @@ Rcn600::~Rcn600(void) {
 		pinMode(_CLK_pin, INPUT);							// Imposto lo stato del pin come INPUT
 	}
 
-	/* Gestione Pin DATA */
 	DATA_PIN_DELETE;										//	Metto il pin Data ad INPUT (e se occore elimino la Classe che lo gestiva)
 }
 
