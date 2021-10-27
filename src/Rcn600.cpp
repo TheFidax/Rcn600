@@ -334,7 +334,13 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 				}
 
 				if (CV_Number == ADDRESS_CV) {														// Se e' stato cambiato l'indirizzo dello Slave
-					_slaveAddress = CvMessage.Byte[2];												// Aggiorno il valore memorizzato dalla Libreria
+					if (CvMessage.Byte[2] > MAX_ADDRESS_VALUE) {									// Controllo se il nuovo valore e' consono
+						notifySusiCVWrite(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);						// Riporto il valore dell'indirizzo al valore di default
+						_slaveAddress = DEFAULT_SLAVE_NUMBER;										// Aggiorno il valore memorizzato dalla Libreria
+					}
+					else {																			// Se il valore e' consono
+						_slaveAddress = CvMessage.Byte[2];											// Aggiorno il valore memorizzato dalla Libreria
+					}
 				}
 
 				break;
