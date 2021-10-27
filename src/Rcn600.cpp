@@ -2,80 +2,80 @@
 
 #include "Rcn600.h"
 
-Rcn600* pointerToRcn600;																		// Puntatore alle Classe Rcn600
+Rcn600* pointerToRcn600;																			// Puntatore alle Classe Rcn600
 
-static void Rcn600InterruptHandler(void) {														// Handle per l'ISR del Clock
-	pointerToRcn600->ISR_SUSI();																// Chiamata all'ISR della Classe
+static void Rcn600InterruptHandler(void) {															// Handle per l'ISR del Clock
+	pointerToRcn600->ISR_SUSI();																	// Chiamata all'ISR della Classe
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Rcn600::Rcn600(uint8_t CLK_pin, uint8_t DATA_pin) {
-	_CLK_pin = CLK_pin;																			// Memorizzo il numero del pin di Clock sia per gestire l'Interrupt oppure per verificare se il clock e' esterno
+	_CLK_pin = CLK_pin;																				// Memorizzo il numero del pin di Clock sia per gestire l'Interrupt oppure per verificare se il clock e' esterno
 
 #ifdef DIGITAL_PIN_FAST
-	_DATA_pin = new digitalPinFast(DATA_pin);													// Se e' attiva la libreria 'Fast' ne creo la Classe
+	_DATA_pin = new digitalPinFast(DATA_pin);														// Se e' attiva la libreria 'Fast' ne creo la Classe
 #else
-	_DATA_pin = DATA_pin;																		// In caso contrario memorizzo il numero del pin per la gestione 'standard' dei pin digitali
+	_DATA_pin = DATA_pin;																			// In caso contrario memorizzo il numero del pin per la gestione 'standard' dei pin digitali
 #endif // DIGITAL_PIN_FAST	
 }
 
 Rcn600::~Rcn600(void) {
-	if (_CLK_pin != EXTERNAL_CLOCK) {															// Se il Pin Clock solo e' Gestito dalla Libreria
-		detachInterrupt(digitalPinToInterrupt(_CLK_pin));										// Disattivo la gestione dell'Interrupt
-		pinMode(_CLK_pin, INPUT);																// Imposto lo stato del pin come INPUT
+	if (_CLK_pin != EXTERNAL_CLOCK) {																// Se il Pin Clock solo e' Gestito dalla Libreria
+		detachInterrupt(digitalPinToInterrupt(_CLK_pin));											// Disattivo la gestione dell'Interrupt
+		pinMode(_CLK_pin, INPUT);																	// Imposto lo stato del pin come INPUT
 	}
 
-	DATA_PIN_DELETE;																			//	Metto il pin Data ad INPUT (e se occore elimino la Classe che lo gestiva)
+	DATA_PIN_DELETE;																				//	Metto il pin Data ad INPUT (e se occore elimino la Classe che lo gestiva)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::initClass(void) {
-	pointerToRcn600 = this;																		// Assegno al puntatore l'indirizzo della Seguente Classe
+	pointerToRcn600 = this;																			// Assegno al puntatore l'indirizzo della Seguente Classe
 
-	if (_CLK_pin != EXTERNAL_CLOCK) {															// Controllo se e' presente il numero di un pin
-		pinMode(_CLK_pin, INPUT);																// il pin di Clock deve essere ad alta impedenza: INTERRUPT
-		attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);		//da normativa i dati fanno letti sul "fronte di discesa" del Clock
+	if (_CLK_pin != EXTERNAL_CLOCK) {																// Controllo se e' presente il numero di un pin
+		pinMode(_CLK_pin, INPUT);																	// il pin di Clock deve essere ad alta impedenza: INTERRUPT
+		attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);			//da normativa i dati fanno letti sul "fronte di discesa" del Clock
 	}
 
-	DATA_PIN_INPUT;																				// Pin Data ad alta impedenza: Interrupr
+	DATA_PIN_INPUT;																					// Pin Data ad alta impedenza: Interrupr
 
-	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {											// Imposto gli slot del Buffer come liberi
-		_Buffer[i].nextMessage = FREE_MESSAGE_SLOT;												// Assegno al 'messaggio successivo' un indicatore simbolico
+	for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {												// Imposto gli slot del Buffer come liberi
+		_Buffer[i].nextMessage = FREE_MESSAGE_SLOT;													// Assegno al 'messaggio successivo' un indicatore simbolico
 	}
 
-	_BufferPointer = NULL;																		// Imposto il puntatore per indicare l'assenza di messaggi da decodificare
+	_BufferPointer = NULL;																			// Imposto il puntatore per indicare l'assenza di messaggi da decodificare
 }
 
 void Rcn600::init(void) {
-	if (notifySusiCVRead) {																		// Se e' presente il sistema di memorizzazione CV
-		_slaveAddress = notifySusiCVRead(ADDRESS_CV);											// Leggo il valore memorizzato nella CV dell'indirizzo
+	if (notifySusiCVRead) {																			// Se e' presente il sistema di memorizzazione CV
+		_slaveAddress = notifySusiCVRead(ADDRESS_CV);												// Leggo il valore memorizzato nella CV dell'indirizzo
 
-		if (_slaveAddress > MAX_ADDRESS_VALUE) {												// Se l'indirizzo e' maggiore di quelli consentiti
-			if (notifySusiCVWrite) {															// Controllo se e' possibile aggiornare il valore con uno corretto
-				notifySusiCVWrite(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);							// Scrivo l'indirizzo di Default
+		if (_slaveAddress > MAX_ADDRESS_VALUE) {													// Se l'indirizzo e' maggiore di quelli consentiti
+			if (notifySusiCVWrite) {																// Controllo se e' possibile aggiornare il valore con uno corretto
+				notifySusiCVWrite(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);								// Scrivo l'indirizzo di Default
 			}
-			_slaveAddress = DEFAULT_SLAVE_NUMBER;												// Utilizzo l'indirizzo di Default: 1
+			_slaveAddress = DEFAULT_SLAVE_NUMBER;													// Utilizzo l'indirizzo di Default: 1
 		}
 	}	
-	else {																						// Se NON E' presente un sistema di memorizzazione CVs
-		_slaveAddress = DEFAULT_SLAVE_NUMBER;													// Utilizzo l'indirizzo di Default: 1
+	else {																							// Se NON E' presente un sistema di memorizzazione CVs
+		_slaveAddress = DEFAULT_SLAVE_NUMBER;														// Utilizzo l'indirizzo di Default: 1
 	}
 	
-	initClass();																				// Inizializzo la Classe ed i suoi componenti
+	initClass();																					// Inizializzo la Classe ed i suoi componenti
 }
 
-void Rcn600::init(uint8_t SlaveAddress) {														// Inizializzazione con indirizzo scelto dall'utente nel codice
-	_slaveAddress = SlaveAddress;																// Salvo l'indirizzo 
+void Rcn600::init(uint8_t SlaveAddress) {															// Inizializzazione con indirizzo scelto dall'utente nel codice
+	_slaveAddress = SlaveAddress;																	// Salvo l'indirizzo 
 
-	if (_slaveAddress > MAX_ADDRESS_VALUE) {													// Se l'indirizzo e' maggiore di quelli consentiti
-		_slaveAddress = DEFAULT_SLAVE_NUMBER;													// Utilizzo l'indirizzo di Default: 1
+	if (_slaveAddress > MAX_ADDRESS_VALUE) {														// Se l'indirizzo e' maggiore di quelli consentiti
+		_slaveAddress = DEFAULT_SLAVE_NUMBER;														// Utilizzo l'indirizzo di Default: 1
 	}
 
-	initClass();																				// Inizializzo la Classe ed i suoi componenti
+	initClass();																					// Inizializzo la Classe ed i suoi componenti
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,78 +112,78 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {
 
 void Rcn600::ISR_SUSI(void) {
 	// Variabili 'statiche' per i confronti e/o immagazzinare informazioni
-	static uint32_t lastByte_time = millis();													// tempo a cui e' stato letto l'ultimo Byte
-	static uint32_t lastbit_time = (micros() - MIN_CLOCK_TIME);									// tempo a cui e' stato letto l'ultimo bit
-	static uint8_t	bitCounter = 0;																// indica quale bit si deve leggere
-	static Rcn600Message* messageSlot;															// indica in quale slot sta venendo salvato il messaggio in ricezione
+	static uint32_t lastByte_time = millis();														// tempo a cui e' stato letto l'ultimo Byte
+	static uint32_t lastbit_time = (micros() - MIN_CLOCK_TIME);										// tempo a cui e' stato letto l'ultimo bit
+	static uint8_t	bitCounter = 0;																	// indica quale bit si deve leggere
+	static Rcn600Message* messageSlot;																// indica in quale slot sta venendo salvato il messaggio in ricezione
 
 	// Variaibli 'dinamiche' allocate ad ogni iterazione
-	uint32_t microsActualISR = micros();														// indica a che 'microsecondi' sta avvenendo l'attuale ISR
-	uint32_t millisActualISR = millis();														// indica a che 'millisecondi' sta avvenendo l'attuale ISR
+	uint32_t microsActualISR = micros();															// indica a che 'microsecondi' sta avvenendo l'attuale ISR
+	uint32_t millisActualISR = millis();															// indica a che 'millisecondi' sta avvenendo l'attuale ISR
 	uint8_t	millisDelayFromLastByte = (millisActualISR - lastByte_time);
 	uint16_t microsDelayFromLastBit = (microsActualISR - lastbit_time);
 
-	if (bitCounter == 0) {																		// Se NON E' disponibile uno slot dove salvare i dati acquisiti
-		messageSlot = searchFreeMessage();														// ne cerco uno libero
+	if (bitCounter == 0) {																			// Se NON E' disponibile uno slot dove salvare i dati acquisiti
+		messageSlot = searchFreeMessage();															// ne cerco uno libero
 		
-		if (messageSlot == NULL) {	return;	}													// Nessuno slot disponibile -> Non acquisisco nulla
-		else {																					// Slot libero trovato -> Acquisisco il primo bit
-			messageSlot->nextMessage = NULL;													// Slot libero trovato -> Imposto lo Slot come 'in utilizzo'
-			if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}										// Passati MENO di 20uS -> Errore
-			else if (microsDelayFromLastBit > MAX_CLOCK_TIME) {}								// Passati PIU' di 500uS -> Errore
-			else {																				// Timing Corretto
-				messageSlot->Byte[0] = READ_DATA_PIN;											// Salvo il bit nella posizione 0
-				++bitCounter;																	// Incremento il contatore dei bit letti
-				lastbit_time = microsActualISR;													// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
+		if (messageSlot == NULL) {	return;	}														// Nessuno slot disponibile -> Non acquisisco nulla
+		else {																						// Slot libero trovato -> Acquisisco il primo bit
+			messageSlot->nextMessage = NULL;														// Slot libero trovato -> Imposto lo Slot come 'in utilizzo'
+			if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}											// Passati MENO di 20uS -> Errore
+			else if (microsDelayFromLastBit > MAX_CLOCK_TIME) {}									// Passati PIU' di 500uS -> Errore
+			else {																					// Timing Corretto
+				messageSlot->Byte[0] = READ_DATA_PIN;												// Salvo il bit nella posizione 0
+				++bitCounter;																		// Incremento il contatore dei bit letti
+				lastbit_time = microsActualISR;														// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
 			}
 		}																			
 	}
-	if (millisDelayFromLastByte < MAX_MESSAGES_DELAY) {											// Dall'ultimo Byte sono passato meno di 7ms -> Timing 'millis' valido
-		if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}											// Passati MENO di 20uS -> Errore
-		else if(microsDelayFromLastBit > MAX_CLOCK_TIME) {}										// Passati PIU' di 500uS -> Errore
-		else {																					// Timing Corretto
-			bitWrite(messageSlot->Byte[bitCounter / 8], (bitCounter % 8), READ_DATA_PIN);		// Salvo il bit letto nello slot libero
-			++bitCounter;																		// Incremento il contatore dei bit letti
-			lastbit_time = microsActualISR;														// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
+	if (millisDelayFromLastByte < MAX_MESSAGES_DELAY) {												// Dall'ultimo Byte sono passato meno di 7ms -> Timing 'millis' valido
+		if (microsDelayFromLastBit < MIN_CLOCK_TIME) {}												// Passati MENO di 20uS -> Errore
+		else if(microsDelayFromLastBit > MAX_CLOCK_TIME) {}											// Passati PIU' di 500uS -> Errore
+		else {																						// Timing Corretto
+			bitWrite(messageSlot->Byte[bitCounter / 8], (bitCounter % 8), READ_DATA_PIN);			// Salvo il bit letto nello slot libero
+			++bitCounter;																			// Incremento il contatore dei bit letti
+			lastbit_time = microsActualISR;															// Memorizzo in che 'microsecondo' e' stato letto l'ultimo bit
 
-			if ((bitCounter % 8) == 0) {														// Controllo se sono stati letti 8 o multipli di 8 bit
-				if (bitCounter == 16) {															// Ho letto 2 Byte completi, lunghezza dei comandi 'normali' (NO CV)
-					if (messageSlot->Byte[0] < 118) {											// Controllo che il comando NON sia per le CV -> i comandi CV sono maggiori di 118 (119, 123, 127)
-						setNextMessage(messageSlot);											// Se e' un messaggio normale lo inserisco nella coda di quelli da decodificare
+			if ((bitCounter % 8) == 0) {															// Controllo se sono stati letti 8 o multipli di 8 bit
+				if (bitCounter == 16) {																// Ho letto 2 Byte completi, lunghezza dei comandi 'normali' (NO CV)
+					if (messageSlot->Byte[0] < 118) {												// Controllo che il comando NON sia per le CV -> i comandi CV sono maggiori di 118 (119, 123, 127)
+						setNextMessage(messageSlot);												// Se e' un messaggio normale lo inserisco nella coda di quelli da decodificare
 
-						bitCounter = 0;															// Azzero il contatore dei bit per leggere un nuovo messaggio
+						bitCounter = 0;																// Azzero il contatore dei bit per leggere un nuovo messaggio
 					}
-					//else {}																	// Comando per manipolare le CVs, NON faccio niente
+					//else {}																		// Comando per manipolare le CVs, NON faccio niente
 				}
-				else if (bitCounter == 24) {													// Ho letto 3 Byte -> Comando manipolazione CVs
-					processCVsMessage(*messageSlot);											// Processo IMMEDIATAMENTE il messaggio ricevuto
+				else if (bitCounter == 24) {														// Ho letto 3 Byte -> Comando manipolazione CVs
+					processCVsMessage(*messageSlot);												// Processo IMMEDIATAMENTE il messaggio ricevuto
 
-					messageSlot->nextMessage = FREE_MESSAGE_SLOT;								// Libero lo Slot per poterlo usare in futuro
+					messageSlot->nextMessage = FREE_MESSAGE_SLOT;									// Libero lo Slot per poterlo usare in futuro
 
-					bitCounter = 0;																// Azzero il contatore dei bit per leggere un nuovo messaggio
+					bitCounter = 0;																	// Azzero il contatore dei bit per leggere un nuovo messaggio
 				}
 
-				lastByte_time = millisActualISR;												// Memorizzo in che 'millis' e' stata completata la lettura del Byte
+				lastByte_time = millisActualISR;													// Memorizzo in che 'millis' e' stata completata la lettura del Byte
 			}
 		}
 	}
-	else if (millisDelayFromLastByte > SYNC_TIME) {												// Sono passati piu' di 7ms -> Controllo se e' avvenuta la 'sincronizzazione': eseguo un reset dei contatori per acquisisire un messaggio da 0
-		bitCounter = 0;																			// dopo il SYNC leggero' il primo bit
-		lastByte_time = millisActualISR;														// imposto questo istante come ultimo Byte letto
+	else if (millisDelayFromLastByte > SYNC_TIME) {													// Sono passati piu' di 7ms -> Controllo se e' avvenuta la 'sincronizzazione': eseguo un reset dei contatori per acquisisire un messaggio da 0
+		bitCounter = 0;																				// dopo il SYNC leggero' il primo bit
+		lastByte_time = millisActualISR;															// imposto questo istante come ultimo Byte letto
  
-		messageSlot->Byte[0] = READ_DATA_PIN;													// Sto leggendo il primo bit del messaggio
+		messageSlot->Byte[0] = READ_DATA_PIN;														// Sto leggendo il primo bit del messaggio
 
-		++bitCounter;																			// Ho letto il bit 0, il prossimo da leggere e' il bit 1
-		lastbit_time = microsActualISR;															// memorizzo l'istante in cui e' stato letto il bit
+		++bitCounter;																				// Ho letto il bit 0, il prossimo da leggere e' il bit 1
+		lastbit_time = microsActualISR;																// memorizzo l'istante in cui e' stato letto il bit
 	}
-	// else {}																					// trascorsi PIU' di 7ms ma MENO di 9ms -> Errore
+	// else {}																						// trascorsi PIU' di 7ms ma MENO di 9ms -> Errore
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
-	uint16_t CV_Number = 897 + (CvMessage.Byte[1] & 0b01111111);									// Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
+	uint16_t CV_Number = FIRST_CV + (CvMessage.Byte[1] & 0b01111111);								// Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
 	uint8_t CV_Value, valid;
 
 	if ((_slaveAddress == 1) && ((CV_Number >= 900) && (CV_Number <= 939))) {
@@ -342,7 +342,6 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 						_slaveAddress = CvMessage.Byte[2];											// Aggiorno il valore memorizzato dalla Libreria
 					}
 				}
-
 				break;
 			}
 			default: {}
