@@ -55,6 +55,9 @@ void Rcn600::init(void) {
 		_slaveAddress = notifySusiCVRead(ADDRESS_CV);											// Leggo il valore memorizzato nella CV dell'indirizzo
 
 		if (_slaveAddress > MAX_ADDRESS_VALUE) {												// Se l'indirizzo e' maggiore di quelli consentiti
+			if (notifySusiCVWrite) {															// Controllo se e' possibile aggiornare il valore con uno corretto
+				notifySusiCVWrite(ADDRESS_CV, DEFAULT_SLAVE_NUMBER);							// Scrivo l'indirizzo di Default
+			}
 			_slaveAddress = DEFAULT_SLAVE_NUMBER;												// Utilizzo l'indirizzo di Default: 1
 		}
 	}	
@@ -330,10 +333,8 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 					}
 				}
 
-				if (CV_Number == ADDRESS_CV) {														// Se e' stato cambiato l'indirizzo dello Slave aggiorno il valore memorizzato
-					if (notifySusiCVRead) {
-						_slaveAddress = notifySusiCVRead(ADDRESS_CV);
-					}
+				if (CV_Number == ADDRESS_CV) {														// Se e' stato cambiato l'indirizzo dello Slave
+					_slaveAddress = CvMessage.Byte[2];												// Aggiorno il valore memorizzato dalla Libreria
 				}
 
 				break;
