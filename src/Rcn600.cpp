@@ -2,10 +2,10 @@
 
 #include "Rcn600.h"
 
-Rcn600* pointerToRcn600; // declare a pointer to testLib class
+Rcn600* pointerToRcn600;									// Puntatore alle Classe Rcn600
 
-static void Rcn600InterruptHandler(void) { // define global handler
-	pointerToRcn600->ISR_SUSI(); // calls class member handler
+static void Rcn600InterruptHandler(void) {					// Handle per l'ISR del Clock
+	pointerToRcn600->ISR_SUSI();							// Chiamata all'ISR della Classe
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,13 +22,13 @@ Rcn600::Rcn600(uint8_t CLK_pin, uint8_t DATA_pin) {
 }
 
 Rcn600::~Rcn600(void) {
-	if (_CLK_pin != EXTERNAL_CLOCK) {	// Gestisco il Pin Clock solo se esso e' Gestito dalla Libreria
-		detachInterrupt(digitalPinToInterrupt(_CLK_pin));
-		pinMode(_CLK_pin, INPUT);
+	if (_CLK_pin != EXTERNAL_CLOCK) {						// Se il Pin Clock solo e' Gestito dalla Libreria
+		detachInterrupt(digitalPinToInterrupt(_CLK_pin));	// Disattivo la gestione dell'Interrupt
+		pinMode(_CLK_pin, INPUT);							// Imposto lo stato del pin come INPUT
 	}
 
 	/* Gestione Pin DATA */
-	DATA_PIN_DELETE;
+	DATA_PIN_DELETE;										//	Metto il pin Data ad INPUT (e se occore elimino la Classe che lo gestiva)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,12 +89,6 @@ Rcn600Message* Rcn600::searchFreeMessage(void) {
 			return &_Buffer[i];
 		}
 	}
-
-#ifdef FULL_BUFFER_ALERT
-	if (fullBufferAlert) {
-		fullBufferAlert();
-	}
-#endif // FULL_BUFFER_ALERT
 	
 	/* Se non trovo uno slot libero ritorno NULL */
 	return NULL;
