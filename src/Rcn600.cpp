@@ -184,7 +184,12 @@ void Rcn600::ISR_SUSI(void) {
 
 void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 	uint16_t CV_Number = FIRST_CV + (CvMessage.Byte[1] & 0b01111111);								// Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
-	uint8_t CV_Value, valid;
+	uint8_t	CV_Value, valid;
+
+	// Controllo se la CV richiesta e' per questo CV, in caso negativo non faccio nulla
+	//	Slave 1:	897 + 900 / 939		+ 1020 + 1021
+	//	Slave 2:	897 + 940 / 979		+ 1020 + 1021
+	//	Slave 3:	897 + 980 / 1019	+ 1020 + 1021
 
 	if ((_slaveAddress == 1) && ((CV_Number >= 900) && (CV_Number <= 939))) {
 		valid = 1;
