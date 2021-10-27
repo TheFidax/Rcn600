@@ -130,7 +130,7 @@ extern "C" {
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiBinaryState(uint8_t Command, uint8_t CommandState) __attribute__((weak));
+	extern	void notifySusiBinaryState(uint16_t Command, uint8_t CommandState) __attribute__((weak));
 	/*
 	*	notifySusiAux() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX
 	*	Input:
