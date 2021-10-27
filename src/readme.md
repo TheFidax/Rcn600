@@ -247,7 +247,17 @@ Le risorse verranno deallocate, i pin verranno messi nello stato di **INPUT** pe
 ------------
 
 # Tipi di Dati
-I seguenti tipi di dati vengono utilizzati dai metodi/funzioni della libreria.
+I seguenti tipi di dati vengono utilizzati dai metodi/funzioni della libreria, *sono tipi simbolici* definiti tramite "#define" e servono a migliorare la leggibilita' del codice, corrispondono al tipo *uint8_t*</br>
+
+```c
+#define	SUSI_DIRECTION		uint8_t
+...
+#define	SUSI_FN_GROUP		uint8_
+...
+#define	SUSI_AUX_GROUP		uint8_t
+...
+#define	SUSI_AN_GROUP		uint8_t
+```
 
 ------------
 
