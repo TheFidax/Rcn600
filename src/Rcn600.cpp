@@ -210,14 +210,14 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 	}
 	//else { /*		CV_Offset>= 124(= >= 1020)	||	CV_Offset == 0(=897)	*/	}					// gestite da tutti gli Slave
 
-	switch (FIRST_CV + CV_Offset) {																	// Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione
-		case 897:	CV_Value = _slaveAddress;	break;
-		case 900:	CV_Value = MANUFACTER_ID;	break;
-		case 901:	CV_Value = SUSI_VER;		break;
-		case 940:	CV_Value = MANUFACTER_ID;	break;
-		case 941:	CV_Value = SUSI_VER;		break;
-		case 980:	CV_Value = MANUFACTER_ID;	break;
-		case 981:	CV_Value = SUSI_VER;		break;
+	switch (CV_Offset) {																			// Devo controllare se la CV richiesta e' di quelle contenenti informazioni quali produttore o versione
+		case 0:		CV_Value = _slaveAddress;	break;												// 897 + 0 = 897
+		case 3:		CV_Value = MANUFACTER_ID;	break;												// 897 + 3 = 900
+		case 4:		CV_Value = SUSI_VER;		break;												// 897 + 4 = 901
+		case 43:	CV_Value = MANUFACTER_ID;	break;												// 897 + 3 + 40 = 940
+		case 44:	CV_Value = SUSI_VER;		break;												// 897 + 4 + 40 = 941
+		case 83:	CV_Value = MANUFACTER_ID;	break;												// 897 + 3 + 80 = 980
+		case 84:	CV_Value = SUSI_VER;		break;												// 897 + 4 + 80 = 981
 		default: {
 			if (notifySusiCVRead) {																	// Se e' presente il sistema di memorizzazione CV, leggo il valore della CV memorizzata
 				CV_Value = notifySusiCVRead(FIRST_CV + CV_Offset);
@@ -276,13 +276,13 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 
 			//in base all'operazione richiesta eseguiro' un'azione
 			if (CvMessage.Byte[2] & 0b00010000) {													// se 1 scrivo
-				switch (FIRST_CV + CV_Offset) {														// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
-					case 900:	return;
-					case 901:	return;
-					case 940:	return;
-					case 941:	return;
-					case 980:	return;
-					case 981:	return;
+				switch (CV_Offset) {																// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
+					case 3:		return;																// 897 + 3 = 900
+					case 4:		return;																// 897 + 4 = 901
+					case 43:	return;																// 897 + 3 + 40 = 940
+					case 44:	return;																// 897 + 4 + 40 = 941
+					case 83:	return;																// 897 + 3 + 80 = 980
+					case 84:	return;																// 897 + 4 + 80 = 981
 					default: {																		// CV scrivibile
 						if (notifySusiCVWrite) {
 							bitWrite(CV_Value, bitPosition, bitRead(CvMessage.Byte[2], 3));			// scrivo il nuovo valore del bit
@@ -316,18 +316,26 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
 			*/
 			/* Devo controllare se la CV richiesta NON e' di quelle contenenti informazioni quali produttore o versione */
 
-			switch (FIRST_CV + CV_Offset) {															// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
-				case 901:	return;
-				case 941:	return;
-				case 981:	return;
-				case 900: {}																		// controllo se si sta tentato di eseguire il reset delle CVs
-				case 940: {}
-				case 980: {
-					if (notifyCVResetFactoryDefault) {												// Se e' presente il sistema di reset delle CVs
-						notifyCVResetFactoryDefault();												// Eseguo il reset
+			switch (CV_Offset) {																	// controllo su quale CV si vuole agire: se e' uno NON SCRIVIBILE, non faccio nulla
 
-						DATA_ACK;																	// Riporto un ACK come conferma operazione
+				// CVs che identificano la Versione del bus SUSI: NON SCRIVIBILI
+				case 4:		return;																	// 897 + 4 = 901
+				case 44:	return;																	// 897 + 4 + 40 = 941
+				case 84:	return;																	// 897 + 4 + 80 = 981
+
+				// CVs che identificano il produttore del modulo SUSI: se il valore che si vuole scrivere e' 8 allora si sta facendo un Reset
+				case 3:		{}																		// 897 + 3 = 900
+				case 43:	{}																		// 897 + 3 + 40 = 940
+				case 83:	{																		// 897 + 3 + 80 = 980
+					if (CvMessage.Byte[2] == 8) {													// Controllo che il valore che si vuole scrivere sia 8
+						if (notifyCVResetFactoryDefault) {											// Se e' presente il sistema di reset delle CVs
+
+							notifyCVResetFactoryDefault();											// Eseguo il reset
+
+							DATA_ACK;																// Riporto un ACK come conferma operazione
+						}
 					}
+					//else {}																		// In caso contrario, non faccio nulla -> ERRORE
 					break;
 				}
 				default: {																			// CV scrivibile
