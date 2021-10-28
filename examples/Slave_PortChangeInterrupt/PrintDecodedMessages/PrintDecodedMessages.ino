@@ -1,11 +1,16 @@
 /*
-Questo esempio stampa tutti i dati decodificati dalla libreria utilizzando un "Port Change Interrupt"
+*   QUESTO ESEMPIO UTILIZZA, PER L'ACQUISIZIONE DEL SEGNALE DI CLOCK, IL SISTEMA "PORTCHANGEINTERRUPT"
+* 
+*   Questo esempio permette di vedere la corretta Acquisizione dei messaggi SUSI:
+*   -   Stampa a video i Comandi Decodificati Ricevuti
+*   -   Permette la lettura/scrittura delle CVs salvate nella EEPROM del Microcontrollore
 */
 
+#include <stdint.h>     // Libreria per i tipi "uintX_t"
 #include <Rcn600.h>     // Includo la libreria per la gestione della SUSI
-#include <EEPROM.h>     // Includo la libreria per la gestione della EEPROM interna
+#include <EEPROM.h>     // Libreria per la gestione della EEPROM interna
 
-Rcn600 SUSI(EXTERNAL_CLOCK, 3);      // Clock Pin7, Data Pin3
+Rcn600 SUSI(EXTERNAL_CLOCK, 3);     // Inizializzo la libreria usando una fonte esterna per il Clock: Clock Pin7, Data Pin3
 
 // Decommentare la #define sotto per stampare lo stato delle Funzioni Digitali
 #define NOTIFY_SUSI_FUNC
@@ -434,30 +439,26 @@ void notifyCVResetFactoryDefault(void) {
 }
 #endif
 
-void setup() {
-    Serial.begin(500000);   // Avvio la comunicazione Seriale
-    while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
+void setup() {                                                                                                      // Setup del Codice
+    Serial.begin(500000);                                                                                           // Avvio la comunicazione Seriale
+    while (!Serial) {}                                                                                              // Attendo che la comunicazione seriale sia disponibile
 
-    Serial.println("SUSI Print Decoded Messages Port Change Interrupt:"); //Informo l'utente che e' pronto a leggere i Byte
+    Serial.println("SUSI Print Decoded Messages Port Change Interrupt:");                                           // Messaggio di Avvio
 
     // Imposto il pin 7 come pin per il clock
-    pinMode(7, INPUT);          // 7 == PD7
-    PCICR |= 0b00000100;      // Abilito i "Port Change Interrupt" sulla porta D
-    PCMSK2 |= 0b10000000;      // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
+    pinMode(7, INPUT);         	                                                                                    // 7 == PD7
+    PCICR |= 0b00000100;      	                                                                                    // Abilito i "Port Change Interrupt" sulla porta D
+    PCMSK2 |= 0b10000000;      	                                                                                    // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
 
-    SUSI.init();            // Avvio la libreria
+    SUSI.init();                                                                                                    // Avvio la libreria
 }
 
-void loop() {
-    SUSI.process();     // Elaboro più volte possibile i dati acquisiti
+void loop() {                                                                                                       // Loop del codice
+    SUSI.process();                                                                                                 // Elaboro piu' volte possibile i dati acquisiti dalla libreria
 }
 
-ISR(PCINT2_vect) {              // Port D, PCINT16 - PCIN23
-    /* 
-    * Da normativa i dati fanno letti sul "fronte di discesa" del Clock
-    * Devo richiamre l'ISR della Libreria quando so che e' avvenuto il fronte di discesa
-    */ 
-    if (!(PIND & (1 << PIND7))) {
-        SUSI.ISR_SUSI();
+ISR(PCINT2_vect) {                                                                                                  // Port D, PCINT16 - PCIN23
+    if (!(PIND & (1 << PIND7))) {                                                                                   // Mi assicuro che il valore del pin sia LOW
+        SUSI.ISR_SUSI();                                                                                            // Invoco il ISR della libreria
     }
 }

@@ -1,9 +1,12 @@
 /*
-Questo esempio stampa tutti i dati decodificati dalla libreria
+*   Questo esempio permette di vedere la corretta Acquisizione dei messaggi SUSI:
+*   -   Stampa a video i Comandi Decodificati Ricevuti
+*   -   Permette la lettura/scrittura delle CVs salvate nella EEPROM del Microcontrollore
 */
 
+#include <stdint.h>     // Libreria per i tipi "uintX_t"
 #include <Rcn600.h>     // Includo la libreria per la gestione della SUSI
-#include <EEPROM.h>     // Includo la libreria per la gestione della EEPROM interna
+#include <EEPROM.h>     // Libreria per la gestione della EEPROM interna
 
 Rcn600 SUSI(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
@@ -446,15 +449,15 @@ void notifyCVResetFactoryDefault(void) {
 }
 #endif
 
-void setup() {
-	Serial.begin(500000);   // Avvio la comunicazione Seriale
-	while (!Serial) {}      // Attendo che la comunicazione seriale sia disponibile
+void setup() {                                                                                                      // Setup del Codice
+    Serial.begin(500000);                                                                                           // Avvio la comunicazione Seriale
+    while (!Serial) {}                                                                                              // Attendo che la comunicazione seriale sia disponibile
 
-	Serial.println("SUSI Print Decoded Messages:"); //Informo l'utente che e' pronto a leggere i Byte
+    Serial.println("SUSI Print Decoded Messages:");                                                                 // Messaggio di Avvio
 
-	SUSI.init();            // Avvio la libreria
+    SUSI.init();                                                                                                    // Avvio la libreria
 }
 
-void loop() {
-	SUSI.process();     // Elaboro più volte possibile i dati acquisiti
+void loop() {                                                                                                       // Loop del codice
+    SUSI.process();                                                                                                 // Elaboro piu' volte possibile i dati acquisiti dalla libreria
 }

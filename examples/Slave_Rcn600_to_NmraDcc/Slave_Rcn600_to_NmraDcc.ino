@@ -7,15 +7,17 @@
 
 #define SUSI_PORT_CHANGE_INTERRUPT          // Utilizza il PortChangeInterrupt al posto di un Pin di tipo Interrupt
 
-#include <NmraDcc.h>
-#include <Rcn600.h>
+#include <stdint.h>     // Libreria per i tipi "uintX_t"
+#include <EEPROM.h>     // Libreria per la gestione della EEPROM interna
+#include <Rcn600.h>     // Includo la libreria per la gestione della SUSI
+#include <NmraDcc.h>    // Libreria per il Dcc
 
-#define This_Decoder_Address 3
+#define This_Decoder_Address 3      // Indirizzo per la libreria Dcc
 
 #ifdef SUSI_PORT_CHANGE_INTERRUPT
-    Rcn600 SUSI(EXTERNAL_CLOCK, 3);         // SUSI con pin Data e ISR esterno
+Rcn600 SUSI(EXTERNAL_CLOCK, 3);     // Inizializzo la libreria usando una fonte esterna per il Clock: Clock Pin7, Data Pin3
 #else
-    Rcn600 SUSI(2, 3);                      // Definisco i pin a cui e' collegato il Bus SUSI
+Rcn600 SUSI(2, 3);                  // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 #endif // SUSI_PORT_CHANGE_INTERRUPT
 
 /* Funzioni Libreria NmraDcc */
@@ -139,34 +141,29 @@ void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) {
 
 
 void setup() {
-    Serial.begin(500000);           // Avvio la comunicazione Seriale
-    while (!Serial) {}              // Attendo che la comunicazione seriale sia disponibile
+    Serial.begin(500000);                                                                                           // Avvio la comunicazione Seriale
+    while (!Serial) {}                                                                                              // Attendo che la comunicazione seriale sia disponibile
 
-    Serial.println("RCN600 to NmraDcc:");
+    Serial.println("RCN600 to NmraDcc:");                                                                           // Messaggio di Avvio
 
 #ifdef SUSI_PORT_CHANGE_INTERRUPT
     // Imposto il pin 7 come pin per il clock
-    pinMode(7, INPUT);         	    // 7 == PD7
-    PCICR |= 0b00000100;      	    // Abilito i "Port Change Interrupt" sulla porta D
-    PCMSK2 |= 0b10000000;      	    // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
-#endif
+    pinMode(7, INPUT);         	                                                                                    // 7 == PD7
+    PCICR |= 0b00000100;      	                                                                                    // Abilito i "Port Change Interrupt" sulla porta D
+    PCMSK2 |= 0b10000000;      	                                                                                    // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
+#endif // SUSI_PORT_CHANGE_INTERRUPT
 
-    SUSI.init();
+    SUSI.init();                                                                                                    // Avvio la libreria
 }
 
 #ifdef SUSI_PORT_CHANGE_INTERRUPT
-ISR(PCINT2_vect) {              	// Port D, PCINT16 - PCIN23
-    /*
-    * Da normativa i dati fanno letti sul "fronte di discesa" del Clock
-    * Devo richiamre l'ISR della Libreria quando so che e' avvenuto il fronte di discesa
-    */
-    if (!(PIND & (1 << PIND7))) {
-        SUSI.ISR_SUSI();
+ISR(PCINT2_vect) {                                                                                                  // Port D, PCINT16 - PCIN23
+    if (!(PIND & (1 << PIND7))) {                                                                                   // Mi assicuro che il valore del pin sia LOW
+        SUSI.ISR_SUSI();                                                                                            // Invoco il ISR della libreria
     }
 }
 #endif // SUSI_PORT_CHANGE_INTERRUPT
 
-
-void loop() {
-    SUSI.process();
+void loop() {                                                                                                       // Loop del codice
+    SUSI.process();                                                                                                 // Elaboro piu' volte possibile i dati acquisiti dalla libreria
 }
