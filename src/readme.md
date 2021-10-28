@@ -265,7 +265,7 @@ I seguenti tipi di dati vengono utilizzati dai metodi/funzioni della libreria, *
 ```c
 SUSI_DIRECTION
 ```
-Tipo *enum*, identifica *simbolicamente* la direzione trasmessa dal Decoder Master: </br>
+Identifica *simbolicamente* la direzione trasmessa dal Decoder Master: </br>
 - SUSI_DIR_REV : Direzione *reverse*
 - SUSI_DIR_FWD : Direzione *forward*
 
@@ -274,7 +274,7 @@ Tipo *enum*, identifica *simbolicamente* la direzione trasmessa dal Decoder Mast
 ```c
 SUSI_FN_GROUP
 ```
-Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Digitali trasmesse dal Decoder Master:</br>
+Identifica *simbolicamente* il gruppo di Funzioni Digitali trasmesse dal Decoder Master:</br>
 - SUSI_FN_0_4 : Funzioni dalla 0 alla 4
 - SUSI_FN_5_12 : Funzioni dalla 5 alla 12
 - SUSI_FN_13_20 : Funzioni dalla 13 alla 20
@@ -290,7 +290,7 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Digitali trasmess
 ```c
 SUSI_AUX_GROUP
 ```
-Tipo *enum*, identifica *simbolicamente* il gruppo di AUXs trasmesse dal Decoder Master:</br>
+Identifica *simbolicamente* il gruppo di AUXs trasmesse dal Decoder Master:</br>
 - SUSI_AUX_1_8 : AUX dalla 1 alla 8
 - SUSI_AUX_9_16 : AUX dalla 9 alla 16
 - SUSI_AUX_17_24 : AUX dalla 17 alla 24
@@ -301,7 +301,7 @@ Tipo *enum*, identifica *simbolicamente* il gruppo di AUXs trasmesse dal Decoder
 ```c
 SUSI_AN_FN_GROUP
 ```
-Tipo *enum*, identifica *simbolicamente* il gruppo di Funzioni Analogiche trasmesse dal Decoder Master:</br>
+Identifica *simbolicamente* il gruppo di Funzioni Analogiche trasmesse dal Decoder Master:</br>
 - SUSI_AN_FN_0_7 : Funzioni Analogiche dalla 0 alla 7
 - SUSI_AN_FN_8_15 : Funzioni Analogiche dalla 8 alla 15
 - SUSI_AN_FN_16_23 : Funzioni Analogiche dalla 16 alla 23
