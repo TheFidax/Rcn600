@@ -6,6 +6,7 @@
 
 # Indice
 * [Introduzione Rcn600 SUSI](#Rcn600-SUSI)
+* [Video di Presentazione](#Video-Presentazione)
 * [API Libreria](#API-Libreria)
 * [Esempi di Utilizzo](#Esempi-di-Utilizzo)
 
@@ -22,8 +23,9 @@ Per funzionare sono necessari 2 resistori da **470Ω in serie** sulle linee SUSI
 
 Maggiori informazioni della specifica nel fle [RCN-600.pdf](https://github.com/TheFidax/Rcn600/blob/master/RCN-600.pdf).
 
-**Video Presentazione del Progetto:**</br>
+------------
 
+# Video Presentazione
 [![Video Presentazione](https://img.youtube.com/vi/VzgkDouOvCY/0.jpg)](http://www.youtube.com/watch?v=VzgkDouOvCY)
 
 ------------
