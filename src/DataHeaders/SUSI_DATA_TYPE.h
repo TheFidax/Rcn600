@@ -3,10 +3,6 @@
 
 #include <stdint.h>
 
-#include "SUSI_FN_BIT.h"
-#include "SUSI_AUX_BIT.h"
-#include "SUSI_AN_fn_BIT.h"
-
 
 /* Identificativi della Direzione ricevuta dal Master */
 #define	SUSI_DIRECTION		uint8_t

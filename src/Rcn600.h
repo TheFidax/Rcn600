@@ -41,6 +41,9 @@
 #endif
 
 #include "DataHeaders/SUSI_DATA_TYPE.h"
+#include "DataHeaders/SUSI_AN_FN_BIT.h"
+#include "DataHeaders/SUSI_AUX_BIT.h"
+#include "DataHeaders/SUSI_FN_BIT.h"
 
 #define	EXTERNAL_CLOCK				255								// indica che il Clock e' acquisito tramite sistema Esterno alla libreria
 
