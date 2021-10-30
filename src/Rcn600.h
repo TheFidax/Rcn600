@@ -1,7 +1,7 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-/* LIB_VERSION: 1.5.0 */
+/* LIB_VERSION: 1.5.1 */
 
 #include "Arduino.h"																													// Libreria per le funzioni tipiche dell'Arduino IDE
 #include <stdint.h>																														// Libreria per i tipi 'uintX_t'
@@ -115,7 +115,7 @@ extern "C" {
 	*	Restituisce:
 	*		- Nulla
 	*/
-	extern	void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) __attribute__((weak));
+	extern	void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte) __attribute__((weak));
 	/*
 	*	notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
 	*	Input:

@@ -11,21 +11,17 @@
 
 Rcn600 SUSI(EXTERNAL_CLOCK, 3);     // Inizializzo la libreria usando una fonte esterna per il Clock: Clock Pin7, Data Pin3
 
-void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) {                          // Funzione CallBack invocata quanto un messaggio e' in attesa di decodifica
+void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte) {                                                  // Funzione CallBack invocata quanto un messaggio e' in attesa di decodifica
     Serial.print("notifySusiRawMessage : ");
 
     Serial.print(firstByte, BIN);                                                                                   // Stampo i Byte ricevuti in formato Binario
     Serial.print(" - ");
     Serial.print(secondByte, BIN);
-    Serial.print(" - ");
-    Serial.print(CvManipulating, BIN);
 
     Serial.print(" ( ");                                                                                            // Stampo il valore Decimale dei Byte ricevuti
     Serial.print(firstByte, DEC);
     Serial.print(" - ");
     Serial.print(secondByte, DEC);
-    Serial.print(" - ");
-    Serial.print(CvManipulating, DEC);
     Serial.println(" )");
 }
 
@@ -47,20 +43,6 @@ void setup() {
 
     // Imposto il pin 7 come pin per il clock
     pinMode(7, INPUT);                                                                                              // 7 == PD7
-    PCICR |= 0b00000100;      	                                                                                    // Abilito i "Port Change Interrupt" sulla porta D
-    PCMSK2 |= 0b10000000;      	                                                                                    // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
-
-    SUSI.init();                                                                                                    // Avvio la libreria
-}
-
-void setup() {                                                                                                      // Setup del Codice
-    Serial.begin(500000);                                                                                           // Avvio la comunicazione Seriale
-    while (!Serial) {}                                                                                              // Attendo che la comunicazione seriale sia disponibile
-
-    Serial.println("PrintRawMessages with External Clock:");                                                        // Messaggio di Avvio
-
-    // Imposto il pin 7 come pin per il clock
-    pinMode(7, INPUT);         	                                                                                    // 7 == PD7
     PCICR |= 0b00000100;      	                                                                                    // Abilito i "Port Change Interrupt" sulla porta D
     PCMSK2 |= 0b10000000;      	                                                                                    // Abilito, per la porta D, il pin 7 (PD7 == pin 7)
 

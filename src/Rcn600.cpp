@@ -1,4 +1,4 @@
-/* LIB_VERSION: 1.5.0 */
+/* LIB_VERSION: 1.5.1 */
 
 #include "Rcn600.h"
 
@@ -386,7 +386,7 @@ void Rcn600::process(void) {
 		if (_BufferPointer != NULL) {		//controllo che sia stati ricevuti dei messaggi
 
 			if (notifySusiRawMessage) {
-				notifySusiRawMessage(_BufferPointer->Byte[0], _BufferPointer->Byte[1], _BufferPointer->Byte[2]);
+				notifySusiRawMessage(_BufferPointer->Byte[0], _BufferPointer->Byte[1]);
 			}
 
 			/* Devo controllare il valore del primo Byte */

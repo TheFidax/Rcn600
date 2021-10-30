@@ -10,21 +10,17 @@
 
 Rcn600 SUSI(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
-void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) {                          // Funzione CallBack invocata quanto un messaggio e' in attesa di decodifica
+void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte) {                                                  // Funzione CallBack invocata quanto un messaggio e' in attesa di decodifica
     Serial.print("notifySusiRawMessage : ");
 
     Serial.print(firstByte, BIN);                                                                                   // Stampo i Byte ricevuti in formato Binario
     Serial.print(" - "); 
     Serial.print(secondByte, BIN); 
-    Serial.print(" - "); 
-    Serial.print(CvManipulating, BIN);
 
     Serial.print(" ( ");                                                                                            // Stampo il valore Decimale dei Byte ricevuti
     Serial.print(firstByte, DEC); 
     Serial.print(" - "); 
     Serial.print(secondByte, DEC); 
-    Serial.print(" - "); 
-    Serial.print(CvManipulating, DEC);
     Serial.println(" )");
 }
 
