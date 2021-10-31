@@ -108,10 +108,10 @@ class Rcn600 {
 extern "C" {
 #endif
 	/*
-	*	notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio da decodificare
+	*	notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio (2 Byte) da decodificare. NON viene invocato per i Messaggi di Manipolazione CVs. Mostra il messaggio Grezzo: NON DECODIFICATO.
 	*	Input:
-	*		- i byte che compongono il messaggio acquisito dalla libreria
-	*		- la lunghezza del messaggio
+	*		- il Primo Byte del Messaggio
+	*		- il Secondo Byte del Messaggio
 	*	Restituisce:
 	*		- Nulla
 	*/
