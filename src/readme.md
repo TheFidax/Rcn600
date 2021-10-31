@@ -12,7 +12,7 @@
 I seguenti metodi sono **obbligatori** per il corretto funzionamento della libreria.
 
 ------------
-##Rcn600
+
 ```c
 Rcn600(CLK_pin, DATA_pin);
 ```
@@ -28,7 +28,7 @@ Dichiarazione delle libreria per l'acquisizione del Clock mediante **PortChangeI
 Il pin Data *puo'* essere di qualsiasi tipo (compresi analogici).</br>
 
 ------------
-##init
+
 ```c
 void init(void);
 ```
