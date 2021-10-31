@@ -3,17 +3,17 @@
 
 /* LIB_VERSION: 1.5.1 */
 
-#include "Arduino.h"																													// Libreria per le funzioni tipiche dell'Arduino IDE
-#include <stdint.h>																														// Libreria per i tipi 'uintX_t'
+#include "Arduino.h"												// Libreria per le funzioni tipiche dell'Arduino IDE
+#include <stdint.h>													// Libreria per i tipi 'uintX_t'
 
-#ifdef __AVR__																															// Se la piattaforma e' AVR puo' essere usata la libreria digitalPinFast; e' escludibile per risparmiare SRAM
-	#include <util/delay.h>																												// Libreria per la gestione del Delay tramite libreria AVR
+#ifdef __AVR__														// Se la piattaforma e' AVR puo' essere usata la libreria digitalPinFast; e' escludibile per risparmiare SRAM
+	#include <util/delay.h>											// Libreria per la gestione del Delay tramite libreria AVR
 
-	#define	DIGITAL_PIN_FAST																											// Libreria per la gestione 'fast' dei pin digitali, ESCLUDIBILE per risparmiare SRAM
+	#define	DIGITAL_PIN_FAST										// Libreria per la gestione 'fast' dei pin digitali, ESCLUDIBILE per risparmiare SRAM
 #endif // __AVR__
 
 #ifdef DIGITAL_PIN_FAST
-	#include <digitalPinFast.h>																											// Libreria per utilizzare i metodi 'Fast' sui pin Digital
+	#include <digitalPinFast.h>										// Libreria per utilizzare i metodi 'Fast' sui pin Digital
 #endif
 
 // Comandi Rapidi sul Pin Data
@@ -40,10 +40,10 @@
 
 #endif
 
-#include "DataHeaders/SUSI_DATA_TYPE.h"
-#include "DataHeaders/SUSI_AN_FN_BIT.h"
-#include "DataHeaders/SUSI_AUX_BIT.h"
-#include "DataHeaders/SUSI_FN_BIT.h"
+#include "DataHeaders/SUSI_DATA_TYPE.h"								// Tipi Simbolici per le Funzioni CallBack
+#include "DataHeaders/SUSI_FN_BIT.h"								// bit per il comando delle Funzioni Digitali
+#include "DataHeaders/SUSI_AN_FN_BIT.h"								// bit per il comando delle Funzioni Analogiche
+#include "DataHeaders/SUSI_AUX_BIT.h"								// bit per il comando delle AUX
 
 #define	EXTERNAL_CLOCK				255								// indica che il Clock e' acquisito tramite sistema Esterno alla libreria
 
