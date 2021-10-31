@@ -10,18 +10,6 @@
 
 Rcn600 SUSI(2, 3);      // (CLK pin, DATA pin) il pin di Clock DEVE ESSERE di tipo interrupt, il pin Data puo' essere in pin qualsiasi: compresi gli analogici
 
-// Decommentare la #define sotto per stampare i messaggi grezzi
-//#define NOTIFY_RAW_MESSAGES
-#ifdef  NOTIFY_RAW_MESSAGES
-void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte, uint8_t CvManipulating) {
-    Serial.print("notifySusiRawMessage : ");
-    Serial.print(firstByte, BIN); Serial.print(" - "); Serial.print(secondByte, BIN); Serial.print(" - "); Serial.print(CvManipulating, BIN);
-    Serial.print(" ( ");
-    Serial.print(firstByte, DEC); Serial.print(" - "); Serial.print(secondByte, DEC); Serial.print(" - "); Serial.print(CvManipulating, DEC);
-    Serial.println(" )");
-}
-#endif
-
 // Decommentare la #define sotto per stampare lo stato delle Funzioni Digitali
 #define NOTIFY_SUSI_FUNC
 #ifdef  NOTIFY_SUSI_FUNC
