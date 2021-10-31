@@ -196,6 +196,20 @@ void notifySusiControllModule(uint8_t ModuleControll);
 
 ------------
 
+**LA SEGUENTE CHIAMATA PUO' ESSERE USATA PER DEBUG O PER ESTRAPOLARE I DATI *GREZZI* ACQUISITI DALLA LIBRERIA**
+
+```c
+void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte);
+```
+*notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio (2 Byte) da decodificare. NON viene invocato per i Messaggi di Manipolazione CVs. Mostra il messaggio Grezzo: NON DECODIFICATO.
+* Input:
+  - il Primo Byte del Messaggio
+  - il Secondo Byte de Messaggio
+* Restituisce:
+  - Nulla
+
+------------
+
 # Manipolazione CVs
 Le seguenti funzioni sono **facoltative** (definite come 'extern' alla libreria), ma permettono alla libreria di dialogare con il Decoder Master in caso di *Lettura/Scrittura CVs*</br>
 La libreria **gestisce l'ACK** che permette al decoder di conoscere l'esito dell'operazione richiesta.
