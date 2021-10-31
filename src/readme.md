@@ -58,18 +58,6 @@ Le seguenti funzioni CallBack sono **facoltative** (definiti come 'extern' alla 
 ------------
 
 ```c
-void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte);
-```
-*notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio (2 Byte) da decodificare. NON viene invocato per i Messaggi di Manipolazione CVs
-* Input:
-  - il Primo Byte del Messaggio
-  - il Secondo Byte de Messaggio
-* Restituisce:
-  - Nulla
-
-------------
-
-```c
 void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState);
 ```
 *notifySusiFunc()* viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali:
@@ -204,6 +192,20 @@ void notifySusiControllModule(uint8_t ModuleControll);
 - Input:
   - byte contenete il controllo del modulo
 - Restituisce:
+  - Nulla
+
+------------
+
+**LA SEGUENTE CHIAMATA PUO' ESSERE USATA PER DEBUG O PER ESTRAPOLARE I DATI *GREZZI* ACQUISITI DALLA LIBRERIA**
+
+```c
+void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte);
+```
+*notifySusiRawMessage()* viene invocato ogni volta che è presente un messaggio (2 Byte) da decodificare. NON viene invocato per i Messaggi di Manipolazione CVs. Mostra il messaggio Grezzo: NON DECODIFICATO.
+* Input:
+  - il Primo Byte del Messaggio
+  - il Secondo Byte de Messaggio
+* Restituisce:
   - Nulla
 
 ------------
