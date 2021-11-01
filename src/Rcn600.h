@@ -1,7 +1,7 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-/* LIB_VERSION: 1.5.1 */
+/* LIB_VERSION: 1.5.2 */
 
 #include "Arduino.h"												// Libreria per le funzioni tipiche dell'Arduino IDE
 #include <stdint.h>													// Libreria per i tipi 'uintX_t'
