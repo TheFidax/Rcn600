@@ -1,4 +1,4 @@
-/* LIB_VERSION: 1.5.1 */
+/* LIB_VERSION: 1.5.2 */
 
 #include "Rcn600.h"
 
