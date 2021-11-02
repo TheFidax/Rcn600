@@ -377,13 +377,13 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 	return (byte)(~(rawValue - 0x01)) * -1;
 }
 
-void Rcn600::process(void) {
+uint8_t Rcn600::process(void) {
 	uint8_t processNextMessage = 1;	// Indica se devo processare piu' messaggi
 
 	while (processNextMessage) {
 		processNextMessage = 0;
 
-		if (_BufferPointer != NULL) {		//controllo che sia stati ricevuti dei messaggi
+		if (_BufferPointer != NULL) {		//controllo che siano stati ricevuti dei messaggi
 
 			if (notifySusiRawMessage) {
 				notifySusiRawMessage(_BufferPointer->Byte[0], _BufferPointer->Byte[1]);
@@ -541,7 +541,7 @@ void Rcn600::process(void) {
 					}
 					else {
 						// Il messaggio successivo NECESSARIO non e' ancora stato ricevuto, esco dal process senza modifiche
-						return;
+						return 1;
 					}
 					break;
 				}
@@ -907,7 +907,7 @@ void Rcn600::process(void) {
 
 					Rcn600Message* next = _BufferPointer->nextMessage;
 					if (next != NULL) {
-						if (next->Byte[0] == 95) {				//i byte di comando devono susseguirsi
+						if (next->Byte[0] == 95) {							//i byte di comando devono susseguirsi
 							if (notifySusiMasterAddress) {					// Controllo se e' presente il metodo per gestire il comando
 								static uint16_t MasterAddress;
 
@@ -921,7 +921,7 @@ void Rcn600::process(void) {
 					}
 					else {
 						// Il messaggio successivo NECESSARIO non e' ancora stato ricevuto, esco dal process senza modifiche
-						return;
+						return 1;
 					}
 					break;
 				}
@@ -951,8 +951,18 @@ void Rcn600::process(void) {
 			Rcn600Message* p = _BufferPointer->nextMessage;
 			_BufferPointer->nextMessage = FREE_MESSAGE_SLOT;
 			_BufferPointer = p;
+
+			// Messaggio decodificato correttamente
+			return 1;
+		}
+		else {
+			// Nessun messaggio da decodificare
+			return 0;
 		}
 	}
+
+	// Nessun messaggio da decodificare
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

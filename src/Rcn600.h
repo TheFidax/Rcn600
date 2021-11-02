@@ -96,10 +96,39 @@ class Rcn600 {
 	public:					/* Metodi Pubblici */
 		Rcn600(uint8_t CLK_pin, uint8_t DATA_pin);					// Creazione dell'oggetto Rcn600 con pin di Interrupt e pin Data
 		~Rcn600(void);												// Distruzionde dell'oggetto Rcn600
-		void init(void);											// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
-		void init(uint8_t SlaveAddress);							// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
 
-		void process(void);											// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
+		/*
+		*	init() Inizializza la libreria, utilizzando i metodi notifySusiCVread
+		*	Input:
+		*		- Nulla
+		*	Restituisce:
+		*		- Nulla
+		*/
+		void init(void);											// Inizializzazione della libreria: collegamento Interrupt, reset Contatori
+		/*
+		*	init() Inizializza la libreria passando l'indirizzo dello Slave
+		*	Input:
+		*		- indirizzo dello Slav : 1, 2, 3
+		*	Restituisce:
+		*		- Nulla
+		*/
+		void init(uint8_t SlaveAddress);							// Inizializzazione della libreria: collegamento Interrupt, reset Contatori e permette di scegliere l'indirizzo del modulo da 1 a 3
+		/*
+		*	process() Va invocato il piu'possibile: decodifica i messaggi grezzi acquisiti
+		*	Input:
+		*		- Nulla
+		*	Restituisce:
+		*		- 0	se NON ci sono messaggi da decodificare
+		*		- 1	se viene decodificato un messaggio correttamente	
+		*/
+		uint8_t process(void);										// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
+		/*
+		*	ISR_SUSI() Va invocato sul fronte di discesa del Clock, SOLO PER CLOCK ESTERNI
+		*	Input:
+		*		- Nulla
+		*	Restituisce:
+		*		- Nulla
+		*/
 		void ISR_SUSI(void);										// Metodo che gestisce 'acquisizione dati tramite Interrupt
 };
 
