@@ -46,9 +46,14 @@ In caso di valore diverso verra' utilizzato il valore **di default: 1**.
 ------------
 
 ```c
-void process(void);
+uint8_t process(void);
 ```
 **E' necessario invocarlo piu' volte possibile** nel 'loop' del codice: decodifica il pacchetto SUSI.
+- Input:
+  - Nulla
+- Restituisce:
+  - 0 Nessun Pacchetto decodificato
+  - 1 Pacchetto *Decodificato Correttamente*
 
 ------------
 
