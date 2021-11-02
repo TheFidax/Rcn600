@@ -52,7 +52,7 @@ uint8_t process(void);
 - Input:
   - Nulla
 - Restituisce:
-  - 0 Nessun Pacchetto decodificato
+  - 0 *Nessun Messaggio* decodificato
   - 1 Pacchetto *Decodificato Correttamente*
 
 ------------
