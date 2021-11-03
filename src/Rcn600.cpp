@@ -1,4 +1,4 @@
-/* LIB_VERSION: 1.5.3 */
+/* LIB_VERSION: 1.5.4 */
 
 #include "Rcn600.h"
 
@@ -944,7 +944,14 @@ uint8_t Rcn600::process(void) {
 					}
 					break;
 				}
-				default: {}
+				default: {	// Messagio non Valido
+					// Aggiorno il puntatore del Buffer
+					Rcn600Message* p = _BufferPointer->nextMessage;
+					_BufferPointer->nextMessage = FREE_MESSAGE_SLOT;
+					_BufferPointer = p;
+
+					return 0;
+				}
 			}
 
 			// Aggiorno il puntatore del Buffer
