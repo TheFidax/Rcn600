@@ -377,7 +377,7 @@ static int ConvertTwosComplementByteToInteger(byte rawValue) {
 	return (byte)(~(rawValue - 0x01)) * -1;
 }
 
-uint8_t Rcn600::process(void) {
+int8_t Rcn600::process(void) {
 	uint8_t processNextMessage = 1;	// Indica se devo processare piu' messaggi
 
 	while (processNextMessage) {
@@ -950,7 +950,7 @@ uint8_t Rcn600::process(void) {
 					_BufferPointer->nextMessage = FREE_MESSAGE_SLOT;
 					_BufferPointer = p;
 
-					return 0;
+					return -1;
 				}
 			}
 
