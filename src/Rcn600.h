@@ -1,7 +1,7 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-/* LIB_VERSION: 1.5.3 */
+/* LIB_VERSION: 1.5.4 */
 
 #include "Arduino.h"												// Libreria per le funzioni tipiche dell'Arduino IDE
 #include <stdint.h>													// Libreria per i tipi 'uintX_t'
@@ -118,7 +118,7 @@ class Rcn600 {
 		*	Input:
 		*		- Nulla
 		*	Restituisce:
-		*		- 0	se NON ci sono messaggi da decodificare
+		*		- 0	Messaggio NON valido Oppure Nessun Messaggio in Coda di Decodifica
 		*		- 1	se viene decodificato un messaggio correttamente	
 		*/
 		uint8_t process(void);										// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
