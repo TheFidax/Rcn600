@@ -118,10 +118,11 @@ class Rcn600 {
 		*	Input:
 		*		- Nulla
 		*	Restituisce:
-		*		- 0	Messaggio NON valido Oppure Nessun Messaggio in Coda di Decodifica
-		*		- 1	se viene decodificato un messaggio correttamente	
+		*		- -1	MESSAGGIO NON VALIDO
+		*		-  0	Nessun Messaggio in Coda di Decodifica
+		*		-  1	MESSAGGIO VALIDO 
 		*/
-		uint8_t process(void);										// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
+		int8_t process(void);										// Metodo che decodifica i Byte ricevuti, DEVE ESSERE RICHIAMATA DAL CODICE PIU' VOLTE POSSIBILE
 		/*
 		*	ISR_SUSI() Va invocato sul fronte di discesa del Clock, SOLO PER CLOCK ESTERNI
 		*	Input:
