@@ -1,7 +1,7 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-/* LIB_VERSION: 1.5.4 */
+/* LIB_VERSION: 1.5.5 */
 
 #include "Arduino.h"												// Libreria per le funzioni tipiche dell'Arduino IDE
 #include <stdint.h>													// Libreria per i tipi 'uintX_t'
@@ -67,10 +67,10 @@
 #define SUSI_BUFFER_LENGTH			5								// lunghezza buffer dove sono contenuti i messaggi
 #define FREE_MESSAGE_SLOT			(Rcn600Message*) this			//valore simbolico per contrassegnare gli slot del buffer come liberi
 
-typedef struct message {
+typedef struct messageRcn600 {
 	uint8_t Byte[3];
 
-	struct message* nextMessage;
+	struct messageRcn600* nextMessage;
 } Rcn600Message;
 
 class Rcn600 {
