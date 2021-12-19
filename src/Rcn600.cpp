@@ -131,7 +131,7 @@ inline void Rcn600::ISR_SUSI(void) {                                            
         messageSlot = searchFreeMessage();                                                              // Cerco uno Slot libero dove salvarlo
         
         if (messageSlot == NULL) {                                                                      // Nessuno Slot libero per memorizzare il messaggio
-            return;	                                                                                    // Esco dall'ISR senza acquisire nulla
+            return;                                                                                     // Esco dall'ISR senza acquisire nulla
         }
         else {                                                                                          // Slot libero trovato -> Acquisisco il primo bit
             messageSlot->nextMessage = NULL;                                                            // Slot libero trovato -> Imposto lo Slot come 'in utilizzo'
