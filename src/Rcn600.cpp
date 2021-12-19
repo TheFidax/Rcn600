@@ -41,8 +41,8 @@ void Rcn600::initClass(void) {
     pointerToRcn600 = this;                                                                             // Assegno al puntatore l'indirizzo della Seguente Classe
 
     if (_CLK_pin != EXTERNAL_CLOCK) {                                                                   // Controllo se e' presente il numero di un pin
-        pinMode(_CLK_pin, INPUT);                                                                       // il pin di Clock deve essere ad alta impedenza: INTERRUPT
-        attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);              //da normativa i dati fanno letti sul "fronte di discesa" del Clock
+        pinMode(_CLK_pin, INPUT);                                                                       // Il pin di Clock deve essere ad alta impedenza: INTERRUPT
+        attachInterrupt(digitalPinToInterrupt(_CLK_pin), Rcn600InterruptHandler, FALLING);              // Da normativa i dati fanno letti sul "fronte di discesa" del Clock
     }
 
     DATA_PIN_INPUT;                                                                                     // Pin Data ad alta impedenza: Interrupr
@@ -122,10 +122,10 @@ inline void Rcn600::ISR_SUSI(void) {                                            
     static uint8_t  bitCounter = 0;                                                                     // indica quale bit si deve leggere
     static Rcn600Message* messageSlot;                                                                  // indica in quale slot sta venendo salvato il messaggio in ricezione
 
-    uint32_t microsActualISR = micros();                                                                // indica a che 'microsecondi' sta avvenendo l'attuale ISR
-    uint32_t millisActualISR = millis();                                                                // indica a che 'millisecondi' sta avvenendo l'attuale ISR
-    uint8_t	millisDelayFromLastByte = (millisActualISR - lastByte_time);                                // Tempo in 'millisecondi' dall'ultimo Byte acquisito
-    uint16_t microsDelayFromLastBit = (microsActualISR - lastbit_time);                                 // Tempo in 'microsecondi' dall'ultimo bit acquisito
+    uint32_t    microsActualISR         =   micros();                                                   // indica a che 'microsecondi' sta avvenendo l'attuale ISR
+    uint32_t    millisActualISR         =   millis();                                                   // indica a che 'millisecondi' sta avvenendo l'attuale ISR
+    uint8_t     millisDelayFromLastByte =   (millisActualISR - lastByte_time);                          // Tempo in 'millisecondi' dall'ultimo Byte acquisito
+    uint16_t    microsDelayFromLastBit  =   (microsActualISR - lastbit_time);                           // Tempo in 'microsecondi' dall'ultimo bit acquisito
 
     if (bitCounter == 0) {                                                                              // Se E' il primo bit del nuovo messaggio
         messageSlot = searchFreeMessage();                                                              // Cerco uno Slot libero dove salvarlo
