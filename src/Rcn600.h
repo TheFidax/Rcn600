@@ -18,7 +18,7 @@
 
 // Comandi Rapidi sul Pin Data
 #ifdef DIGITAL_PIN_FAST
-    #define	READ_DATA_PIN   _DATA_pin->digitalReadFast()                                                                    // Legge il livello logico del Pin utilizzando la libreria Fast
+    #define READ_DATA_PIN   _DATA_pin->digitalReadFast();                                                                   // Legge il livello logico del Pin utilizzando la libreria Fast
     #define DATA_PIN_INPUT  _DATA_pin->pinModeFast(INPUT);                                                                  // Imposta ilPin come 'INPUT' utilizzando la libreria Fast
     #define	DATA_PIN_OUTPUT _DATA_pin->pinModeFast(OUTPUT);
     #define	DATA_PIN_HIGH   _DATA_pin->digitalWriteFast(HIGH);
