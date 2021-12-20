@@ -208,39 +208,39 @@ extern "C" {                                                                    
         *   Restituisce:
         *       - Nulla
         */
-        extern	void notifySusiTriggerPulse(uint8_t state) __attribute__((weak));
+        extern  void notifySusiTriggerPulse(uint8_t state) __attribute__((weak));
         /*
-        *	notifySusiMotorCurrent() viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
-        *	Input:
-        *		- Assorbimento di Corrente: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiMotorCurrent() viene invocato quando: si riceve dal Master i dati sull'assorbimento di Corrente da parte del Motore
+        *   Input:
+        *       - Assorbimento di Corrente: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
+        *   Restituisce:
+        *       - Nulla
         */
-        extern	void notifySusiMotorCurrent(int8_t current) __attribute__((weak));
+        extern  void notifySusiMotorCurrent(int8_t current) __attribute__((weak));
         /*
-        *	notifySusiRequestSpeed() viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
-        *	Input:
-        *		- la velocita' (128 step) richiesta
-        *		- la direzione richiesta
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiRequestSpeed() viene invocato quando: si ricevono i dati sulla Velocita' e sulla Direzione richiesti dalla Centrale al Master
+        *   Input:
+        *       - la velocita' (128 step) richiesta
+        *       - la direzione richiesta
+        *   Restituisce:
+        *       - Nulla
         */
-        extern	void notifySusiRequestSpeed(uint8_t Speed, SUSI_DIRECTION Dir) __attribute__ ((weak));
+        extern  void notifySusiRequestSpeed(uint8_t Speed, SUSI_DIRECTION Dir) __attribute__ ((weak));
         /*
-        *	notifySusiRealSpeed() viene invocato quando: si ricevono i dati dal Master sulla Velocita' e sulla Direzione reali 
-        *	Input:
-        *		- la velocita' (128 step) reale
-        *		- la direzione reale
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiRealSpeed() viene invocato quando: si ricevono i dati dal Master sulla Velocita' e sulla Direzione reali 
+        *   Input:
+        *       - la velocita' (128 step) reale
+        *       - la direzione reale
+        *   Restituisce:
+        *       - Nulla
         */
-        extern	void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir) __attribute__ ((weak));
+        extern  void notifySusiRealSpeed(uint8_t Speed, SUSI_DIRECTION Dir) __attribute__ ((weak));
         /*
-        *	notifySusiMotorLoad() viene invocato quando: si riceve dal Master i dati sul carico del Motore
-        *	Input:
-        *		- Carico del Motore: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiMotorLoad() viene invocato quando: si riceve dal Master i dati sul carico del Motore
+        *   Input:
+        *       - Carico del Motore: da -128 a + 127 (gia' convertita dal Complemento a 2 originale)
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiMotorLoad(int8_t load) __attribute__((weak));
         /*
