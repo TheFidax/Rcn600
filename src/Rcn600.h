@@ -193,6 +193,7 @@ extern "C" {                                                                    
         */
         extern  void notifySusiBinaryState(uint16_t Command, uint8_t CommandState) __attribute__((weak));
         /*
+        *   notifySusiAux() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX
         *   Input:
         *       - il numero dell'AUX
         *       - lo stato dell'uscita (attiva = 1, disattiva = 0)
@@ -243,21 +244,21 @@ extern "C" {                                                                    
         */
         extern	void notifySusiMotorLoad(int8_t load) __attribute__((weak));
         /*
-        *	notifySusiAnalogFunction() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni analogiche
-        *	Input:
-        *		- il gruppo Analogico decodificato
-        *		- lo stato del gruppo
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiAnalogFunction() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni analogiche
+        *   Input:
+        *       - il gruppo Analogico decodificato
+        *       - lo stato del gruppo
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) __attribute__((weak));
         /*
-        *	notifySusiAnalogDirectCommand() viene invocato quando: si ricevono i dati dal Master i comandi diretti per il funzionamento analogico
-        *	Input:
-        *		- il numero del comando: 1 o 2
-        *		- i bit del comando
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiAnalogDirectCommand() viene invocato quando: si ricevono i dati dal Master i comandi diretti per il funzionamento analogico
+        *   Input:
+        *       - il numero del comando: 1 o 2
+        *       - i bit del comando
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
         /*
