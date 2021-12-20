@@ -24,7 +24,7 @@
     #define	DATA_PIN_HIGH   _DATA_pin->digitalWriteFast(HIGH);
     #define	DATA_PIN_LOW    _DATA_pin->digitalWriteFast(LOW);
     #define	DATA_PIN_DELETE	delete _DATA_pin
-    #define	DATA_ACK        DATA_PIN_OUTPUT;    DATA_PIN_LOW;   _delay_us(1500);    DATA_PIN_HIGH;  DATA_PIN_INPUT          // Macro per esguire l'ACK della linea DATA quando necessario
+    #define DATA_ACK        DATA_PIN_OUTPUT;    DATA_PIN_LOW;   _delay_us(1500);    DATA_PIN_HIGH;  DATA_PIN_INPUT          // Macro per esguire l'ACK della linea DATA quando necessario
 #else
     #define READ_DATA_PIN   digitalRead(_DATA_pin)
     #define DATA_PIN_INPUT  pinMode(_DATA_pin, INPUT);
@@ -65,7 +65,7 @@
 
 /* Buffer Acquisizione */
 #define SUSI_BUFFER_LENGTH          5                                                                                       // lunghezza buffer dove sono contenuti i messaggi
-#define FREE_MESSAGE_SLOT           (Rcn600Message*) this                                                                   //valore simbolico per contrassegnare gli slot del buffer come liberi
+#define FREE_MESSAGE_SLOT           (Rcn600Message*) this                                                                   // valore simbolico per contrassegnare gli slot del buffer come liberi
 
 typedef struct messageRcn600 {
     uint8_t Byte[3];
