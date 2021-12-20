@@ -162,9 +162,8 @@ class Rcn600 {
         inline void ISR_SUSI(void);
 };
 
-// Funzioni Esterne, implementabili a discrizione dell'utente
 #if defined (__cplusplus)
-extern "C" {
+extern "C" {                                                                                                                // Funzioni Esterne, implementabili a discrizione dell'utente
 #endif
         /*
         *   notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio (2 Byte) da decodificare. NON viene invocato per i Messaggi di Manipolazione CVs. Mostra il messaggio Grezzo: NON DECODIFICATO.
@@ -176,21 +175,21 @@ extern "C" {
         */
         extern	void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte) __attribute__((weak));
         /*
-        *	notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
-        *	Input:
-        *		- il gruppo Funzioni decodificato
-        *		- lo stato del gruppo funzioni
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiFunc() viene invocato quando: si ricevono i dati dal Master su un gruppo di funzioni digitali
+        *   Input:
+        *       - il gruppo Funzioni decodificato
+        *       - lo stato del gruppo funzioni
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiFunc(SUSI_FN_GROUP SUSI_FuncGrp, uint8_t SUSI_FuncState) __attribute__((weak));
         /*
-        *	notifySusiBinaryState() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione
-        *	Input:
-        *		- il numero della funzione (da 1 a 127)
-        *		- lo stato della Funzione (attiva = 1, disattiva = 0)
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiBinaryState() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica funzione
+        *   Input:
+        *       - il numero della funzione (da 1 a 127)
+        *       - lo stato della Funzione (attiva = 1, disattiva = 0)
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiBinaryState(uint16_t Command, uint8_t CommandState) __attribute__((weak));
         /*
