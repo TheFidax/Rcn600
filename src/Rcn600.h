@@ -18,7 +18,7 @@
 
 // Comandi Rapidi sul Pin Data
 #ifdef DIGITAL_PIN_FAST
-    #define READ_DATA_PIN   _DATA_pin->digitalReadFast();                                                                   // Legge il livello logico del Pin utilizzando la libreria Fast
+    #define READ_DATA_PIN   _DATA_pin->digitalReadFast()                                                                    // Legge il livello logico del Pin utilizzando la libreria Fast
     #define DATA_PIN_INPUT  _DATA_pin->pinModeFast(INPUT);                                                                  // Imposta ilPin come 'INPUT' utilizzando la libreria Fast
     #define DATA_PIN_OUTPUT _DATA_pin->pinModeFast(OUTPUT);
     #define DATA_PIN_HIGH   _DATA_pin->digitalWriteFast(HIGH);
@@ -82,7 +82,7 @@ class Rcn600 {
         Rcn600Message* _BufferPointer;                                                                                      // Puntatore per scorrere il Buffer
 
 #ifdef	DIGITAL_PIN_FAST
-        digitalPinFast *_DATA_pin                                                                                           // Oggetto che contiene i dati del pin a cui e' collegata la linea Data
+        digitalPinFast* _DATA_pin;                                                                                          // Oggetto che contiene i dati del pin a cui e' collegata la linea Data
 #else
         uint8_t _DATA_pin;                                                                                                  // pin a cui e' collegata la linea "Data", puo' essere un pin qualsiasi (Compresi gli analogici)
 #endif
