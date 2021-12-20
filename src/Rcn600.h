@@ -3,69 +3,69 @@
 
 /* LIB_VERSION: 1.5.6 */
 
-#include "Arduino.h"												// Libreria per le funzioni tipiche dell'Arduino IDE
-#include <stdint.h>													// Libreria per i tipi 'uintX_t'
+#include "Arduino.h"                                                                                                        // Libreria per le funzioni tipiche dell'Arduino IDE
+#include <stdint.h>                                                                                                         // Libreria per i tipi 'uintX_t'
 
-#ifdef __AVR__														// Se la piattaforma e' AVR puo' essere usata la libreria digitalPinFast; e' escludibile per risparmiare SRAM
-    #include <util/delay.h>											// Libreria per la gestione del Delay tramite libreria AVR
+#ifdef __AVR__                                                                                                              // Se la piattaforma e' AVR puo' essere usata la libreria digitalPinFast; e' escludibile per risparmiare SRAM
+    #include <util/delay.h>                                                                                                 // Libreria per la gestione del Delay tramite libreria AVR
 
-    #define	DIGITAL_PIN_FAST										// Libreria per la gestione 'fast' dei pin digitali, ESCLUDIBILE per risparmiare SRAM
+    #define	DIGITAL_PIN_FAST                                                                                                // Libreria per la gestione 'fast' dei pin digitali, ESCLUDIBILE per risparmiare SRAM
 #endif // __AVR__
 
 #ifdef DIGITAL_PIN_FAST
-    #include <digitalPinFast.h>										// Libreria per utilizzare i metodi 'Fast' sui pin Digital
+    #include <digitalPinFast.h>                                                                                             // Libreria per utilizzare i metodi 'Fast' sui pin Digital
 #endif
 
 // Comandi Rapidi sul Pin Data
 #ifdef DIGITAL_PIN_FAST
-    #define		READ_DATA_PIN		_DATA_pin->digitalReadFast()
-    #define		DATA_PIN_INPUT		_DATA_pin->pinModeFast(INPUT);
-    #define		DATA_PIN_OUTPUT		_DATA_pin->pinModeFast(OUTPUT);
-    #define		DATA_PIN_HIGH		_DATA_pin->digitalWriteFast(HIGH);
-    #define		DATA_PIN_LOW		_DATA_pin->digitalWriteFast(LOW);
-    #define		DATA_PIN_DELETE		delete _DATA_pin
-    #define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT				// Macro per esguire l'ACK della linea DATA quando necessario
+    #define	READ_DATA_PIN   _DATA_pin->digitalReadFast()
+    #define DATA_PIN_INPUT  _DATA_pin->pinModeFast(INPUT);
+    #define	DATA_PIN_OUTPUT _DATA_pin->pinModeFast(OUTPUT);
+    #define	DATA_PIN_HIGH   _DATA_pin->digitalWriteFast(HIGH);
+    #define	DATA_PIN_LOW    _DATA_pin->digitalWriteFast(LOW);
+    #define	DATA_PIN_DELETE	delete _DATA_pin
+    #define	DATA_ACK        DATA_PIN_OUTPUT;    DATA_PIN_LOW;   _delay_us(1500);    DATA_PIN_HIGH;  DATA_PIN_INPUT          // Macro per esguire l'ACK della linea DATA quando necessario
 #else
-    #define		READ_DATA_PIN		digitalRead(_DATA_pin)
-    #define		DATA_PIN_INPUT		pinMode(_DATA_pin, INPUT);
-    #define		DATA_PIN_OUTPUT		pinMode(_DATA_pin, OUTPUT);
-    #define		DATA_PIN_HIGH		digitalWrite(_DATA_pin, HIGH);
-    #define		DATA_PIN_LOW		digitalWrite(_DATA_pin, LOW);
-    #define		DATA_PIN_DELETE		DATA_PIN_INPUT
+    #define READ_DATA_PIN   digitalRead(_DATA_pin)
+    #define DATA_PIN_INPUT  pinMode(_DATA_pin, INPUT);
+    #define DATA_PIN_OUTPUT pinMode(_DATA_pin, OUTPUT);
+    #define DATA_PIN_HIGH   digitalWrite(_DATA_pin, HIGH);
+    #define DATA_PIN_LOW    digitalWrite(_DATA_pin, LOW);
+    #define DATA_PIN_DELETE DATA_PIN_INPUT
 #ifdef __AVR__
-    #define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	_delay_us(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT				// Macro per esguire l'ACK della linea DATA quando necessario
+    #define DATA_ACK    DATA_PIN_OUTPUT;    DATA_PIN_LOW;   _delay_us(1500);    DATA_PIN_HIGH;  DATA_PIN_INPUT              // Macro per esguire l'ACK della linea DATA quando necessario
 #else
-    #define		DATA_ACK			DATA_PIN_OUTPUT;	DATA_PIN_LOW;	delayMicroseconds(1500);	DATA_PIN_HIGH;	DATA_PIN_INPUT		// Macro per esguire l'ACK della linea DATA quando necessario
+    #define DATA_ACK    DATA_PIN_OUTPUT;    DATA_PIN_LOW;   delayMicroseconds(1500);    DATA_PIN_HIGH;  DATA_PIN_INPUT      // Macro per esguire l'ACK della linea DATA quando necessario
 #endif // __AVR__
 
 #endif
 
-#include "DataHeaders/SUSI_DATA_TYPE.h"								// Tipi Simbolici per le Funzioni CallBack
-#include "DataHeaders/SUSI_FN_BIT.h"								// bit per il comando delle Funzioni Digitali
-#include "DataHeaders/SUSI_AN_FN_BIT.h"								// bit per il comando delle Funzioni Analogiche
-#include "DataHeaders/SUSI_AUX_BIT.h"								// bit per il comando delle AUX
+#include "DataHeaders/SUSI_DATA_TYPE.h"                                                                                     // Tipi Simbolici per le Funzioni CallBack
+#include "DataHeaders/SUSI_FN_BIT.h"                                                                                        // bit per il comando delle Funzioni Digitali
+#include "DataHeaders/SUSI_AN_FN_BIT.h"                                                                                     // bit per il comando delle Funzioni Analogiche
+#include "DataHeaders/SUSI_AUX_BIT.h"                                                                                       // bit per il comando delle AUX
 
-#define	EXTERNAL_CLOCK				255								// indica che il Clock e' acquisito tramite sistema Esterno alla libreria
+#define	EXTERNAL_CLOCK              255                                                                                     // indica che il Clock e' acquisito tramite sistema Esterno alla libreria
 
 /* Gestione CVs */
-#define	ADDRESS_CV					897								// identifica la CV in cui e' contentuto l'indirizzo del Modulo Slave
-#define	FIRST_CV					ADDRESS_CV						// identifica la prima CV dei moduli SUSI -> da 897 a 1023
-#define	MANUFACTER_ID				13								// identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
-#define	SUSI_VER					10								// identifica la versione del protocollo SUSI: 1.0
+#define	ADDRESS_CV                  897                                                                                     // identifica la CV in cui e' contentuto l'indirizzo del Modulo Slave
+#define	FIRST_CV                    ADDRESS_CV                                                                              // identifica la prima CV dei moduli SUSI -> da 897 a 1023
+#define	MANUFACTER_ID               13                                                                                      // identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
+#define	SUSI_VER                    10                                                                                      // identifica la versione del protocollo SUSI: 1.0
 
 /* Indirizzi Moduli Slave */
-#define DEFAULT_SLAVE_NUMBER		1								// identifica l'indirizzo dello Slave SUSI: default 1
-#define MAX_ADDRESS_VALUE			3								// Numero massimo di Moduli SUSI collegabili al Decoder: 3
+#define DEFAULT_SLAVE_NUMBER        1                                                                                       // identifica l'indirizzo dello Slave SUSI: default 1
+#define MAX_ADDRESS_VALUE           3                                                                                       // Numero massimo di Moduli SUSI collegabili al Decoder: 3
 
 /* Timing Protocollo */
-#define MAX_MESSAGES_DELAY			7								// tempo Massimo che può trascorrere da due Byte di un messaggio
-#define	SYNC_TIME					9								// tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME				20								// minima durata di un Clock: 10 + 10 uS
-#define MAX_CLOCK_TIME				500								// massima durata di un Clock : livello alto + livello basso
+#define MAX_MESSAGES_DELAY          7                                                                                       // tempo Massimo che può trascorrere da due Byte di un messaggio
+#define	SYNC_TIME                   9                                                                                       // tempo necessario a sincronizzare Master e Slave: 9ms
+#define MIN_CLOCK_TIME              20                                                                                      // minima durata di un Clock: 10 + 10 uS
+#define MAX_CLOCK_TIME              500                                                                                     // massima durata di un Clock : livello alto + livello basso
 
 /* Buffer Acquisizione */
-#define SUSI_BUFFER_LENGTH			5								// lunghezza buffer dove sono contenuti i messaggi
-#define FREE_MESSAGE_SLOT			(Rcn600Message*) this			//valore simbolico per contrassegnare gli slot del buffer come liberi
+#define SUSI_BUFFER_LENGTH          5                                                                                       // lunghezza buffer dove sono contenuti i messaggi
+#define FREE_MESSAGE_SLOT           (Rcn600Message*) this                                                                   //valore simbolico per contrassegnare gli slot del buffer come liberi
 
 typedef struct messageRcn600 {
     uint8_t Byte[3];
