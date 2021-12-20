@@ -127,37 +127,37 @@ class Rcn600 {
         ~Rcn600(void);
 
         /*
-        *	init() Inizializza la libreria, utilizzando i metodi notifySusiCVread
-        *	Input:
-        *		- Nulla
-        *	Restituisce:
-        *		- Nulla
+        *   init() Inizializza la libreria, utilizzando i metodi notifySusiCVread
+        *   Input:
+        *       - Nulla
+        *   Restituisce:
+        *       - Nulla
         */
         void init(void);
         /*
-        *	init() Inizializza la libreria passando l'indirizzo dello Slave
-        *	Input:
-        *		- indirizzo dello Slav : 1, 2, 3
-        *	Restituisce:
-        *		- Nulla
+        *   init() Inizializza la libreria passando l'indirizzo dello Slave
+        *   Input:
+        *       - indirizzo dello Slav : 1, 2, 3
+        *   Restituisce:
+        *       - Nulla
         */
         void init(uint8_t SlaveAddress);
         /*
-        *	process() Va invocato il piu'possibile: decodifica i messaggi grezzi acquisiti
-        *	Input:
-        *		- Nulla
-        *	Restituisce:
-        *		- -1	MESSAGGIO NON VALIDO
-        *		-  0	Nessun Messaggio in Coda di Decodifica
-        *		-  1	MESSAGGIO VALIDO 
+        *   process() Va invocato il piu'possibile: decodifica i messaggi grezzi acquisiti
+        *   Input:
+        *       - Nulla
+        *   Restituisce:
+        *       - -1	MESSAGGIO NON VALIDO
+        *       -  0	Nessun Messaggio in Coda di Decodifica
+        *       -  1	MESSAGGIO VALIDO 
         */
         int8_t process(void);
         /*
-        *	ISR_SUSI() Va invocato sul fronte di discesa del Clock, SOLO PER CLOCK ESTERNI
-        *	Input:
-        *		- Nulla
-        *	Restituisce:
-        *		- Nulla
+        *   ISR_SUSI() Va invocato sul fronte di discesa del Clock, SOLO PER CLOCK ESTERNI
+        *   Input:
+        *       - Nulla
+        *   Restituisce:
+        *       - Nulla
         */
         inline void ISR_SUSI(void);
 };
@@ -167,12 +167,12 @@ class Rcn600 {
 extern "C" {
 #endif
         /*
-        *	notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio (2 Byte) da decodificare. NON viene invocato per i Messaggi di Manipolazione CVs. Mostra il messaggio Grezzo: NON DECODIFICATO.
+        *   notifySusiRawMessage() viene invocato ogni volta che è presente un messaggio (2 Byte) da decodificare. NON viene invocato per i Messaggi di Manipolazione CVs. Mostra il messaggio Grezzo: NON DECODIFICATO.
         *   Input:
-        *		- il Primo Byte del Messaggio
-        *		- il Secondo Byte del Messaggio
-        *	Restituisce:
-        *		- Nulla
+        *       - il Primo Byte del Messaggio
+        *       - il Secondo Byte del Messaggio
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiRawMessage(uint8_t firstByte, uint8_t secondByte) __attribute__((weak));
         /*
