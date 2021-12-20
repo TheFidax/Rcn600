@@ -294,15 +294,11 @@ extern "C" {
     extern uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) __attribute__((weak));
     /* RESET CVs, viene utilizzato lo stesso metodo della Libreria NmraDcc:
     * 
-    *  notifyCVResetFactoryDefault() Called when CVs must be reset.
-    *                                This is called when CVs must be reset
-    *                                to their factory defaults.
-    *
-    *  Inputs:
-    *    None
-    *                                                                                                        
-    *  Returns:
-    *    None
+    *  notifyCVResetFactoryDefault() Called when CVs must be reset. This is called when CVs must be reset to their factory defaults.
+    *   Inputs:
+    *       - None                                                                                          
+    *   Returns:
+    *       - None
     */
     extern void notifyCVResetFactoryDefault(void) __attribute__((weak));
 #if defined (__cplusplus)
