@@ -20,10 +20,10 @@
 #ifdef DIGITAL_PIN_FAST
     #define READ_DATA_PIN   _DATA_pin->digitalReadFast();                                                                   // Legge il livello logico del Pin utilizzando la libreria Fast
     #define DATA_PIN_INPUT  _DATA_pin->pinModeFast(INPUT);                                                                  // Imposta ilPin come 'INPUT' utilizzando la libreria Fast
-    #define	DATA_PIN_OUTPUT _DATA_pin->pinModeFast(OUTPUT);
-    #define	DATA_PIN_HIGH   _DATA_pin->digitalWriteFast(HIGH);
-    #define	DATA_PIN_LOW    _DATA_pin->digitalWriteFast(LOW);
-    #define	DATA_PIN_DELETE	delete _DATA_pin
+    #define DATA_PIN_OUTPUT _DATA_pin->pinModeFast(OUTPUT);
+    #define DATA_PIN_HIGH   _DATA_pin->digitalWriteFast(HIGH);
+    #define DATA_PIN_LOW    _DATA_pin->digitalWriteFast(LOW);
+    #define DATA_PIN_DELETE	delete _DATA_pin
     #define DATA_ACK        DATA_PIN_OUTPUT;    DATA_PIN_LOW;   _delay_us(1500);    DATA_PIN_HIGH;  DATA_PIN_INPUT          // Macro per esguire l'ACK della linea DATA quando necessario
 #else
     #define READ_DATA_PIN   digitalRead(_DATA_pin)                                                                          // Legge il livello logico del Pin utilizzando le funzioni native di Arduino
