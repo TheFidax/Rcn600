@@ -191,22 +191,21 @@ extern "C" {                                                                    
         *   Restituisce:
         *       - Nulla
         */
-        extern	void notifySusiBinaryState(uint16_t Command, uint8_t CommandState) __attribute__((weak));
+        extern  void notifySusiBinaryState(uint16_t Command, uint8_t CommandState) __attribute__((weak));
         /*
-        *	notifySusiAux() viene invocato quando: si ricevono i dati dal Master sullo stato di UNA specifica AUX
-        *	Input:
-        *		- il numero dell'AUX
-        *		- lo stato dell'uscita (attiva = 1, disattiva = 0)
-        *	Restituisce:
-        *		- Nulla
+        *   Input:
+        *       - il numero dell'AUX
+        *       - lo stato dell'uscita (attiva = 1, disattiva = 0)
+        *   Restituisce:
+        *       - Nulla
         */
-        extern	void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState) __attribute__((weak));
+        extern  void notifySusiAux(SUSI_AUX_GROUP SUSI_auxGrp, uint8_t SUSI_AuxState) __attribute__((weak));
         /*
-        *	notifySusiTriggerPulse() viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione) per eventuali sbuffi di vapore
-        *	Input:
-        *		- stato del comando Trigger/Pulse
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiTriggerPulse() viene invocato quando: si riceve dal Master il comando di Trigger (o pulsazione) per eventuali sbuffi di vapore
+        *   Input:
+        *       - stato del comando Trigger/Pulse
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiTriggerPulse(uint8_t state) __attribute__((weak));
         /*
