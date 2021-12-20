@@ -87,7 +87,7 @@ void Rcn600::init(uint8_t SlaveAddress) {                                       
 
 /* Gestione Buffer */
 
-inline Rcn600Message* Rcn600::searchFreeMessage(void) {                                                 // Cerco uno Slot libero dove salvare i dati ricevuti
+Rcn600Message* Rcn600::searchFreeMessage(void) {                                                        // Cerco uno Slot libero dove salvare i dati ricevuti
     for (uint8_t i = 0; i < SUSI_BUFFER_LENGTH; ++i) {                                                  // Scorro tutto il Buffer
         if (_Buffer[i].nextMessage == FREE_MESSAGE_SLOT) {                                              // Se uno slot risulta libero
             return &_Buffer[i];                                                                         // Restituisco l'indirizzo di quello Slot
@@ -136,10 +136,8 @@ inline void Rcn600::ISR_SUSI(void) {                                            
         else {                                                                                          // Slot libero trovato -> Acquisisco il primo bit
             messageSlot->nextMessage = NULL;                                                            // Slot libero trovato -> Imposto lo Slot come 'in utilizzo'
             if (microsDelayFromLastBit < MIN_CLOCK_TIME) {                                              // Passati MENO di 20uS -> Errore
-                return;                                                                                 // Ritorno senza fare nulla
             }
             else if (microsDelayFromLastBit > MAX_CLOCK_TIME) {                                         // Passati PIU' di 500uS -> Errore
-                return;                                                                                 // Ritorno senza fare nulla
             }
             else {                                                                                      // Timing Corretto
                 messageSlot->Byte[0] = READ_DATA_PIN;                                                   // Salvo il bit nella posizione 0
@@ -196,7 +194,7 @@ inline void Rcn600::ISR_SUSI(void) {                                            
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Rcn600::processCVsMessage(Rcn600Message CvMessage) {
+void Rcn600::processCVsMessage(Rcn600Message CvMessage) {                                               // Elabora un messaggio contenente un'operazione sulle CVs
     uint8_t CV_Offset = CvMessage.Byte[1] & 0b01111111;												// Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
     uint8_t	CV_Value;																				// Tiene traccia del valore della CV
 

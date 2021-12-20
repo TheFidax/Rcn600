@@ -101,11 +101,25 @@ class Rcn600 {
         *   Input:
         *       - Nulla
         *   Restituisce:
-        *       - Il Puntatore allo Slot libero nel Buffer
+        *       - Il Puntatore allo Slot libero nel Buffer (NULL se Nessuno Slot libero)
         */
-        inline Rcn600Message* searchFreeMessage(void);
-        void setNextMessage(Rcn600Message* nextMessage);			// Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
-        void processCVsMessage(Rcn600Message CvMessage);			// elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
+        Rcn600Message* searchFreeMessage(void);
+        /*
+        *   setNextMessage() Inserisce nel buffer un messaggio ricevuto Completo dall'ISR
+        *   Input:
+        *       - Il puntatore al Messaggio salvato nel Buffer
+        *   Restituisce:
+        *       - Nulla
+        */
+        void setNextMessage(Rcn600Message* nextMessage);
+        /*
+        *   setNextMessage() Elabora Immediatamente un Messaggio che richiede un'interazione con le CVs
+        *   Input:
+        *       - Il puntatore al Messaggio da elaborare
+        *   Restituisce:
+        *       - Nulla
+        */
+        void processCVsMessage(Rcn600Message CvMessage);
 
     public:
         /*
