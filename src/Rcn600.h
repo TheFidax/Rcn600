@@ -7,9 +7,9 @@
 #include <stdint.h>                                                                                                         // Libreria per i tipi 'uintX_t'
 
 #ifdef __AVR__                                                                                                              // Se la piattaforma e' AVR puo' essere usata la libreria digitalPinFast; e' escludibile per risparmiare SRAM
-    #include <util/delay.h>                                                                                                 // Libreria per la gestione del Delay tramite libreria AVR
+    #include    <util/delay.h>                                                                                              // Libreria per la gestione del Delay tramite libreria AVR
 
-    #define	DIGITAL_PIN_FAST                                                                                                // Libreria per la gestione 'fast' dei pin digitali, ESCLUDIBILE per risparmiare SRAM
+    #define     DIGITAL_PIN_FAST                                                                                            // Libreria per la gestione 'fast' dei pin digitali, ESCLUDIBILE per risparmiare SRAM
 #endif // __AVR__
 
 #ifdef DIGITAL_PIN_FAST
