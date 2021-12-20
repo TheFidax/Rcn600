@@ -173,7 +173,7 @@ class Rcn600 {
         *   Restituisce:
         *       - Nulla
         */
-        inline void ISR_SUSI(void);
+        void ISR_SUSI(void);
 };
 
 #if defined (__cplusplus)

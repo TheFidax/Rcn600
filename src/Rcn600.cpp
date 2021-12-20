@@ -116,7 +116,7 @@ void Rcn600::setNextMessage(Rcn600Message* nextMessage) {                       
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-inline void Rcn600::ISR_SUSI(void) {                                                                    // Gestione dell'ISR in base al Clock
+void Rcn600::ISR_SUSI(void) {                                                                           // Gestione dell'ISR in base al Clock
     static uint32_t lastByte_time = millis();                                                           // tempo a cui e' stato letto l'ultimo Byte
     static uint32_t lastbit_time = (micros() - MIN_CLOCK_TIME);                                         // tempo a cui e' stato letto l'ultimo bit
     static uint8_t  bitCounter = 0;                                                                     // indica quale bit si deve leggere
