@@ -251,7 +251,7 @@ extern "C" {                                                                    
         *   Restituisce:
         *       - Nulla
         */
-        extern	void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) __attribute__((weak));
+        extern  void notifySusiAnalogFunction(SUSI_AN_GROUP SUSI_AnalogGrp, uint8_t SUSI_AnalogState) __attribute__((weak));
         /*
         *   notifySusiAnalogDirectCommand() viene invocato quando: si ricevono i dati dal Master i comandi diretti per il funzionamento analogico
         *   Input:
@@ -260,15 +260,15 @@ extern "C" {                                                                    
         *   Restituisce:
         *       - Nulla
         */
-        extern	void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
+        extern  void notifySusiAnalogDirectCommand(uint8_t commandNumber, uint8_t Command) __attribute__((weak));
         /*
-        *	notifySusiNoOperation() viene invocato quando: si riceve il comando "no operation", serve prevalentemente a scopo di test
-        *	Input:
-        *		- l'argomento del comando
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiNoOperation() viene invocato quando: si riceve il comando "no operation", serve prevalentemente a scopo di test
+        *   Input:
+        *       - l'argomento del comando
+        *   Restituisce:
+        *       - Nulla
         */
-        extern	void notifySusiNoOperation(uint8_t commandArgument) __attribute__((weak));
+        extern  void notifySusiNoOperation(uint8_t commandArgument) __attribute__((weak));
         /*
         *   notifySusiMasterAddress() viene invocato quando: si riceve l'indirizzo digitale del Master
         *   Input:
