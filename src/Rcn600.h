@@ -271,19 +271,19 @@ extern "C" {
         */
         extern	void notifySusiNoOperation(uint8_t commandArgument) __attribute__((weak));
         /*
-        *	notifySusiMasterAddress() viene invocato quando: si riceve l'indirizzo digitale del Master
-        *	Input:
-        *		- l'indirizzo Digitale del Master
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiMasterAddress() viene invocato quando: si riceve l'indirizzo digitale del Master
+        *   Input:
+        *       - l'indirizzo Digitale del Master
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiMasterAddress(uint16_t MasterAddress) __attribute__((weak));
         /*
-        *	notifySusiControlModule() viene invocato quando: si riceve il comando sul controllo del modulo
-        *	Input:
-        *		- byte contenete il controllo del modulo
-        *	Restituisce:
-        *		- Nulla
+        *   notifySusiControlModule() viene invocato quando: si riceve il comando sul controllo del modulo
+        *   Input:
+        *       - byte contenete il controllo del modulo
+        *   Restituisce:
+        *       - Nulla
         */
         extern	void notifySusiControllModule(uint8_t ModuleControll) __attribute__((weak));
 
@@ -292,20 +292,20 @@ extern "C" {
         /* METODI MANIPOLAZIONE CVs */
 
         /*
-        *	notifySusiCVRead() viene invocato quando: e' richiesta la lettura di una CV
-        *	Input:
-        *		- il numero della CV da leggere
-        *	Restituisce:
-        *		- ritorna il valore della CV letta
+        *   notifySusiCVRead() viene invocato quando: e' richiesta la lettura di una CV
+        *   Input:
+        *       - il numero della CV da leggere
+        *   Restituisce:
+        *       - ritorna il valore della CV letta
         */
         extern uint8_t notifySusiCVRead(uint16_t CV) __attribute__((weak));
         /*
-        *	notifySusiCVWrite() viene invocato quando: e' richiesta la Scrittura di una CV.
-        *	Input:
-        *		- il numero della CV richiesta
-        *		- il Nuovo valore della CV
-        *	Restituisce:
-        *		- il valore letto (post scrittura) nella posizione richiesta
+        *   notifySusiCVWrite() viene invocato quando: e' richiesta la Scrittura di una CV.
+        *   Input:
+        *       - il numero della CV richiesta
+        *       - il Nuovo valore della CV
+        *   Restituisce:
+        *       - il valore letto (post scrittura) nella posizione richiesta
         */
         extern uint8_t notifySusiCVWrite(uint16_t CV, uint8_t Value) __attribute__((weak));
         /* RESET CVs, viene utilizzato lo stesso metodo della Libreria NmraDcc:
