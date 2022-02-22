@@ -123,7 +123,7 @@ class Rcn600 {
 
     public:
         /*
-        *   ~Rcn600() Creazione della Classe
+        *   Rcn600() Creazione della Classe
         *   Input:
         *       - il Pin a cui e' connesso la linea 'Clock'
         *       - il Pin a cui e' connessa la linea 'Data'
