@@ -282,8 +282,8 @@ void Rcn600::processCVsMessage(Rcn600Message CvMessage) {                       
             * K = 1: scrivi bit. D e' scritto nella posizione di bit B del CV.
             * Lo slave conferma la scrittura con un riconoscimento.
             */
-            uint8_t	bitValue = (CvMessage.Byte[2] & 0b00001000);                                        // leggo il valore del bit da confrontare/scrivere
-            uint8_t	bitPosition = (CvMessage.Byte[2] & 0b00000111);                                     // leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
+            uint8_t bitValue = (CvMessage.Byte[2] & 0b00001000);                                        // leggo il valore del bit da confrontare/scrivere
+            uint8_t bitPosition = (CvMessage.Byte[2] & 0b00000111);                                     // leggo in quale posizione si trova il bit su cui fare il confronto/scrittura
 
             //in base all'operazione richiesta eseguiro' un'azione
             if (CvMessage.Byte[2] & 0b00010000) {                                                       // se 1 scrivo
