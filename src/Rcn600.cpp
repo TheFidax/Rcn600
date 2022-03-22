@@ -196,7 +196,7 @@ void Rcn600::ISR_SUSI(void) {                                                   
 
 void Rcn600::processCVsMessage(Rcn600Message CvMessage) {                                               // Elabora un messaggio contenente un'operazione sulle CVs
     uint8_t CV_Offset = CvMessage.Byte[1] & 0b01111111;                                                 // Elimino il bit piu' significativo (bit7) dal Byte contenente l'Offset delle CVs	
-    uint8_t	CV_Value;                                                                                   // Tiene traccia del valore della CV
+    uint8_t CV_Value;                                                                                   // Tiene traccia del valore della CV
 
     // Controllo se la CV richiesta e' per questo Slave, in caso negativo non faccio nulla (e ritorno)
     //  Slave 1:    897 + 900 / 939     + 1020 / 1024
