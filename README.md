@@ -1,4 +1,5 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheFidax/Rcn600)
+[![GitHub stars](https://img.shields.io/github/stars/TheFidax/Rcn600)](https://github.com/TheFidax/Rcn600/stargazers)
 ![GitHub Release Date](https://img.shields.io/github/release-date/TheFidax/Rcn600?color=blue&label=last%20release)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/TheFidax/Rcn600/latest?color=orange)
 [![arduino-library-badge](https://www.ardu-badge.com/badge/Rcn600.svg)](https://www.ardu-badge.com/Rcn600)
