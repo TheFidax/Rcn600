@@ -3,7 +3,7 @@
 
 /* LIB_VERSION: 1.5.6 */
 
-#include "Arduino.h"                                                                                                        // Libreria per le funzioni tipiche dell'Arduino IDE
+#include <Arduino.h>                                                                                                        // Libreria per le funzioni tipiche dell'Arduino IDE
 #include <stdint.h>                                                                                                         // Libreria per i tipi 'uintX_t'
 
 #ifdef __AVR__                                                                                                              // Se la piattaforma e' AVR puo' essere usata la libreria digitalPinFast; e' escludibile per risparmiare SRAM
