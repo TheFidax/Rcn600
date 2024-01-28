@@ -1,4 +1,4 @@
-/* LIB_VERSION: 1.5.7 */
+/* LIB_VERSION: 1.5.8 */
 
 #include "Rcn600.h"                                                                                     // Header
 
@@ -160,7 +160,7 @@ void Rcn600::ISR_SUSI(void) {                                                   
 
             if ((bitCounter % 8) == 0) {                                                                // Controllo se sono stati letti 8 o multipli di 8 bit
                 if (bitCounter == 16) {                                                                 // Ho letto 2 Byte completi, lunghezza dei comandi 'normali' (NO CV)
-                    if (messageSlot->Byte[0] < 118) {                                                   // Controllo che il comando NON sia per le CV -> i comandi CV sono maggiori di 118 (119, 123, 127)
+                    if (messageSlot->Byte[0] < 119) {                                                   // Controllo che il comando NON sia per le CV -> i comandi CV sono maggiori o uguali a 119 (119, 123, 127)
                         setNextMessage(messageSlot);                                                    // Lo inserisco nella coda di quelli da decodificare
 
                         bitCounter = 0;                                                                 // Azzero il contatore dei bit per leggere un nuovo messaggio

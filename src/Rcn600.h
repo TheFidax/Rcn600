@@ -1,7 +1,7 @@
 #ifndef RCN_600_h
 #define RCN_600_h
 
-/* LIB_VERSION: 1.5.7 */
+/* LIB_VERSION: 1.5.8 */
 
 #include <Arduino.h>                                                                                                        // Libreria per le funzioni tipiche dell'Arduino IDE
 #include <stdint.h>                                                                                                         // Libreria per i tipi 'uintX_t'
@@ -51,7 +51,7 @@
 #define	ADDRESS_CV                  897                                                                                     // identifica la CV in cui e' contentuto l'indirizzo del Modulo Slave
 #define	FIRST_CV                    ADDRESS_CV                                                                              // identifica la prima CV dei moduli SUSI -> da 897 a 1023
 #define	MANUFACTER_ID               13                                                                                      // identifica il costrutte del modulo SUSI: 13 da normativa NMRA : https://www.nmra.org/sites/default/files/appendix_a2c_s-9.2.2.pdf
-#define	SUSI_VER                    10                                                                                      // identifica la versione del protocollo SUSI: 1.0
+#define	SUSI_VER                    13                                                                                      // identifica la versione del protocollo SUSI: 1.3
 
 /* Indirizzi Moduli Slave */
 #define DEFAULT_SLAVE_NUMBER        1                                                                                       // identifica l'indirizzo dello Slave SUSI: default 1
@@ -60,7 +60,7 @@
 /* Timing Protocollo */
 #define MAX_MESSAGES_DELAY          7                                                                                       // tempo Massimo che può trascorrere da due Byte di un messaggio
 #define	SYNC_TIME                   9                                                                                       // tempo necessario a sincronizzare Master e Slave: 9ms
-#define MIN_CLOCK_TIME              20                                                                                      // minima durata di un Clock: 10 + 10 uS
+#define MIN_CLOCK_TIME              16                                                                                      // minima durata di un Clock: 10 + 10 uS (la funzione Micros ha risoluzione di 4uS, ho usato valore 16 per prevenire problemi con i 'clock veloci')
 #define MAX_CLOCK_TIME              500                                                                                     // massima durata di un Clock : livello alto + livello basso
 
 /* Buffer Acquisizione */
